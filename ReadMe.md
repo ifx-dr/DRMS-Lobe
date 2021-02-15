@@ -1,8 +1,7 @@
 # Digital Reference Managing System
 
-The Digital Reference(DR) is a Semantic Web-based ontology that represents entities and their relationships in the domain semiconductor manufacturing. It is expected to serve as a data structure that supports the collaboration among multiple parties. This project proposes a solution to manage the DR securely and trustworhily. \
-The DR managing system is implemented based on a private Blcokchain network provided by Hyperledger Fabric. The api is realised using Node.js, while for the front end React.js is applied.\
-
+The Digital Reference(DR) is a Semantic Web-based ontology that represents entities and their relationships in the domain of semiconductor manufacturing. It is expected to serve as a data structure that supports the collaboration among multiple parties. This project proposes a solution to manage the DR securely and trustworthy.
+The DR managing system is implemented based on a private Blockchain network provided by Hyperledger Fabric. The API is realised using Node.js, while for the front end React.js is applied.
 ## Summary
 
   - [Getting Started](#getting-started)
@@ -14,9 +13,7 @@ The DR managing system is implemented based on a private Blcokchain network prov
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on
-your local machine for development and testing purposes. See deployment
-for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
@@ -28,33 +25,37 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 
 - Go into the folder 
 
-		`cd DR-System-Final/Backend/test-network`
+		cd DR-System-Final/Backend/test-network
 		
-- Start the network with the Certificate Authority to to manage identities and certificates
+- Start the network with the Certificate Authority to manage identities and certificates
 		
-		`./network.sh up -ca`
+		./network.sh up -ca
 		
-- Create a channel for transactions between organizations in the network. Channels are only visible for members who are invited into it, and invisible for other members of the system.
+- Create a channel for transactions between organizations in the network. Channels are only visible for members who are invited into it and invisible for other members of the system.
 
-		`./network.sh createChannel`
+		./network.sh createChannel
 
 - Deploy the chain code called basic on all members on this channel
 
-		`./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-javascript -ccl javascript`
+		./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-javascript -ccl javascript
 
 - When the chain code is updated, it could be deployed again (for the next time, numbers of the ccv and ccs should increase )
 
-		`./network.sh deployCC -ccn basic -ccp /asset-transfer-basic/chaincode-javascript -ccl javascript  1.1 2 -ccv 1.1 ccs 2`
+		./network.sh deployCC -ccn basic -ccp /asset-transfer-basic/chaincode-javascript -ccl javascript  1.1 2 -ccv 1.1 ccs 2
+
+- Bring down the network when you want to close the project
+
+		./network.sh down
 
 ### To start the front end
 
-- Go into the folder Frontend/
+- Go into the folder Front end/
 
-		`cd DR-System-Final/Frontend`
+		cd DR-System-Final/Frontend
 
-- Run the front end
+- Run the Front end
 
-		`npm run start`
+		npm run start
 
 - Invoke the initiating function via opening the page: [initiate](http://localhost:3001/initiate)
 
@@ -64,24 +65,22 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 
 - Go into the following folder:
 	
-		`cd DR-System-Final/Backend/asset-transfer-basic/application-javascript`
+		cd DR-System-Final/Backend/asset-transfer-basic/application-javascript
 	
 - Start the API\cb1 
-		`node app.js`
+		node app.js
 		
 ## Features
-1. Page Login: This page provides mock login function. To interact within project, please first type in a member id, such as member1, member2, member3, and so on (Only ID is enough, PWD is not necessary).\
+1. Page Login: This page provides a mock login function. To interact with the project, please first type in a member id, such as member1, member2, member3, and so on (Only ID is enough, PWD is not necessary).
 2. Page Dashboard: here, members can see how many tokens he has, total members in the system, URI and Hash value of the last DR, as well as a window for members to upload the DR. Note, only the author of the current ongoing proposal has access to upload DR file, others will be rejected.
-3. Page Create New Proposal: Every members can create new proposals on this page\
-4. Page CreateVeto Proposal: A member can create a veto proposal, only when his role is lobe owner and the related original proposal has been closed within 30 days.\
-5. Page Vote for a Proposal: Members can vote for the ongoing proposal in the system. If the voter\'92s role is lobe owner, his vote will directly decide the proposal\'92s result. Otherwise, the votes will be collected until there are more than 50% members have participated.
-6. For a test purpose, all the data in the system is visible under the link: http:localhost//3001/allData\
+3. Page Create New Proposal: Every members can create new proposals on this page
+4. Page CreateVeto Proposal: A member can create a veto proposal, only when his role is lobe owner and the related original proposal has been closed within 30 days.
+5. Page Vote for a Proposal: Members can vote for the ongoing proposal in the system. If the voters role is lobe owner, his vote will directly decide the proposal result. Otherwise, the votes will be collected until there are more than 50% of members have participated.
+6. For a test purpose, all the data in the system is visible under the link: http:localhost//3001/allData
 
 ## Comments
-1. The web pages are set to avoid automatic refresh after operations taken. So sometimes you need to manually refresh them and see the updated data. Also, for the page Login, there is no response after you submit a member ID. If you refresh the web page, the member ID will be lost, you need to type it again on the Login page.
-2. Every a certain amount of time, the one owns the highest tokens in each domain will be a (new) lobe owner. However, this functionality is not accomplished yet. TO avoid error, this feature is kept but the time to trigger this feature is set to be quite long.
+1. The web pages are set to avoid automatic refresh after operations are taken. So sometimes you need to manually refresh them and see the updated data. Also, for the page Login, there is no response after you submit a member ID. If you refresh the web page, the member ID will be lost, you need to type it again on the Login page.
+2. Every a certain amount of time, the one who owns the highest tokens in each domain will be a (new) lobe owner. However, this functionality is not accomplished yet. TO avoid error, this feature is kept but the time to trigger this feature is set to be quite long.
 ## Author
 
-  - **Lanyingzhu Luo** - 
-
-}
+  - **Lanyingzhu Luo**
