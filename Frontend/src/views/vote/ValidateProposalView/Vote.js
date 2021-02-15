@@ -9,7 +9,6 @@ import {
   TextField, Input, Button
 } from '@material-ui/core';
 
-
 export default class Vote extends Component {
   constructor() {
     super();
@@ -19,7 +18,7 @@ export default class Vote extends Component {
       vote: '',
       author_ID: '',
       messages: '',
-    }
+    };
   }
   componentDidMount() {
     this.getOnGoingProp();

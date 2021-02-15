@@ -13,6 +13,7 @@ class UploadDR extends Component {
     this.state = {
       files: null,
       open: false,
+      author:'',
     };
     this.handleUpload = this.handleUpload.bind(this);
   }
@@ -29,10 +30,19 @@ class UploadDR extends Component {
     }
 
   };
+
+  getAuthor = async () => {
+    const data = await fetch('http://localhost:3001/checkUpload').then((response) =>response.json());
+    console.log(data);
+    this.setState({
+      author: data
+    })
+  };
+
   handleSubmit = async(e) => {
     e.preventDefault();
-    await this.handleClose();
-    if (this.state.open === false) {
+    await this.getAuthor();
+    if (this.state.author !== window.userID) {
       alert('Sorry, only the author of the ongoing proposal can upload');
       return;
     }
@@ -52,26 +62,6 @@ class UploadDR extends Component {
       .catch(e => {console.log(e)});
   };
 
-  handleClose = async() => {
-    const memberID = {
-      ID: 'member1'
-    }
-    let result = await fetch('http://localhost:3001/checkUpload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(memberID)
-    }).then(function(response){
-      return response.json()
-    }).then(function(body){
-      console.log(body);
-    });
-    console.log('Result is '+result);
-    this.setState({
-      open: result
-    })
-  };
 
   handleOpen = async() => {
     this.setState({

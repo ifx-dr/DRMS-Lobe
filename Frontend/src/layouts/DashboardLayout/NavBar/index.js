@@ -54,7 +54,7 @@ const items = [
   {
     href: '/app/validateProposal',
     icon: UserCheck,
-    title: 'Validate a Proposal'
+    title: 'Vote for a Proposal'
   }
 ];
 

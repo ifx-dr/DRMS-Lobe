@@ -21,6 +21,8 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+
+
 const Dashboard = () => {
   const classes = useStyles();
   return (
@@ -77,7 +79,7 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <UploadDR />
+            <UploadDR />}
           </Grid>
           <Grid
             item

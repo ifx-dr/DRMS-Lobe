@@ -5,7 +5,7 @@ import AccountBalance from '@material-ui/icons/AccountBalance';
 class Tokens extends Component {
   constructor(props) {
     super(props);
-    this.state = { tokens: [] };
+    this.state = { tokens: null };
   }
 
   componentDidMount() {
@@ -13,28 +13,31 @@ class Tokens extends Component {
   }
 
   getTokens = async () => {
-    let data = {
+    const data = {
       id: 'member1'
     }
-    if(window.userID) {data.id = window.userID;}
+    let token = 0;
+    if(window.userID) {
+      data.id = window.userID;
+    }
     // const data = await fetch('http://localhost:3001/tokens').then((response) => response.json());
     let result = await fetch('http://localhost:3001/tokens', {
-          mode: 'no-cors',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(data)
         }).then(function(response){
-          alert('***********Succesfully invoke func'+response.json())
-          return response;
+          return response.json();
         }).then(function(body){
+          token=body;
           console.log(body);
         })
+    console.log('RESULT= ' + token);
     this.setState({
-      tokens: result
+      tokens: token
     })
-    console.log('***********Succesfully invoke func'+this.state.tokens);
+    console.log('***********Succesfully invoke func '+this.state.tokens);
     };
 
   render() {

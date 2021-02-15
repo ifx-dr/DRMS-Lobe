@@ -566,18 +566,14 @@ class DRChaincode extends Contract {
             }
         }
     }
-    async DRUpload_Available(ctx, ID) {
-        try {
-            console.log(' checking the DRUpload Right'+ID);
-            let ongoingProp_ID = await ctx.stub.getState('ongoingProposal');
-            ongoingProp_ID = 'proposal' + JSON.parse(ongoingProp_ID);
-            console.log('The ongoingPro ID' + ongoingProp_ID);
-            let Prop = await ctx.stub.getState(ongoingProp_ID);
-            Prop = JSON.parse(Prop);
-            return Prop.AuthorID === ID;
-        } catch (e) {
-            console.log('Error when checking the DRUpload Right'+e);
-        }
+    async DRUpload_Available(ctx) {
+        console.log(' checking the DRUpload Right');
+        let ongoingProp_ID = await ctx.stub.getState('ongoingProposal');
+        ongoingProp_ID = 'proposal' + JSON.parse(ongoingProp_ID);
+        console.log('The ongoingPro ID' + ongoingProp_ID);
+        let Prop = await ctx.stub.getState(ongoingProp_ID);
+        Prop = JSON.parse(Prop);
+        return Prop.AuthorID;
     }
     //
     //

@@ -117,9 +117,10 @@ async function main() {
 			});
 			app.post("/tokens", async (req, res) => {
 				//Get the tokens for member1
-				console.log('membersId from UI'+req.body.id);
+				console.log('membersId from frontend: '+ req.body.id);
 				let result = await contract.submitTransaction('CheckTokens', req.body.id);
-				res.json(result);
+				res.json(result.toString());
+				console.log('token amount: '+ result);
 			});
 			// For submitTransaction, the transaction will be sent to both peers and if both peers endorse the transaction, the endorsed proposal will be sent
 			// to the orderer to be committed by each of the peer's to the channel ledger.
@@ -138,10 +139,25 @@ async function main() {
 				let result = await contract.evaluateTransaction('OnGoingProposal');
 				res.json(JSON.parse(result.toString()));
 			});
-			app.post("/checkUpload", async (req, res) => {
-				let result = await contract.submitTransaction('DRUpload_Available', req.body.ID);
-				res.json(result);
-				console.log(result + "The DRUpload is visible*********");
+			async function parseFile(req) {
+				console.log('In the ParseFile!');
+				let RequireFile = null;
+				req.pipe(req.busboy);
+				req.busboy.on('file', async function(fieldname, file, filename) {
+					console.log('FileName:'+ filename);
+					file.on('data', async function (data) {
+							RequireFile = await data;
+							console.log('RequireFile:' + RequireFile);
+						}
+					);
+				});
+				await sleep(2000);
+				return RequireFile;
+			}
+			app.get("/checkUpload", async (req, res) => {
+				let result = await contract.evaluateTransaction('DRUpload_Available');
+				res.json(result.toString());
+				console.log("The DRUpload is visible*********"+ result.toString());
 			});
 			app.post("/ipfs", async (req, res) => {
 				console.info("***********In the database API *****");
