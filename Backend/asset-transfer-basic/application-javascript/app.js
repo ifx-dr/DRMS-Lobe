@@ -172,42 +172,6 @@ async function main() {
 				let addHash = await contract.submitTransaction('AddHash', result.path);
 				res.json(addHash);
 			});
-
-			//
-			//
-			/*console.log('\n--> Evaluate Transaction: ReadAsset, function returns an asset with a given assetID');
-			result = await contract.evaluateTransaction('ReadAsset', 'asset13');
-			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-
-			console.log('\n--> Evaluate Transaction: AssetExists, function returns "true" if an asset with given assetID exist');
-			result = await contract.evaluateTransaction('AssetExists', 'asset1');
-			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-
-			console.log('\n--> Submit Transaction: UpdateAsset asset1, change the appraisedValue to 350');
-			await contract.submitTransaction('UpdateAsset', 'asset1', 'blue', '5', 'Tomoko', '350');
-			console.log('*** Result: committed');
-
-			console.log('\n--> Evaluate Transaction: ReadAsset, function returns "asset1" attributes');
-			result = await contract.evaluateTransaction('ReadAsset', 'asset1');
-			console.log(`*** Result: ${prettyJSONString(result.toString())}`);
-*/
-			/*try {
-				// How about we try a transactions where the executing chaincode throws an error
-				// Notice how the submitTransaction will throw an error containing the error thrown by the chaincode
-				console.log('\n--> Submit Transaction: UpdateAsset asset70, asset70 does not exist and should return an error');
-				await contract.submitTransaction('UpdateAsset', 'asset70', 'blue', '5', 'Tomoko', '300');
-				console.log('******** FAILED to return an error');
-			} catch (error) {
-				console.log(`*** Successfully caught the error: \n    ${error}`);
-			}
-*/
-			/*console.log('\n--> Submit Transaction: TransferAsset asset1, transfer to new owner of Tom');
-			await contract.submitTransaction('TransferAsset', 'asset1', 'Tom');
-			console.log('*** Result: committed');
-
-			console.log('\n--> Evaluate Transaction: ReadAsset, function returns "asset1" attributes');
-			result = await contract.evaluateTransaction('ReadAsset', 'asset1');
-			console.log(`*** Result: ${prettyJSONString(result.toString())}`);*/
 		} finally {
 			// Disconnect from the gateway when the application is closing
 			// This will close all connections to the network

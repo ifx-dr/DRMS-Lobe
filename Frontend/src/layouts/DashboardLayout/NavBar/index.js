@@ -49,7 +49,7 @@ const items = [
   {
     href: '/app/vetoProposal',
     icon: UserCheck,
-    title: 'Create CreateVetoProp Proposal',
+    title: 'Create Veto Proposal',
   },
   {
     href: '/app/validateProposal',

@@ -9,59 +9,7 @@
 const { Contract } = require('fabric-contract-api');
 
 class DRChaincode extends Contract {
-
-    async InitLedger(ctx) {
-        const assets = [
-            {
-                ID: 'asset1',
-                Color: 'blue',
-                Size: 5,
-                Owner: 'Tomoko',
-                AppraisedValue: 300,
-            },
-            {
-                ID: 'asset2',
-                Color: 'red',
-                Size: 5,
-                Owner: 'Brad',
-                AppraisedValue: 400,
-            },
-            {
-                ID: 'asset3',
-                Color: 'green',
-                Size: 10,
-                Owner: 'Jin Soo',
-                AppraisedValue: 500,
-            },
-            {
-                ID: 'asset4',
-                Color: 'yellow',
-                Size: 10,
-                Owner: 'Max',
-                AppraisedValue: 600,
-            },
-            {
-                ID: 'asset5',
-                Color: 'black',
-                Size: 15,
-                Owner: 'Adriana',
-                AppraisedValue: 700,
-            },
-            {
-                ID: 'asset6',
-                Color: 'white',
-                Size: 15,
-                Owner: 'Michel',
-                AppraisedValue: 800,
-            },
-        ];
-
-        for (const asset of assets) {
-            asset.docType = 'asset';
-            await ctx.stub.putState(asset.ID, Buffer.from(JSON.stringify(asset)));
-            console.info(`Asset ${asset.ID} initialized`);
-        }
-    }
+    //set initial value to variables
     async Init_Ledger(ctx) {
         const proposals =[
             {
@@ -108,6 +56,7 @@ class DRChaincode extends Contract {
         // if no the current ongoing proposal will be closed
         const time = Date();
         await ctx.stub.putState('time', Buffer.from(JSON.stringify(time)));
+        //A closed proposal will be stored in this object. Its ID will change from 'proposalX' to 'closedproposalX'
         const closedProposals = [
             {
                 ID: 'closedproposal20',
@@ -171,6 +120,8 @@ class DRChaincode extends Contract {
             console.info(`Member ${member.ID} initialized`);
         }
         await ctx.stub.putState('members', Buffer.from(JSON.stringify(members)));
+        //acceptVoter1 stands for voters who vote for proposal 1 as accptance
+        //this array helps to record members votes and later reward them
         const acceptVoter1 = [
             {
                 ID: 'member3',
@@ -178,6 +129,7 @@ class DRChaincode extends Contract {
             }
         ];
         await ctx.stub.putState('acceptVoter1', Buffer.from(JSON.stringify(acceptVoter1)));
+        //Similar to acceptVoter
         const rejectVoter1 = [
             {
                 ID: 'member3',
@@ -185,6 +137,7 @@ class DRChaincode extends Contract {
             }
         ];
         await ctx.stub.putState('rejectVoter1', Buffer.from(JSON.stringify(rejectVoter1)));
+        //record the current obe owner in a lobe
         const domainLobeOwners = [
             {
                 ID: 'Manufacturing',
@@ -197,7 +150,7 @@ class DRChaincode extends Contract {
             await ctx.stub.putState(domain.ID, Buffer.from(JSON.stringify(domain)));
             console.info(`Member ${domain.ID} initialized`);
         }
-        const total_members = 2;
+        const total_members = 3;
         await ctx.stub.putState('total_members', Buffer.from(JSON.stringify(total_members)));
         const total_proposals = 3;
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(total_proposals)));
@@ -233,6 +186,7 @@ class DRChaincode extends Contract {
         console.log(total_roposal + 'is read');
         return total_roposal.toString();
     }
+    //return tokens of user with 'id', to dashboard
     async CheckTokens(ctx, id) {
         //Get the tokens member with the "id" has
         console.log('memberId'+id);
@@ -240,16 +194,19 @@ class DRChaincode extends Contract {
         member = JSON.parse(member);
         return member.Tokens;
     }
+    //return amount of total members to the dashboard
     async CheckTotalMembers(ctx){
         //Get the amount of all members. It is shown on dashboard.
         const totalMembers = await ctx.stub.getState('total_members');
         return totalMembers.toString();
     }
+    //return the latest DR
     async CheckLatestDR(ctx) {
         //Check the id of the latest DR
         const result = await ctx.stub.getState('latestDR');
         return result.toString();
     }
+    //return the proposal that is ongoing
     async OnGoingProposal(ctx) {
         //Get the ongoing proposal
         let ongoingProp_ID = await ctx.stub.getState('ongoingProposal');
@@ -263,13 +220,14 @@ class DRChaincode extends Contract {
         const hash = ongoingProp.Hash;
         return hash !== null ? hash : 'The file is not uploaded by the creator yet';
     }
+    //create a new proposal or a veto proposal
     async CreateProposal(ctx, domain, uri, author_id, message, type, originalID){
         //get amount of total proposals, for later update
         let total_proposals = await ctx.stub.getState('total_proposals');
         let valid = parseInt(total_proposals) + 1;
         //generate a new id
         let id = 'proposal'+ valid;
-        //get the object of the author
+        //get the author
         let member = await ctx.stub.getState(author_id);
         member = JSON.parse(member);
         //get the amount of tokens this author, and charge 20 tokens as deposit of the proposal
@@ -282,7 +240,7 @@ class DRChaincode extends Contract {
         }
         //Check whether this proposal is a veto proposal
         if(type !== 'newProposal'){
-            //Check whether the author has power to create a veto proposal
+            //Check whether the author is able to create a veto proposal
             let vetoPower = await this.CheckVetoProposal(ctx, type, author_id, originalID);
             console.log('*****It is a veto proposal'+vetoPower + type + author_id);
             if(vetoPower === true){
@@ -356,6 +314,9 @@ class DRChaincode extends Contract {
         let acceptVoter = await ctx.stub.getState(acceptVID);
         let rejectVoter = await ctx.stub.getState(rejectVID);
         console.log('****************11111');
+        // Here should also be a check, whether a voter has already voted once. If yes, he cannot vote gain.
+        // However, for the easy of test of the system performance we comment the CheckVoteTwice function
+        // Please cancel the comment if you need this check
         /*const voteTwice = await this.CheckVoteTwice(ctx, acceptVoter, rejectVoter, voter_id);
         if(voteTwice===true) {
             return ('Sorry you have already vote for ' + prop_id);
@@ -383,7 +344,7 @@ class DRChaincode extends Contract {
         //Handle votes from normal experts
         let total_members = await ctx.stub.getState('total_members');
         total_members = JSON.parse(total_members);
-
+        //collect result of this vote
         const totalVotes = proposal.AcceptedVotes + proposal.RejectedVotes +1;
         if (vote === 'accept') {
             acceptVoter = JSON.parse(acceptVoter);
@@ -411,6 +372,7 @@ class DRChaincode extends Contract {
         console.log('Voter is' + voter_id + 'Proposal author is' + prop_id);
         return prop_id.toString() === voter_id;
     }
+    // Check whether the voter has already voted once
     /*    async CheckVoteTwice(ctx, acceptVoter, rejectVoter, voter_id) {
         const aVoter = JSON.parse(acceptVoter);
         const rVoter = JSON.parse(rejectVoter);
@@ -494,8 +456,12 @@ class DRChaincode extends Contract {
         let currentID = id.substring(8);
         let nextID = parseInt(currentID)+1;
         console.log('NextID**********'+nextID);
+        // Reset the acceptVoter and rejectVoter for the next ongoing proposal.
         await ctx.stub.deleteState('acceptVoter'+currentID);
         await ctx.stub.deleteState('rejectVoter'+currentID);
+        //To create new acceptVoter and rejectVoter, a initial value is set as 'acceptNew' and 'rejectNew'
+        // This means that member 3 receives 10 tokens even he did nothing
+        // A better way is needed to set the initial value
         const acceptNew = [
             {
                 ID: 'member3',
@@ -575,92 +541,6 @@ class DRChaincode extends Contract {
         Prop = JSON.parse(Prop);
         return Prop.AuthorID;
     }
-    //
-    //
-    // CreateAsset issues a new asset to the world state with given details.
-    async CreateAsset(ctx, id, color, size, owner, appraisedValue) {
-        const asset = {
-            ID: id,
-            Color: color,
-            Size: size,
-            Owner: owner,
-            AppraisedValue: appraisedValue,
-        };
-        ctx.stub.putState(id, Buffer.from(JSON.stringify(asset)));
-        return JSON.stringify(asset);
-    }
-
-    // ReadAsset returns the asset stored in the world state with given id.
-    async ReadAsset(ctx, id) {
-        const assetJSON = await ctx.stub.getState(id); // get the asset from chaincode state
-        if (!assetJSON || assetJSON.length === 0) {
-            throw new Error(`The asset ${id} does not exist`);
-        }
-        return assetJSON.toString();
-    }
-
-    // UpdateAsset updates an existing asset in the world state with provided parameters.
-    async UpdateAsset(ctx, id, color, size, owner, appraisedValue) {
-        const exists = await this.AssetExists(ctx, id);
-        if (!exists) {
-            throw new Error(`The asset ${id} does not exist`);
-        }
-
-        // overwriting original asset with new asset
-        const updatedAsset = {
-            ID: id,
-            Color: color,
-            Size: size,
-            Owner: owner,
-            AppraisedValue: appraisedValue,
-        };
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(updatedAsset)));
-    }
-
-    // DeleteAsset deletes an given asset from the world state.
-    async DeleteAsset(ctx, id) {
-        const exists = await this.AssetExists(ctx, id);
-        if (!exists) {
-            throw new Error(`The asset ${id} does not exist`);
-        }
-        return ctx.stub.deleteState(id);
-    }
-
-    // AssetExists returns true when asset with given ID exists in world state.
-    async AssetExists(ctx, id) {
-        const assetJSON = await ctx.stub.getState(id);
-        return assetJSON && assetJSON.length > 0;
-    }
-
-    // TransferAsset updates the owner field of asset with given id in the world state.
-    async TransferAsset(ctx, id, newOwner) {
-        const assetString = await this.ReadAsset(ctx, id);
-        const asset = JSON.parse(assetString);
-        asset.Owner = newOwner;
-        return ctx.stub.putState(id, Buffer.from(JSON.stringify(asset)));
-    }
-
-    // GetAllAssets returns all assets found in the world state.
-    async GetAllAssets(ctx) {
-        const allResults = [];
-        // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
-        const iterator = await ctx.stub.getStateByRange('', '');
-        let result = await iterator.next();
-        while (!result.done) {
-            const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
-            let record;
-            try {
-                record = JSON.parse(strValue);
-            } catch (err) {
-                console.log(err);
-                record = strValue;
-            }
-            allResults.push({ Key: result.value.key, Record: record });
-            result = await iterator.next();
-        }
-        return JSON.stringify(allResults);
-    }
-
 }
 
 module.exports = DRChaincode;

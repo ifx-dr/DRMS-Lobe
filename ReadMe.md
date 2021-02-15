@@ -39,9 +39,9 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 
 		./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-javascript -ccl javascript
 
-- When the chain code is updated, it could be deployed again (for the next time, numbers of the ccv and ccs should increase )
+- When the chain code is updated, it should be deployed again (each time, numbers of the ccv and ccs should increase )
 
-		./network.sh deployCC -ccn basic -ccp /asset-transfer-basic/chaincode-javascript -ccl javascript  1.1 2 -ccv 1.1 ccs 2
+		./network.sh deployCC -ccn basic -ccp /asset-transfer-basic/chaincode-javascript -ccl javascript -ccv 1.1 ccs 2
 
 - Bring down the network when you want to close the project
 
@@ -52,6 +52,10 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 - Go into the folder Front end/
 
 		cd DR-System-Final/Frontend
+
+- If this is the first time to deploy the system, we need to install needed packages and so on
+
+		npm install
 
 - Run the Front end
 
@@ -67,6 +71,10 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 	
 		cd DR-System-Final/Backend/asset-transfer-basic/application-javascript
 	
+- If this is the first time to deploy the system, we need to install needed packages and so on
+
+		npm install
+
 - Start the API\cb1 
 		node app.js
 		
@@ -74,7 +82,7 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 1. Page Login: This page provides a mock login function. To interact with the project, please first type in a member id, such as member1, member2, member3, and so on (Only ID is enough, PWD is not necessary).
 2. Page Dashboard: here, members can see how many tokens he has, total members in the system, URI and Hash value of the last DR, as well as a window for members to upload the DR. Note, only the author of the current ongoing proposal has access to upload DR file, others will be rejected.
 3. Page Create New Proposal: Every members can create new proposals on this page
-4. Page CreateVeto Proposal: A member can create a veto proposal, only when his role is lobe owner and the related original proposal has been closed within 30 days.
+4. Page Create Veto Proposal: A member can create a veto proposal, only when his role is lobe owner and the related original proposal has been closed within 30 days.
 5. Page Vote for a Proposal: Members can vote for the ongoing proposal in the system. If the voters role is lobe owner, his vote will directly decide the proposal result. Otherwise, the votes will be collected until there are more than 50% of members have participated.
 6. For a test purpose, all the data in the system is visible under the link: http:localhost//3001/allData
 
