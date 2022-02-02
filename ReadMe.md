@@ -17,7 +17,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Since this project is based on the Hyperledger Fabric, you can check prerequisites here: [HyperledgerFabric-Prerequisites](https://hyperledger-fabric.readthedocs.io/en/release-1.4/prereqs.html)
+Since this project is based on the Hyperledger Fabric, you can check prerequisites here: [HyperledgerFabric-Prerequisites](https://hyperledger-fabric.readthedocs.io/en/release-1.4/prereqs.html).
+
+-	Note
+	This prerequisites are for older versions but it works. This is the new way to prepare the prerequisites: [HyperledgerFabric-Prerequisites-Latest](https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html).
+
+	It is recomended to install Node version 14.13.1 and NPM 6.9.0 instead of the ones that are in the prerequisites for the next steps.
+
+After installing this prerequisites, it is necesary to download fabric samples: [Install Fabric and Fabric Samples](https://hyperledger-fabric.readthedocs.io/en/latest/install.html).
+
+-	Note
+	You can use Git bash for cURL comands.
+
+Copy the folders /bin and /config from "fabric-sample" to "DR-System-Final\Backend".
+
 
 ## Deployment
 
@@ -49,9 +62,9 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 
 - Clean the realted organization files and wallet for the network start next time:
 	1. under ../Backend/test-network/organizations: delete /ordererOrganizations, /peerOrganizations
-	2. under ../Backend/test-network/organizations/ordererOrg: delete all files except fabric-ca-server-config.yaml
-	3. under ../Backend/test-network/organizations/org1: delete all files except fabric-ca-server-config.yaml
-	4. under ../Backend/test-network/organizations/org2: delete all files except fabric-ca-server-config.yaml
+	2. under ../Backend/test-network/fabric-ca/organizations/ordererOrg: delete all files except fabric-ca-server-config.yaml
+	3. under ../Backend/test-network/fabric-ca/organizations/org1: delete all files except fabric-ca-server-config.yaml
+	4. under ../Backend/test-network/fabric-ca/organizations/org2: delete all files except fabric-ca-server-config.yaml
 	5. under ../Backend/asset-transfer-basic/application-javascript: delete /wallet
 	
 	
@@ -104,3 +117,4 @@ Since this project is based on the Hyperledger Fabric, you can check prerequisit
 ## Author
 
   - **Lanyingzhu Luo**
+  - **Imanol Loperena Irastorza**
