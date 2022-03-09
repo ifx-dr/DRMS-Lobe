@@ -68,8 +68,10 @@ export default class Vote extends Component {
       },
       body: JSON.stringify(data)
     }).then(function(response){
-      alert('You voted for proposal!');
-      return response.json()
+      //This have to be changed
+      console.log(response);
+      alert('You have voted!');
+      return response.json();
     }).then(function(body){
       console.log(body);
     });

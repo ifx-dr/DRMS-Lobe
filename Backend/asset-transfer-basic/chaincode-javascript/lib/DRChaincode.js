@@ -160,7 +160,10 @@ class DRChaincode extends Contract {
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         const fileHash = 'https://ipfs.io/ipfs/QmSWDa85q8FQzB8qAnuoxZ4LDoXoWKmD6t4sPszdq5FiW2?filename=test.owl';
         await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
+
+        console.log('*******************DRChaincode*******************');
     }
+
     // GetAllAssets returns all assets found in the world state.
     async GetAllData(ctx) {
         const allResults = [];
@@ -181,11 +184,13 @@ class DRChaincode extends Contract {
         }
         return JSON.stringify(allResults);
     }
+
     async CheckTotalProposals(ctx){
         const total_roposal = await ctx.stub.getState('total_proposals');
         console.log(total_roposal + 'is read');
         return total_roposal.toString();
     }
+
     //return tokens of user with 'id', to dashboard
     async CheckTokens(ctx, id) {
         //Get the tokens member with the "id" has
@@ -194,18 +199,21 @@ class DRChaincode extends Contract {
         member = JSON.parse(member);
         return member.Tokens;
     }
+
     //return amount of total members to the dashboard
     async CheckTotalMembers(ctx){
         //Get the amount of all members. It is shown on dashboard.
         const totalMembers = await ctx.stub.getState('total_members');
         return totalMembers.toString();
     }
+
     //return the latest DR
     async CheckLatestDR(ctx) {
         //Check the id of the latest DR
         const result = await ctx.stub.getState('latestDR');
         return result.toString();
     }
+
     //return the proposal that is ongoing
     async OnGoingProposal(ctx) {
         //Get the ongoing proposal
@@ -214,12 +222,14 @@ class DRChaincode extends Contract {
         const ongoingProp = await ctx.stub.getState(ongoingProp_ID);
         return JSON.parse(ongoingProp);
     }
+
     async CheckDRHash(ctx) {
         //Get the Hash of the ongoing proposal. If it is null, return a statement saying it is empty
         const ongoingProp = await this.OnGoingProposal(ctx);
         const hash = ongoingProp.Hash;
         return hash !== null ? hash : 'The file is not uploaded by the creator yet';
     }
+
     //create a new proposal or a veto proposal
     async CreateProposal(ctx, domain, uri, author_id, message, type, originalID){
         //get amount of total proposals, for later update
@@ -270,6 +280,7 @@ class DRChaincode extends Contract {
         await ctx.stub.putState(id, Buffer.from(JSON.stringify(proposal)));
         return ('You successfully create a proposal!');
     }
+
     //
     async CheckVetoProposal(ctx, type, author_id, originalID){
         // To create a veto proposal, the author should be a lobe owner
@@ -293,6 +304,7 @@ class DRChaincode extends Contract {
             console.log('Error when getting the creation date of the proposal'+ originalID + e);
         }
     }
+
     //It is triggered when members vote for a proposal
     async ValidateProposal(ctx,prop_id, voter_id, vote, message) {
         console.log(prop_id, voter_id, vote, message);
@@ -302,25 +314,28 @@ class DRChaincode extends Contract {
         } catch (e) {
             console.log('error to get proposal' + prop_id);
         }
+
         //check whether the voter votes for his own proposal
         const ownProposal = await this.CheckOwnProposal(ctx, proposal.AuthorID, voter_id);
         if(ownProposal === true) {
             return ('Sorry you can not vote for your own proposal!');
         }
+
         //check whether the voter already voted once
         const acceptVID = 'acceptVoter'+prop_id.substring(8);
         const rejectVID = 'acceptVoter' + prop_id.substring(8);
         console.log('****AcceptVoterID'+acceptVID);
         let acceptVoter = await ctx.stub.getState(acceptVID);
         let rejectVoter = await ctx.stub.getState(rejectVID);
-        console.log('****************11111');
+
         // Here should also be a check, whether a voter has already voted once. If yes, he cannot vote gain.
         // However, for the easy of test of the system performance we comment the CheckVoteTwice function
         // Please cancel the comment if you need this check
-        /*const voteTwice = await this.CheckVoteTwice(ctx, acceptVoter, rejectVoter, voter_id);
+        const voteTwice = await this.CheckVoteTwice(ctx, acceptVoter, rejectVoter, voter_id);
         if(voteTwice===true) {
             return ('Sorry you have already vote for ' + prop_id);
-        }*/
+        }
+
         //check whether the vote comes from a lobe owner && within 24 hours since proposal has been ongoing
         let lobeownerVote = await this.CheckLobeOwnerPower(ctx, prop_id, voter_id, vote);
         console.log('The result*****' + lobeownerVote);
@@ -341,9 +356,11 @@ class DRChaincode extends Contract {
         } catch(e){
             console.log('********Problems when checking Lobe Owners Voting power'+e);
         }
+
         //Handle votes from normal experts
         let total_members = await ctx.stub.getState('total_members');
         total_members = JSON.parse(total_members);
+
         //collect result of this vote
         const totalVotes = proposal.AcceptedVotes + proposal.RejectedVotes +1;
         if (vote === 'accept') {
@@ -359,6 +376,7 @@ class DRChaincode extends Contract {
         await ctx.stub.putState('acceptVoter'+prop_id.substring(8), Buffer.from(JSON.stringify(acceptVoter)));
         await ctx.stub.putState('rejectVoter'+prop_id.substring(8), Buffer.from(JSON.stringify(rejectVoter)));
         console.log('***check more than half of members voted');
+        
         // Check whether already majority members have voted fo the proposal
         // If yes, the will check the result of the proposal and then close it.
         // Here we take 50% as majority
@@ -366,14 +384,18 @@ class DRChaincode extends Contract {
             let result = await this.ProposalVoteResult(ctx,proposal.Type, voter_id ,proposal.ID, parseInt(proposal.AcceptedVotes), parseInt(proposal.RejectedVotes), proposal.URI);
             return ('*************Invoke Result Checking Function*********' + result + totalVotes);
         }
-        return('Successfully Vote for proposal!');
+
+        return('Successfully Vote for proposaaal!');
     }
+
     async CheckOwnProposal(ctx, prop_id, voter_id) {
         console.log('Voter is' + voter_id + 'Proposal author is' + prop_id);
         return prop_id.toString() === voter_id;
     }
+
     // Check whether the voter has already voted once
-    /*    async CheckVoteTwice(ctx, acceptVoter, rejectVoter, voter_id) {
+    async CheckVoteTwice(ctx, acceptVoter, rejectVoter, voter_id) {
+        console.log('CheckVoteTwice')
         const aVoter = JSON.parse(acceptVoter);
         const rVoter = JSON.parse(rejectVoter);
         const voters = aVoter.concat(rVoter);
@@ -383,7 +405,8 @@ class DRChaincode extends Contract {
             }
         }
         return false;
-    }*/
+    }
+
     async CheckLobeOwnerPower(ctx, prop_id, voter_id, vote) {
         //check whether the vote comes from a lobe owner
         let member = await ctx.stub.getState(voter_id);
@@ -401,9 +424,10 @@ class DRChaincode extends Contract {
         }
         return ('LO');
     }
+
     //check the result of a proposal
     async ProposalVoteResult(ctx, prop_type, author_id, id, accept, reject, uri) {
-        //For a veto proposal, if there are 70% of members vote for rejection, it will bre rejected
+        //For a veto proposal, if there are 70% of members vote for rejection, it will be rejected
         if (prop_type.toString() === 'vetoProposal') {
             if(reject/(reject+accept) >= 0.7) {
                 await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(uri)));
@@ -424,6 +448,7 @@ class DRChaincode extends Contract {
             }
         }
     }
+
     // Close the proposal with 'id' as 'result'
     // Reward the relative participants
     // Add the closed proposal to 'closedProposals'
@@ -489,6 +514,7 @@ class DRChaincode extends Contract {
         await ctx.stub.deleteState(id);
         return ('The proposal ended as' + result);
     }
+
     //Check if a member who is noe the lobe owner but has the highest tokens under a domain
     //This member will be a new lobe owner
     async CheckNewLobeOwner(ctx) {
@@ -516,6 +542,7 @@ class DRChaincode extends Contract {
         }
         return ('accomplish checking new Lobe Owner');
     }
+
     async CheckTime(ctx) {
         //lastingTime is time for a proposal to be processed. Here it is set to be 5 min
         let lastingTime = 300000;
@@ -532,6 +559,7 @@ class DRChaincode extends Contract {
             }
         }
     }
+    
     async DRUpload_Available(ctx) {
         console.log(' checking the DRUpload Right');
         let ongoingProp_ID = await ctx.stub.getState('ongoingProposal');
