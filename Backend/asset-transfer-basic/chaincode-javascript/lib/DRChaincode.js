@@ -132,6 +132,16 @@ class DRChaincode extends Contract {
                 Tokens: 500,
                 Total_Proposal: 0,
                 Total_Accepted_Proposal: 0
+            },
+            {
+                ID: 'test1',
+                Name: 'test1',
+                Email: 'test1@gmail.com',
+                Role: 'Expert',
+                Domain: 'Manufacturing',
+                Tokens: 10,
+                Total_Proposal: 0,
+                Total_Accepted_Proposal: 0
             }
         ];
         for(const member of members){
@@ -144,7 +154,7 @@ class DRChaincode extends Contract {
         //this array helps to record members votes and later reward them
         const acceptVoter1 = [
             {
-                ID: 'member3',
+                ID: 'test1',
                 Message: 'Test'
             }
         ];
@@ -152,7 +162,7 @@ class DRChaincode extends Contract {
         //Similar to acceptVoter
         const rejectVoter1 = [
             {
-                ID: 'member3',
+                ID: 'test1',
                 Message: ''
             }
         ];
@@ -509,13 +519,13 @@ class DRChaincode extends Contract {
         // A better way is needed to set the initial value
         const acceptNew = [
             {
-                ID: 'member3',
+                ID: 'test1',
                 Message: 'Test'
             }
         ];
         const rejectNew = [
             {
-                ID: 'member3',
+                ID: 'test1',
                 Message: ''
             }
         ];
