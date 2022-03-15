@@ -89,14 +89,14 @@ class DRChaincode extends Contract {
                 Email: 'luo@gmail.com',
                 Role: 'Expert',
                 Domain: 'Manufacturing',
-                Tokens: 210,
+                Tokens: 100,
                 Total_Proposal: 0,
                 Total_Accepted_Proposal: 0
             },
             {
                 ID: 'member2',
-                Name: 'Lan',
-                Email: 'lan@gmail.com',
+                Name: 'Benat',
+                Email: 'benat@gmail.com',
                 Role: 'Lobe_Owner',
                 Domain: 'Manufacturing',
                 Tokens: 200,
@@ -105,11 +105,31 @@ class DRChaincode extends Contract {
             },
             {
                 ID: 'member3',
-                Name: 'Lun',
-                Email: 'lan@gmail.com',
+                Name: 'Xabi',
+                Email: 'xabi@gmail.com',
                 Role: 'Expert',
                 Domain: 'Manufacturing',
                 Tokens: 300,
+                Total_Proposal: 0,
+                Total_Accepted_Proposal: 0
+            },
+            {
+                ID: 'member4',
+                Name: 'ilir',
+                Email: 'ilir@gmail.com',
+                Role: 'Expert',
+                Domain: 'Manufacturing',
+                Tokens: 400,
+                Total_Proposal: 0,
+                Total_Accepted_Proposal: 0
+            },
+            {
+                ID: 'member5',
+                Name: 'Imanol',
+                Email: 'imanol@gmail.com',
+                Role: 'Expert',
+                Domain: 'Manufacturing',
+                Tokens: 500,
                 Total_Proposal: 0,
                 Total_Accepted_Proposal: 0
             }
@@ -150,7 +170,7 @@ class DRChaincode extends Contract {
             await ctx.stub.putState(domain.ID, Buffer.from(JSON.stringify(domain)));
             console.info(`Member ${domain.ID} initialized`);
         }
-        const total_members = 3;
+        const total_members = members.length;
         await ctx.stub.putState('total_members', Buffer.from(JSON.stringify(total_members)));
         const total_proposals = 3;
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(total_proposals)));
