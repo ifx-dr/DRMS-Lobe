@@ -54,7 +54,7 @@ Copy the folders /bin and /config from "fabric-sample" to "DR-System-Final\Backe
 
 - When the chain code is updated, it should be deployed again (each time, numbers of the ccv and ccs should increase )
 
-		./network.sh deployCC -ccn basic -ccp /asset-transfer-basic/chaincode-javascript -ccl javascript -ccv 1.1 ccs 2
+		./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-javascript -ccl javascript -ccv 1.1 -ccs 2
 
 - Bring down the network when you want to close the project
 
@@ -62,9 +62,9 @@ Copy the folders /bin and /config from "fabric-sample" to "DR-System-Final\Backe
 
 - Clean the realted organization files and wallet for the network start next time:
 	1. under ../Backend/test-network/organizations: delete /ordererOrganizations, /peerOrganizations
-	2. under ../Backend/test-network/fabric-ca/organizations/ordererOrg: delete all files except fabric-ca-server-config.yaml
-	3. under ../Backend/test-network/fabric-ca/organizations/org1: delete all files except fabric-ca-server-config.yaml
-	4. under ../Backend/test-network/fabric-ca/organizations/org2: delete all files except fabric-ca-server-config.yaml
+	2. under ../Backend/test-network/organizations/fabric-ca/ordererOrg: delete all files except fabric-ca-server-config.yaml
+	3. under ../Backend/test-network/organizations/fabric-ca/org1: delete all files except fabric-ca-server-config.yaml
+	4. under ../Backend/test-network/organizations/fabric-ca/org2: delete all files except fabric-ca-server-config.yaml
 	5. under ../Backend/asset-transfer-basic/application-javascript: delete /wallet
 	
 	
