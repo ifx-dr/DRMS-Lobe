@@ -13,7 +13,7 @@ class DRChaincode extends Contract {
     async Init_Ledger(ctx) {
         const proposals =[
             {
-                ID: 'proposal1',
+                ID: 'proposal4',
                 URI: 'http://localhost:3006/v1',
                 Domain: 'manufacturing',
                 Valid: '1',
@@ -28,7 +28,7 @@ class DRChaincode extends Contract {
                 Hash: 'https://ipfs.io/ipfs/QmSWDa85q8FQzB8qAnuoxZ4LDoXoWKmD6t4sPszdq5FiW2?filename=test.owl',
             },
             {
-                ID: 'proposal2',
+                ID: 'proposal5',
                 URI: 'http://localhost:3006/v2',
                 Domain: 'manufacturing',
                 Valid: '2',
@@ -59,19 +59,19 @@ class DRChaincode extends Contract {
         //A closed proposal will be stored in this object. Its ID will change from 'proposalX' to 'closedproposalX'
         const closedProposals = [
             {
-                ID: 'closedproposal20',
+                ID: 'closedproposal1',
                 State: 'accepted',
                 EndDate: Date(),
                 Veto: false
             },
             {
-                ID: 'closedproposal22',
+                ID: 'closedproposal2',
                 State: 'rejected',
                 EndDate: Date(),
                 Veto: false
             },
             {
-                ID: 'closedproposal23',
+                ID: 'closedproposal3',
                 State: 'empty',
                 EndDate: Date(),
                 Veto: false
@@ -150,23 +150,23 @@ class DRChaincode extends Contract {
             console.info(`Member ${member.ID} initialized`);
         }
         await ctx.stub.putState('members', Buffer.from(JSON.stringify(members)));
-        //acceptVoter1 stands for voters who vote for proposal 1 as accptance
+        //acceptVoter4 stands for voters who vote for proposal 4 as accptance
         //this array helps to record members votes and later reward them
-        const acceptVoter1 = [
+        const acceptVoter4 = [
             {
                 ID: 'test1',
                 Message: 'Test'
             }
         ];
-        await ctx.stub.putState('acceptVoter1', Buffer.from(JSON.stringify(acceptVoter1)));
+        await ctx.stub.putState('acceptVoter4', Buffer.from(JSON.stringify(acceptVoter4)));
         //Similar to acceptVoter
-        const rejectVoter1 = [
+        const rejectVoter4 = [
             {
                 ID: 'test1',
                 Message: ''
             }
         ];
-        await ctx.stub.putState('rejectVoter1', Buffer.from(JSON.stringify(rejectVoter1)));
+        await ctx.stub.putState('rejectVoter4', Buffer.from(JSON.stringify(rejectVoter4)));
         //record the current obe owner in a lobe
         const domainLobeOwners = [
             {
@@ -182,9 +182,9 @@ class DRChaincode extends Contract {
         }
         const total_members = members.length;
         await ctx.stub.putState('total_members', Buffer.from(JSON.stringify(total_members)));
-        const total_proposals = 3;
+        const total_proposals = proposals.length + closedProposals.length;
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(total_proposals)));
-        const ongoingProposal = 1;
+        const ongoingProposal = 4;
         await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(ongoingProposal)));
         const latestDR = 'http://localhost:3006/v0';
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
@@ -415,7 +415,7 @@ class DRChaincode extends Contract {
             return ('*************Invoke Result Checking Function*********' + result + totalVotes);
         }
 
-        return('Successfully Vote for proposaaal!');
+        return('Successfully Vote for proposal!');
     }
 
     async CheckOwnProposal(ctx, prop_id, voter_id) {
