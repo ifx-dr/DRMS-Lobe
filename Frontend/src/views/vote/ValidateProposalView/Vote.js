@@ -68,11 +68,9 @@ export default class Vote extends Component {
       },
       body: JSON.stringify(data)
     }).then(function(response){
-      //This have to be changed
-      console.log(response);
-      alert('You have voted!');
       return response.json();
     }).then(function(body){
+      alert(body.Message);
       console.log(body);
     });
   }
@@ -107,10 +105,10 @@ export default class Vote extends Component {
                   ProposalType: {this.state.prop.Type},
                 </p>
                 <p>
-                  AcceptedVotes: {this.state.prop.AcceptedVotes},
+                  AcceptedVotes: {this.state.prop.NumAcceptedVotes},
                 </p>
                 <p>
-                  RejectedVotes: {this.state.prop.RejectedVotes},
+                  RejectedVotes: {this.state.prop.NumRejectedVotes},
                 </p>
               </Grid>
 

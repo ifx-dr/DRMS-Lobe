@@ -126,14 +126,41 @@ async function main() {
 			// to the orderer to be committed by each of the peer's to the channel ledger.
 			app.post("/createProposal", async (req, res) => {
 				console.log('\n--> Submit Transaction: CreatedProposal');
+				let message = '';
+				let penalization = await contract.submitTransaction('CheckInactivity', req.body.author);
+				if(penalization != 0) {
+					message = 'Penalization for inactivity: ' + penalization.toString() + ' tokens removed.\n';
+					console.log(message);
+				}
+
 				let result = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID);
-				res.json(result);
 				console.log('******The creation result is:' + result);
+				if (message != '') result += message + '\n';
+				res.json(result);
 			});
 			app.post("/validateProposal", async (req, res) => {
+				let message = '';
+				
+				let penalization = await contract.submitTransaction('CheckInactivity', req.body.author_ID);
+				if(penalization != 0) {
+					message = 'Penalization for inactivity: ' + penalization.toString() + ' tokens removed.\n';
+					console.log(message);
+				} 
+				
 				let result = await contract.submitTransaction('ValidateProposal', req.body.prop_ID, req.body.author_ID, req.body.vote, req.body.messages);
+				result = JSON.parse(result.toString());
+				console.log(result.Message);
+
+				if (result.Finished === true) {
+					let endProposalResult = await contract.submitTransaction('EndProposal', result.ProposalID, result.Result);
+					console.log(endProposalResult.toString());
+
+					let checkLobeOwnerResult = await contract.submitTransaction('CheckNewLobOwner');
+					console.log(checkLobeOwnerResult.toString());
+				}
+
+				result.Message = message + result.Message;
 				res.json(result);
-				console.log(result.toString());
 			});
 			app.get("/ongoingProp", async (req, res) => {
 				let result = await contract.evaluateTransaction('OnGoingProposal');
