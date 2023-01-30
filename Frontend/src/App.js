@@ -9,7 +9,11 @@ import routes from 'src/routes';
 
 const App = () => {
   const routing = useRoutes(routes);
-
+  // let token = {
+  //   ID:'',
+  //   Name:
+  // };
+  // sessionStorage.setItem('token',token);
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />

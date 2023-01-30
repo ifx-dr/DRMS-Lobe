@@ -10,6 +10,8 @@ import {
   Input,
   Button
 } from '@material-ui/core';
+import useToken from 'src/useToken';
+import { Navigate } from 'react-router';
 
 export default class CreateVetoProp extends Component {
   constructor() {
@@ -20,9 +22,12 @@ export default class CreateVetoProp extends Component {
       URI: '',
       Valid: '',
       Author: '',
+      // Author: token.username,
       OriginalID: '',
       Creation_Date: '',
-      Messages: ''
+      Messages: '',
+      Download:'',
+      Redirect: ''
     }
   }
 
@@ -44,6 +49,12 @@ export default class CreateVetoProp extends Component {
       URI: value
     })
   }
+  handleChangeDL = async (event) => {
+    let value = event.target.value;
+    this.setState({
+      Download: value
+    })
+  }
   handleChangeM = async (event) => {
     let value = event.target.value
     this.setState({
@@ -53,31 +64,58 @@ export default class CreateVetoProp extends Component {
     });
   }
   handleSubmit = async(event) => {
+    let token = sessionStorage.getItem('token');
+    if(token==null){
+      this.setState({
+        Redirect:'Login'
+      })
+      alert('Please login in!');
+      return;
+    }
+    token = JSON.parse(token);
+
     event.preventDefault();
     const data = {
       type: 'vetoProposal',
       domain: this.state.Domain,
       uri: this.state.URI,
       message: this.state.Messages,
-      originalID: this.state.OriginalID}
+      originalID: this.state.OriginalID,
+      // author: window.userID,
+      author: token.ID,
+      download: this.state.Download
+    }
+    // console.log('veto: '+token);
       console.log('****New Proposal invokes createProposal api*********');
-      fetch('http://localhost:3001/createProposal', {
+    await fetch('http://localhost:3001/createProposal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       }).then(function(response){
-        alert('Your proposal is created');
-        return response.json()
-      }).then(function(body){
-
+        // alert(response);
+        // let body = response.json();
+        // alert(body);
+        // return body;
+        return response.json();
+      }).then((body)=>{
+        alert(body);
         console.log(body);
+        this.setState({
+          Redirect:'Dashboard'
+        });
       });
 
   }
   render()
     {
+      if(this.state.Redirect=='Login'){
+        return <Navigate to='/app/login' state={this.state}></Navigate>
+      }
+      else if(this.state.Redirect=='Dashboard'){
+        return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+      }
       return (
         <form onSubmit={this.handleSubmit} >
           <Card>
@@ -107,13 +145,19 @@ export default class CreateVetoProp extends Component {
                   </Typography>
                   <select value={this.state.Domain} onChange={this.handleChangeD}>
                     <option></option>
-                    <option value='Product'>(Arrowhead) Cloud</option>
+                    <option value='Planning'>Planning</option>
+                    <option value='Time'>Time</option>
+                    <option value='Supply Chain'>Supply Chain</option>
+                    <option value='Organisation'>Organisation</option>
+                    <option value='Semiconductor Production'>Semiconductor Production</option>
+                    <option value='Product'>Product</option>
                     <option value='Power'>Power</option>
-                    <option value='Process'>Process</option>
                     <option value='Sensor'>Sensor</option>
-                    <option value='SupplyChain'>Supply Chain</option>
+                    <option value='Semi-conductor Development'>Semi-conductor Development</option>
                     <option value='System'>System</option>
-                    <option value='WiredCommunication'>Wired Communication</option>
+                    <option value='Process'>Process</option>
+                    <option value='Wired Communication'>Wired Communication</option>
+                    <option value='Cloud'>Cloud</option>
                   </select>
                 </Grid>
               </Grid>
@@ -135,6 +179,16 @@ export default class CreateVetoProp extends Component {
                   name="URI"
                   type="URI"
                   value={this.state.URI}
+                  variant="outlined"
+                />
+                <TextField
+                  fullWidth
+                  onChange={this.handleChangeDL}
+                  label="Download Link"
+                  margin="normal"
+                  name="Download Link"
+                  type="Download Link"
+                  value={this.state.Download}
                   variant="outlined"
                 />
                 <TextField

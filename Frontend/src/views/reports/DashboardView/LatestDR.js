@@ -48,7 +48,7 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here is the latest DR：
+                Here is the latest DR: 
               </Typography>
               <Typography
                 color="textPrimary"

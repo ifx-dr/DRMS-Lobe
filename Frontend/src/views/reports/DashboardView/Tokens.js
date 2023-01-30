@@ -14,12 +14,16 @@ class Tokens extends Component {
 
   getTokens = async () => {
     const data = {
-      id: 'member1'
+      id: 'visitor'
     }
     let token = 0;
-    if(window.userID) {
-      data.id = window.userID;
+    let session_token = sessionStorage.getItem('token')
+    if(session_token!=null){
+      data.id = JSON.parse(session_token).ID;
     }
+    // if(window.userID) {
+    //   data.id = window.userID;
+    // }
     // const data = await fetch('http://localhost:3001/tokens').then((response) => response.json());
     let result = await fetch('http://localhost:3001/tokens', {
           method: 'POST',
@@ -56,7 +60,7 @@ class Tokens extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Your Tokens：
+                Your Tokens:
               </Typography>
               <Typography
                 color="textPrimary"

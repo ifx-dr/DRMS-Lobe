@@ -10,6 +10,8 @@ import {
   Input,
   Button
 } from '@material-ui/core';
+import useToken from 'src/useToken';
+import { Navigate } from 'react-router';
 
 export default class CreateNewProp extends Component {
   constructor() {
@@ -19,9 +21,12 @@ export default class CreateNewProp extends Component {
       Domain: '',
       URI: '',
       Valid: '',
-      Author: window.userID,
+      // Author: window.userID,
+      Author: '',
       Creation_Date: '',
-      Messages: ''
+      Messages: '',
+      Download: '',
+      Redirect:''
     }
   }
 
@@ -37,6 +42,12 @@ export default class CreateNewProp extends Component {
       URI: value
     })
   }
+  handleChangeDL = async (event) => {
+    let value = event.target.value;
+    this.setState({
+      Download: value
+    })
+  }
   handleChangeM = async (event) => {
     let value = event.target.value
     this.setState({
@@ -46,37 +57,66 @@ export default class CreateNewProp extends Component {
     console.log(this.state.Author);
   }
 
-  handleSubmit = async(event) => {
+  async handleSubmit(event){
+    // const {token, setToken} = useToken();
+    let token = sessionStorage.getItem('token');
+    if(token==null){
+      this.setState({
+        Redirect:'Login'
+      })
+      alert('Please login in!');
+      return;
+    }
+    // console.log("before parse: "+token)
+    token = JSON.parse(token);
+    // console.log(token);
+    // console.log("author: "+token.ID);
     event.preventDefault();
     const data = {
       type: this.state.Type,
       domain: this.state.Domain,
-      author: this.state.Author,
+      // author: this.state.Author,
+      author: token.ID,
+      // author: 'member1',
       uri: this.state.URI,
       message: this.state.Messages,
+      download: this.state.Download,
       originalID: ''}
+      // console.log("new: "+token)
       console.log('****New Proposal invokes createProposal api*********');
-      fetch('http://localhost:3001/createProposal', {
+      await fetch('http://localhost:3001/createProposal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
       }).then(function(response){
-        alert('Your proposal is created');
+
+        // alert('Your proposal is created');
         return response.json()
-      }).then(function(body){
+      }).then((body)=>{
+        alert(body);
         console.log(body);
+        
+        this.setState({
+          Redirect:'Dashboard'
+        });
       });
   }
   render()
     {
+      if(this.state.Redirect=='Login'){
+        return <Navigate to='/app/login' state={this.state}></Navigate>
+      }
+      else if(this.state.Redirect=='Dashboard'){
+        return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+      }
       return (
-        <form onSubmit={this.handleSubmit} >
+        <form onSubmit={this.handleSubmit.bind(this)} >
           <Card>
             <CardHeader
-              subheader="This operation charges you 20 tokens as deposit."
               title="Create New Proposal"
+              subheader="This operation charges you 20 tokens as deposit."
             />
             <Divider />
             <CardContent>
@@ -100,13 +140,19 @@ export default class CreateNewProp extends Component {
                   </Typography>
                   <select value={this.state.Domain} onChange={this.handleChangeD}>
                     <option></option>
-                    <option value='Product'>(Arrowhead) Cloud</option>
+                    <option value='Planning'>Planning</option>
+                    <option value='Time'>Time</option>
+                    <option value='Supply Chain'>Supply Chain</option>
+                    <option value='Organisation'>Organisation</option>
+                    <option value='Semiconductor Production'>Semiconductor Production</option>
+                    <option value='Product'>Product</option>
                     <option value='Power'>Power</option>
-                    <option value='Process'>Process</option>
                     <option value='Sensor'>Sensor</option>
-                    <option value='SupplyChain'>Supply Chain</option>
+                    <option value='Semi-conductor Development'>Semi-conductor Development</option>
                     <option value='System'>System</option>
-                    <option value='WiredCommunication'>Wired Communication</option>
+                    <option value='Process'>Process</option>
+                    <option value='Wired Communication'>Wired Communication</option>
+                    <option value='Cloud'>Cloud</option>
                   </select>
                 </Grid>
               </Grid>
@@ -119,6 +165,16 @@ export default class CreateNewProp extends Component {
                   name="URI"
                   type="URI"
                   value={this.state.URI}
+                  variant="outlined"
+                />
+                <TextField
+                  fullWidth
+                  onChange={this.handleChangeDL}
+                  label="Download Link"
+                  margin="normal"
+                  name="Download Link"
+                  type="Download Link"
+                  value={this.state.Download}
                   variant="outlined"
                 />
                 <TextField

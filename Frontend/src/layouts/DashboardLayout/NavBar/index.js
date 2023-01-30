@@ -22,13 +22,36 @@ import {
   Users as UsersIcon
 } from 'react-feather';
 import NavItem from './NavItem';
+import useToken from 'src/useToken';
 
+// let user = {
+//   //avatar: '/static/images/avatars/avatar_6.png',
+//   jobTitle: 'Experts',
+//   name: 'Luo'
+// };
 
-let user = {
-  //avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Experts',
-  name: 'Luo'
-};
+// let user;
+// if(window.userID){
+//   user = {
+//     //avatar: '/static/images/avatars/avatar_6.png',
+//     jobTitle: window.userRole,
+//     name: window.userName
+//   };
+// }
+// else{
+//   user = {
+//     //avatar: '/static/images/avatars/avatar_6.png',
+//     jobTitle: 'Visitor',
+//     name: 'Bob'
+//   };
+// }
+
+// const token = sessionStorage.getItem('token');
+// const {token, setToken} = useToken();
+// let user = {
+//   jobTitle: 'Visitor',
+//   name: token.ID
+// }
 
 const items = [
   {
@@ -77,6 +100,28 @@ const useStyles = makeStyles(() => ({
 const NavBar = ({ onMobileClose, openMobile }) => {
   const classes = useStyles();
   const location = useLocation();
+
+  // const {token, setToken} = useToken();
+  // console.log(token)
+  let token = sessionStorage.getItem('token');
+  let user;
+  if(token!=null){
+    token = JSON.parse(token);
+    user = {
+      jobTitle: token.Name,
+      name: token.ID
+    }
+  }
+  else{
+    user = {
+      jobTitle: 'Visitor',
+      name: "Bob"
+    }
+  }
+  // let user = {
+  //   jobTitle: 'Visitor',
+  //   name: "Bob"
+  // }
 
   useEffect(() => {
     if (openMobile && onMobileClose) {

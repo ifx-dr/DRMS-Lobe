@@ -32,6 +32,7 @@ class DRHash extends Component {
   };
 
   render() {
+    let download = this.state.Hash;
     return (
       <Card>
         <CardContent>
@@ -46,7 +47,7 @@ class DRHash extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here you can download the DR：
+                Here you can download the DR:
               </Typography>
               <Typography
                 color="textPrimary"
@@ -54,6 +55,12 @@ class DRHash extends Component {
               >
                 {this.state.Hash}
               </Typography>
+              {/* <button>
+              <a style='text-decoration:none;' href="https://www.w3schools.com" 
+               target="_blank">
+                download DR 
+              </a></button> */}
+              <button><a href={this.state.Hash} style={{"text-decoration":"none",}} target="_blank">download DR</a></button>
             </Grid>
           </Grid>
         </CardContent>

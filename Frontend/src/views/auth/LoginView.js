@@ -1,16 +1,21 @@
 import React, { Component } from 'react';
+import { withRouter, useNavigate, Link, Navigate } from 'react-router-dom';
 import {
   Button,
   TextField,
   Card, CardHeader, Divider, CardContent, Input
 } from '@material-ui/core';
+import useToken from 'src/useToken';
+import Tokens from '../reports/DashboardView/Tokens';
 
-export default class LoginViews extends Component {
-  constructor() {
-    super();
+class LoginViews extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
+      userName: '',
       ID: '',
-      PWD: ''
+      PWD: '',
+      flag: false
     }
   }
   handleChangeN = async (event) => {
@@ -25,10 +30,110 @@ export default class LoginViews extends Component {
       PWD: value
     })
   }
-  handleSubmit = async (event) => {
+  getMemberInfo = async () => {
+    
+    // const data = await fetch('http://localhost:3001/memberInfo').then((response) =>response.json());
+    // this.setState({
+    //   members: data
+    // })
+    // const navigate = useNavigate();
+    let data = {
+      memberID: this.state.ID
+    };
+    // let flag = 1;
+    let result = await fetch('http://localhost:3001/memberInfo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }).then(function(response){
+          return response.json();
+        }).then(function(body){
+          console.log(body);
+          if(!body.error){
+            window.userID = body.ID;
+            window.userName = body.Name;
+            window.userRole = body.Role;
+            alert(`
+                   ID:   ${window.userID}\n
+                   Name: ${window.userName}\n
+                   Role: ${window.userRole}\n
+                   login success`);
+            // this.props.history.push('/app/dashboard')
+            // flag = 0;
+            // return 0;
+            // window.location = "/app/dashboard";
+            // navigate('/app/dashboard');
+          }
+          else{
+            alert(body.error);
+            // return 1;
+          }
+        })
+    // if(window.userName){
+      
+    //   navigate('/app/dashboard');
+    // }
+  };
+  async handleSubmit(event)  {
+    // let navigate = useNavigate();
+    // const {token, setToken} = useToken();
     event.preventDefault();
-    window.userID =this.state.ID
-    console.log(window.userID);
+    let data = {
+      memberID: this.state.ID
+    };
+    console.log("get memberInfo: "+data.memberID);
+    // let flag = 1;
+    let result = await fetch('http://localhost:3001/memberInfo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }).then((response)=>{
+          return response.json();
+        }).then((body)=>{
+          console.log(body);
+          // re-login: update token
+          // setToken(body);
+          sessionStorage.setItem('token',JSON.stringify(body));
+          if(!body.error){
+            window.userID = body.ID;
+            window.userName = body.Name;
+            // window.userRole = body.Role;
+            alert(`
+                   ID:   ${window.userID}\n
+                   Name: ${window.userName}\n
+                   login success`);
+            this.setState({
+              flag: true,
+            })
+            // alert(`
+            //        ID:   ${window.userID}\n
+            //        Name: ${window.userName}\n
+            //        Role: ${window.userRole}\n
+            //        login success`);
+            // this.props.history.push('/app/dashboard')
+            // flag = 0;
+            // return 0;
+            // window.location = "/app/dashboard";
+            
+            // navigate('http://localhost:3006/app/dashboard/');
+          }
+          else{
+            alert(body.error);
+            // return 1;
+          }
+        })
+
+    // window.userID =this.state.ID
+    
+    // this.getMemberInfo().then(()=>{
+    //   console.log(window.userID);
+    //   // navigate('../dashboard');
+    //   // window.location.href = "/app/dashboard";
+    // });
   }
   updateEmployeeDetails = (event) => {
     this.setState({ data:{Id:event.target.value} });
@@ -38,9 +143,11 @@ export default class LoginViews extends Component {
       data: '',
       changeEmployeeInfo: () => {},
     });
+    if(this.state.flag){
+      return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+    }
     return (
-
-      <form onSubmit={this.handleSubmit} >
+      <form onSubmit={this.handleSubmit.bind(this)} >
         <Card>
           <CardHeader
             subheader= {window.userID} //"This is a mock page for log in"
@@ -79,3 +186,4 @@ export default class LoginViews extends Component {
       </form>)
   }
 };
+export default LoginViews;

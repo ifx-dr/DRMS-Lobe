@@ -8,6 +8,8 @@ import {
   Typography,
   TextField, Input, Button
 } from '@material-ui/core';
+import useToken from 'src/useToken';
+import { Navigate } from 'react-router';
 
 export default class Vote extends Component {
   constructor() {
@@ -18,6 +20,7 @@ export default class Vote extends Component {
       vote: '',
       author_ID: '',
       messages: '',
+      Redirect: ''
     };
   }
   componentDidMount() {
@@ -31,12 +34,14 @@ export default class Vote extends Component {
   }
   getOnGoingProp = async () => {
     const data = await fetch('http://localhost:3001/ongoingProp').then((response) => response.json());
-    this.setState({
-      prop: data,
-      prop_ID: data.ID,
-      // eslint-disable-next-line react/destructuring-assignment
-    });
-    console.log(this.state.prop + this.state.prop_ID);
+    if(!data.error){
+      this.setState({
+        prop: data,
+        prop_ID: data.ID,
+        // eslint-disable-next-line react/destructuring-assignment
+      });
+      console.log(this.state.prop + this.state.prop_ID);
+    }
   };
 
   handleChangeV = async (event) => {
@@ -52,12 +57,23 @@ export default class Vote extends Component {
     });
   }
   handleSubmit = async(event) => {
+    let token = sessionStorage.getItem('token');
+    if(token==null){
+      this.setState({
+        Redirect:'Login'
+      })
+      alert('Please login in!');
+      return;
+    }
+    token = JSON.parse(token);
+
     event.preventDefault();
     clearInterval(this.state.intervalId);
     const data = {
       prop_ID: this.state.prop_ID,
       vote: this.state.vote,
-      author_ID: window.userID,
+      // author_ID: window.userID,
+      author_ID: token.ID,
       messages: this.state.messages,
     }
     console.log('Submit*******'+ JSON.stringify(data));
@@ -69,13 +85,22 @@ export default class Vote extends Component {
       body: JSON.stringify(data)
     }).then(function(response){
       return response.json();
-    }).then(function(body){
+    }).then((body)=>{
       alert(body.Message);
       console.log(body);
+      this.setState({
+        Redirect:'Dashboard'
+      })
     });
   }
   render()
   {
+    if(this.state.Redirect=='Login'){
+      return <Navigate to='/app/login' state={this.state}></Navigate>
+    }
+    else if(this.state.Redirect=='Dashboard'){
+      return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+    }
     return (
       <form onSubmit={this.handleSubmit}>
         <Card>

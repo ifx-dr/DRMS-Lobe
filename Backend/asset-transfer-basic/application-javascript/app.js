@@ -8,9 +8,15 @@
 var express = require("express");
 var app = express();
 const cors = require('cors');
-var busboy = require('connect-busboy');
+// var busboy = require('connect-busboy');
+var busboy = require('busboy');
 var multer = require('multer');
 
+const fs = require('fs');
+const yaml = require('js-yaml')
+const crypto = require("crypto");
+const BC = require('./blockchain/blockchain')
+const algorithm = "aes-256-cbc"; 
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
@@ -23,6 +29,10 @@ const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUser';
 const gateway = new Gateway();
+
+const memberAssetCollectionName = 'assetCollection';
+const org1PrivateCollectionName = 'Org1MSPPrivateCollection';
+
 function prettyJSONString(inputString) {
 	return JSON.stringify(JSON.parse(inputString), null, 2);
 }
@@ -31,7 +41,7 @@ app.use(express.json());
 // for parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 // for parsing files in req.body
-app.use(busboy());
+// app.use(busboy());
 // for parsing multipart/form-data
 app.use(express.static('public'));
 app.use(cors());
@@ -74,13 +84,73 @@ async function main() {
 
 			// Get the contract from the network.
 			const contract = network.getContract(chaincodeName);
+			// contract.addDiscoveryInterest({ name: chaincodeName, collectionNames: [org1PrivateCollectionName] });
 
+			// app.get("/private", async(req, res)=>{
+			// 	console.log('get private data from PDC');
+			// 	let result = await contract.evaluateTransaction('ReadPrivateAsset', org1PrivateCollectionName, "privateData");
+			// 	console.log(JSON.parse(result));
+			// 	res.json(JSON.parse(`{"success":${JSON.stringify(result)}}`));
+			// })
+			// app.get("/crypto", async(req, res)=>{
+			// 	console.log('get symmetric key from PDC');
+			// 	let result = JSON.parse(await contract.evaluateTransaction('GetSymmetricKey'));
+			// 	console.log(result);
+			// 	let data = Buffer.from(result.data);
+			// 	let cryptoMaterials = JSON.parse(data.toString());
+			// 	console.log(data.toString());
+			// 	console.log(cryptoMaterials.IV);
+			// 	res.json(JSON.parse(`{"success":${JSON.stringify(result)}}`));
+			// })
 			app.get("/initiate", async (req, res) => {
+				console.log('*****read ledger file*****')
+				let fileContents = fs.readFileSync('ledger.yaml', 'utf8');
+				let ledger = yaml.load(fileContents);
+				let blockchain = BC.loadChainFromExcel('./blockchain/blockchain_hist.xlsx');
+				// console.log(blockchain);
+				let latestBlock = blockchain.getLatestBlock();
+				await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
+				await contract.submitTransaction('InitBlockchainFromFile', JSON.stringify(blockchain));
+				await contract.submitTransaction('InitLatestBlock', JSON.stringify(latestBlock));
+				res.json(JSON.parse('{"success":"ledger initialized from file"}'));
+			})
+			app.get("/saveStatus", async (req, res) => {
+				console.log('*****save system status: members, ongoing and closed proposals****');
+				// await contract.submitTransaction('SaveSystemStatus');
+				let ledger = {};
+				ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
+				ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
+				ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));;
+				let yamlStr = yaml.dump(ledger);
+				fs.writeFileSync('ledger_out.yaml', yamlStr, 'utf8');
+
+				let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
+				BC.exportChainOnlyToExcel(chain, './blockchain/blockchain_hist_out.xlsx');
+				// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
+				res.json(JSON.parse('{"success":"ledger saved"}'));
+			});
+			app.get("/initiate_origin", async (req, res) => {
 				// Initialize a set of data on the channel using the chaincode 'Init_Ledger' function.
 				// This type of transaction would only be run once by an application the first time it was started after it
 				// deployed the first time.
 				console.log('*****create variables and set initiate value****');
 				await contract.submitTransaction('Init_Ledger');
+
+				// let assetData = {
+				// 	name:"simple test",
+				// 	prop:100
+				// };
+				// let statefulTxn = contract.createTransaction('CreatePrivateAsset');
+				// let tmapData = Buffer.from(JSON.stringify(assetData));
+				// console.log(tmapData);
+				// statefulTxn.setTransient({
+				// 	asset_properties: tmapData
+				// });
+				// let result = await statefulTxn.submit();
+				// console.log(JSON.stringify(result))
+
+				// await contract.submitTransaction('GenerateSymmetricKey');
+				res.json(JSON.parse('{"success":"ledger initialized"}'));
 			});
 			//Check whether a proposal is expired every 1 min
 			let NewLobeOwner = setInterval(async function(str1, str2) {
@@ -108,17 +178,26 @@ async function main() {
 			app.get("/DR", async (req, res) => {
 				//Get the URI of the latest  DR
 				let result = await contract.evaluateTransaction('CheckLatestDR');
+				console.log("app CheckLatestDR: "+result.toString());
 				res.json(result.toString());
 			});
 			app.get("/DRHash", async (req, res) => {
 				//Get the Hash value of the latest DR
 				let result = await contract.evaluateTransaction('CheckDRHash');
+				console.log("app CheckDRHash: "+result.toString());
 				res.json(result.toString());
 			});
 			app.post("/tokens", async (req, res) => {
 				//Get the tokens for member1
 				console.log('membersId from frontend: '+ req.body.id);
-				let result = await contract.submitTransaction('CheckTokens', req.body.id);
+				let result;
+				if(req.body.id!=='visitor'){
+					result = await contract.submitTransaction('CheckTokens', req.body.id);
+				}
+				else{
+					result = "please login";
+				}
+				// let result = await contract.submitTransaction('CheckTokens', req.body.id);
 				res.json(result.toString());
 				console.log('token amount: '+ result);
 			});
@@ -127,16 +206,18 @@ async function main() {
 			app.post("/createProposal", async (req, res) => {
 				console.log('\n--> Submit Transaction: CreatedProposal');
 				let message = '';
+				console.log('author: '+req.body.author)
 				let penalization = await contract.submitTransaction('CheckInactivity', req.body.author);
 				if(penalization != 0) {
 					message = 'Penalization for inactivity: ' + penalization.toString() + ' tokens removed.\n';
 					console.log(message);
 				}
 
-				let result = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID);
+				let result = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID, req.body.download);
 				console.log('******The creation result is:' + result);
 				if (message != '') result += message + '\n';
-				res.json(result);
+				console.log(result.toString());
+				res.json(result.toString());
 			});
 			app.post("/validateProposal", async (req, res) => {
 				let message = '';
@@ -163,42 +244,158 @@ async function main() {
 				res.json(result);
 			});
 			app.get("/ongoingProp", async (req, res) => {
-				let result = await contract.evaluateTransaction('OnGoingProposal');
+				let result = await contract.evaluateTransaction('GetOngoingProposal');
 				res.json(JSON.parse(result.toString()));
 			});
 			async function parseFile(req) {
 				console.log('In the ParseFile!');
-				let RequireFile = null;
-				req.pipe(req.busboy);
-				req.busboy.on('file', async function(fieldname, file, filename) {
-					console.log('FileName:'+ filename);
+				var RequireFile = null;
+				// req.pipe(req.busboy);
+				// req.busboy.on('file', async function(fieldname, file, filename) {
+				// 	console.log('FileName:'+ filename);
+				// 	file.on('data', async function (data) {
+				// 			RequireFile = await data;
+				// 			console.log('RequireFile:' + RequireFile);
+				// 		}
+				// 	);
+				// });
+
+				var bb = busboy({ headers: req.headers });
+				bb.on('file', function(fieldname, file, filename, encoding, mimetype) {
+					console.log('FileName:'+ filename.filename);
 					file.on('data', async function (data) {
-							RequireFile = await data;
-							console.log('RequireFile:' + RequireFile);
-						}
-					);
+						RequireFile = await data;
+						console.log('RequireFile:' + RequireFile);
+						return RequireFile;
+					});
 				});
-				await sleep(2000);
-				return RequireFile;
+				req.pipe(bb);
+				// await sleep(2000);
+				// console.log('RequireFile2:' + RequireFile);
+				
 			}
 			app.get("/checkUpload", async (req, res) => {
 				let result = await contract.evaluateTransaction('DRUpload_Available');
 				res.json(result.toString());
 				console.log("The DRUpload is visible*********"+ result.toString());
 			});
+
 			app.post("/ipfs", async (req, res) => {
-				console.info("***********In the database API *****");
-				const IPFS = require('ipfs-core');
-				const ipfs = await IPFS.create();
-				let RequireFile = await parseFile(req);
-				await sleep(8000);
-				console.log('RFile: ' + RequireFile);
-				let result = await ipfs.add(RequireFile);
-				console.log('Result: ' + result.path);
-				let contract = await network.getContract();
-				let addHash = await contract.submitTransaction('AddHash', result.path);
-				res.json(addHash);
+				console.log("***********In the database API *****");
+				const ipfsAPI = require('ipfs-api');
+				const ipfs = ipfsAPI({host: 'localhost', port: '5001', protocol: 'http'});
+
+				console.log('In the ParseFile ipfs!');
+				var RequireFile = null;
+				var FileName = null;
+
+				var bb = busboy({ headers: req.headers });
+				req.pipe(bb);
+				bb.on('file', async function(fieldname, file, filename, encoding, mimetype){
+					FileName = filename.filename;
+					console.log('FileName:'+ FileName);
+					file.on('data', async function (data) {
+						if (RequireFile === null) {
+							RequireFile = data;
+						} else {
+							RequireFile = Buffer.concat([RequireFile, data]);
+						}
+					});
+					file.on('end', async function() {
+						// let result = JSON.parse(await contract.evaluateTransaction('GetSymmetricKey'));
+						// console.log(result);
+						// let data = Buffer.from(result.data);
+						// let cryptoMaterials = JSON.parse(data.toString());
+						
+						// let symmetricKey = Buffer.from(cryptoMaterials.symmetricKey,'hex');
+						// let IV = Buffer.from(cryptoMaterials.IV,'hex');
+						// let symmetricKey = Buffer.from("b0d2aad9db0ce0b379600225538c5642a793da7888e0e2e7559c8c64455cc322", 'hex');
+						// let IV = Buffer.from("55fac4a1e8cdcd52456ba2f7d1b297db", 'hex');
+						// console.log(symmetricKey);
+						// console.log(IV);
+						// console.log('RFile: ' + RequireFile);
+						// var fileContent = Buffer.from(RequireFile, "utf-8");
+						var fileContent = RequireFile;
+						console.log("file size: "+fileContent.length)
+						// const cipher = crypto.createCipheriv(algorithm, symmetricKey, IV);
+						// var fileContentEncrypted = cipher.update(fileContent, "utf-8", "hex");
+						// fileContentEncrypted += cipher.final("hex");
+						// fs.writeFileSync("../../../test/temp.txt",fileContentEncrypted)
+						// fileContentEncrypted = fileContent;
+						// console.log(fileContentEncrypted);
+						// var buff = {
+						// 	path: FileName,
+						// 	content: Buffer.from(fileContentEncrypted)
+						// }
+
+						// ipfs temporarily not available
+						var hash = `fake link: ipfs not available`;
+						console.log("new uploaded file: "+hash);
+						await contract.submitTransaction('AddHash', hash);
+						res.json(hash);
+						// ipfs.add(buff, async (err,result)=>{
+						// 	if(err) throw err;
+						// 	console.log(result);
+						// 	var hash = `http://127.0.0.1:8080/ipfs/${result[0].hash}?filename=${result[0].path}`;
+						// 	console.log("new uploaded file: "+hash);
+						// 	await contract.submitTransaction('AddHash', hash);
+						// 	res.json(hash);
+						// });
+					})
+				});
 			});
+			// app.post("/downloadDecryptedDR", async (req, res) =>{
+			// 	let result = await contract.evaluateTransaction('GetSymmetricKey');
+			// 	cryptoMaterials = JSON.parse(result);
+			// 	let symmetricKey = cryptoMaterials.symmetricKey;
+			// 	let IV = cryptoMaterials.IV;
+			// 	let hashStr = "";
+			// 	let getPath = "./";
+			// 	ipfs.get(hashStr,async (err,result)=>{
+			// 		if(err) throw err;
+			// 		// console.log(result);  //注意：调用get方法时回调函数中的参数是一个数组形式 内容在content中
+			// 		// fs.writeFileSync(getPath, result[0].content);
+			// 		// console.log('file: ' + getPath);
+			// 		// console.log('从ipfs中下载文件成功!')
+			// 		//写入文件
+			// 		let encryptedData = result[0].content.toString();
+			// 		const decipher = crypto.createDecipheriv(algorithm, symmetricKey, IV);
+			// 		let decryptedData = decipher.update(encryptedData, "hex", "utf-8");
+			// 		decryptedData += decipher.final("utf8");
+			// 		fs.writeFile('./fromIPFS.txt', decryptedData)
+			// 	})
+			// })
+			// login: search by member ID, return name and role
+			app.post("/memberInfo", async (req, res) => {
+				//Get the amount of members in the system
+				console.log(JSON.stringify(req.body));
+				let result = await contract.evaluateTransaction('GetMemberById', req.body.memberID);
+				console.log(JSON.stringify(result.toString()));
+				res.json(JSON.parse(result.toString()));
+			});
+
+			// check blockchain
+			app.get("/checkBlockchain", async (req, res) => {
+				let result = await contract.evaluateTransaction('GetBlockchain');
+				res.json(result.toString());
+				console.log("view blockchain:\n"+result.toString());
+			});
+			app.get("/checkLatestBlock", async (req, res) => {
+				let result = await contract.evaluateTransaction('GetLatestBlock');
+				res.json(result.toString());
+				console.log("view latest block:\n"+ result.toString());
+			});
+			app.get("/checkAllLobeOwners", async (req, res) => {
+				let result = await contract.evaluateTransaction('GetAllLobeOwners');
+				res.json(result.toString());
+				console.log("view all lobe owners:\n"+ result.toString());
+			});
+			app.get("/checkMembersInDomain", async (req, res) => {
+				let result = await contract.evaluateTransaction('GetMembersInDomain');
+				res.json(result.toString());
+				console.log("view members in domains:\n"+ result.toString());
+			});
+			
 		} finally {
 			// Disconnect from the gateway when the application is closing
 			// This will close all connections to the network

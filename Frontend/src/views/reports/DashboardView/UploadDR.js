@@ -46,6 +46,7 @@ class UploadDR extends Component {
       alert('Sorry, only the author of the ongoing proposal can upload');
       return;
     }
+    alert('Uploading...', '', [], {cancelable: true});
     let formData = new FormData();
     formData.append('file', this.state.files);
     for (let key of formData.entries()) {
