@@ -10,6 +10,7 @@ UserInfo:
     LobeOwner: ['Planning','Time','Supply Chain','Organisation','Semiconductor Production']
     Expert: []
     # AllRoles: {"Manufacturing":"Expert"}
+    test: 123
 
 
   - ID: 'member2'
