@@ -10,7 +10,14 @@ UserInfo:
     LobeOwner: ['Planning','Time','Supply Chain','Organisation','Semiconductor Production']
     Expert: []
     # AllRoles: {"Manufacturing":"Expert"}
-
+    Layer:
+      # L1:
+      L2: 
+        - LayerID: 'DigitalReference.owl'
+          LobeOwner: ['Planning','Time','Supply Chain','Organisation','Semiconductor Production']
+          Expert: []
+      # L3:
+      # L4:
 
   - ID: 'member2'
     Name: 'Philipp'
@@ -23,6 +30,13 @@ UserInfo:
     LobeOwner: ['Product','Power','Sensor','Semi-conductor Development']
     Expert: []
     # AllRoles: {"Manufacturing":"Expert"}
+    Layer:
+      L2: 
+        - LayerID: 'DigitalReference.owl'
+          LobeOwner: ['Product','Power','Sensor','Semi-conductor Development']
+          Expert: []
+
+
 
   - ID: 'member3'
     Name: 'Marta'
@@ -35,6 +49,13 @@ UserInfo:
     LobeOwner: ['System','Process','Wired Communication','Cloud']
     Expert: []
     # AllRoles: {"Manufacturing":"Expert"}
+    Layer:
+      L2: 
+        - LayerID: 'DigitalReference.owl'
+          LobeOwner: ['System','Process','Wired Communication','Cloud']
+          Expert: []
+
+
 
   - ID: 'member4'
     Name: 'Yipeng'
@@ -47,6 +68,12 @@ UserInfo:
     LobeOwner: []
     Expert: []
     # AllRoles: {"Manufacturing":"Expert"}  
+    Layer:
+      L2: 
+        - LayerID: 'DigitalReference.owl'
+          LobeOwner: []
+          Expert: []
+
 
 OngoingProposalInfo:
   - ID: 'proposal1'
