@@ -3,10 +3,10 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1170
+    Tokens: 1210
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Feb 01 2023 15:18:19 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Wed Feb 01 2023 15:58:41 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Planning
       - Time
@@ -21,7 +21,7 @@ UserInfo:
     Tokens: 1030
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Feb 01 2023 15:19:12 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Wed Feb 01 2023 15:55:56 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Product
       - Power
@@ -35,7 +35,7 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Wed Feb 01 2023 15:58:08 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - System
       - Process
@@ -52,30 +52,15 @@ UserInfo:
     LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
-OngoingProposalInfo:
-  - ID: proposal2
-    URI: >-
-      https://github.com/tibonto/dr/commit/08cc171ae8fe31f2c84c826b4cc42f722158e303
-    Domain:
-      - Planning
-      - Power
-      - Cloud
-    Valid: '2'
-    AuthorID: member1
-    Supervisor: member1
-    Proposal_Message: a test case of providing changes to DR
-    Creation_Date: Wed Feb 01 2023 15:18:19 GMT+0000 (Coordinated Universal Time)
-    State: ongoing
-    Type: newProposal
-    OriginalID: ''
-    NumAcceptedVotes: 0
-    NumRejectedVotes: 0
-    AcceptedVotes: []
-    RejectedVotes: []
-    Hash: >-
-      https://github.com/tibonto/dr/archive/08cc171ae8fe31f2c84c826b4cc42f722158e303.zip
+OngoingProposalInfo: []
 ClosedProposalInfo:
   - ID: proposal1
     State: accept
-    EndDate: Wed Feb 01 2023 15:19:14 GMT+0000 (Coordinated Universal Time)
+    EndDate: Wed Feb 01 2023 15:55:58 GMT+0000 (Coordinated Universal Time)
+    Supervisor: member2
+    Veto: false
+  - ID: proposal2
+    State: accept
+    EndDate: Wed Feb 01 2023 15:58:43 GMT+0000 (Coordinated Universal Time)
+    Supervisor: member1
     Veto: false
