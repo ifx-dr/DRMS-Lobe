@@ -52,7 +52,7 @@ class LatestDR extends Component {
               </Typography>
               <Typography
                 color="textPrimary"
-                variant="h4"
+                variant="h6"
               >
                 {this.state.DR}
               </Typography>
