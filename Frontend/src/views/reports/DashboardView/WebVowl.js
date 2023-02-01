@@ -46,7 +46,7 @@ const WebVowl = ({ className, ...rest }) => {
       {...rest}
     >
       <CardHeader
-        title="Web Vowl"
+        title="WebVOWL"
       />
       <Divider />
       <CardContent>
@@ -55,7 +55,8 @@ const WebVowl = ({ className, ...rest }) => {
           position="relative"
         >
           {/* <iframe src="http://www.visualdataweb.de/webvowl/" height="600" width="1200"/> */}
-          <iframe src="http://vowl.visualdataweb.org/webvowl-old/webvowl-old.html" height="600" width="1200"/>
+          {/* <iframe src="http://vowl.visualdataweb.org/webvowl-old/webvowl-old.html" height="600" width="1200"/> */}
+          <iframe src="http://vowl.visualdataweb.org/webvowl-old/webvowl-old.html" height="100%" width="100%"/>
         </Box>
       </CardContent>
       <Divider />
