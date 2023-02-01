@@ -1,3 +1,26 @@
+LayerInfo:
+  - ID: L1
+    Name: 'Top-level Layer'
+    Ontology:
+    LastUpdate:
+  - ID: L2
+    Name: 'Domain-specific Layer'
+    Ontology: 
+      - ID: 'DigitalReference.owl'
+        Lobe: ['Planning','Time','Supply Chain','Organisation','Semiconductor Production',\
+               'Product','Power','Sensor','Semi-conductor Development',\
+               'System','Process','Wired Communication','Cloud']
+    LastUpdate: '31.01.2023'
+  - ID: L3
+    Name: 'General Application Layer'
+    Ontology:
+    LastUpdate:
+  - ID: L4
+    Name: 'Specific Application Layer'
+    Ontology:
+    LastUpdate:
+
+
 UserInfo:
   - ID: 'member1'
     Name: 'Hans'
