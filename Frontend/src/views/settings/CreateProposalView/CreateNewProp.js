@@ -18,7 +18,7 @@ export default class CreateNewProp extends Component {
     super();
     this.state = {
       Type: 'newProposal',
-      Domain: '',
+      Domain: [],
       URI: '',
       Valid: '',
       // Author: window.userID,
@@ -32,8 +32,22 @@ export default class CreateNewProp extends Component {
 
   handleChangeD = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
+    // console.log(value);
+    let d = this.state.Domain;
+    let flag = false;
+    for (var i = 0; i < d.length; i++) {
+      if (d[i] === value[0]) {
+        d.splice(i, 1);
+        flag = true;
+        break;
+      }
+    }
+    if (!flag) {
+      d.push(value[0]);
+    }
+    // console.log(d);
     this.setState({
-      Domain: value,
+      Domain: d
     });
   };
   handleChangeU = async (event) => {
@@ -154,6 +168,17 @@ export default class CreateNewProp extends Component {
                     <option value='Wired Communication'>Wired Communication</option>
                     <option value='Cloud'>Cloud</option>
                   </select>
+                  <Typography
+                    color="textPrimary"
+                    gutterBottom
+                    variant="h6"
+                  >
+                  selected domains: 
+                  {this.state.Domain.map((value, index) => {
+                      return <li key={index}>{value}</li>;
+                    }
+                  )}
+                  </Typography>
                 </Grid>
               </Grid>
 

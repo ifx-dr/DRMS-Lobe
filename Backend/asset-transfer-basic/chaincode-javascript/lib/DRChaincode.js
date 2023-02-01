@@ -570,6 +570,7 @@ class DRChaincode extends Contract {
             return proposal;
         } catch (e) {
             console.log('error to get proposal' + proposalID);
+            return JSON.parse(`{"error":"cannot get proposal ${proposalID}"}`);
         }
     }
 
@@ -649,6 +650,19 @@ class DRChaincode extends Contract {
         return ('LO');
     }
 
+    async CheckTimeOut(ctx) {
+        //check whether the vote is timed out
+        //Check whether within 24 Hours min since proposal is ongoing
+        let startTime = await ctx.stub.getState('time');
+        startTime = new Date(startTime);
+        let currentT = new Date().getTime();
+        if( (currentT - startTime) > 86400000) {
+            console.log('Out of time' + (currentT - startTime));
+            return true;
+        }
+        return false;
+    }
+
     async CheckVetoProposal(ctx, domain, author_id, originalID){
         // To create a veto proposal, the author should be a lobe owner
         // and the original proposal has been accepted within 30 days
@@ -699,18 +713,45 @@ class DRChaincode extends Contract {
         //Check whether this proposal is a veto proposal
         if(type !== 'newProposal'){
             //Check whether the author is able to create a veto proposal
-            let vetoPower = await this.CheckVetoProposal(ctx, domain, author_id, originalID);
-            console.log('*****It is a veto proposal'+vetoPower + type + author_id);
+            // let vetoPower = await this.CheckVetoProposal(ctx, domain, author_id, originalID);
+            // console.log('*****It is a veto proposal'+vetoPower + type + author_id);
+
+            // only the supervisor of the previous proposal has veto power
+            let originalProposal = await this.GetProposal(ctx, originalID);
+            if(originalProposal.error){
+                return ('Sorry You are not able to create this veto proposal: \n\
+                         cannot get the original proposal');
+            }
+            let vetoPower = originalProposal.Supervisor == author_id;
             if(vetoPower !== true){
-                return ('Sorry You are not able to create this veto proposal');
+                return ('Sorry You are not able to create this veto proposal: \n\
+                         you are not the supervisor of the original proposal');
             }
         }
+
+        // assign a supervisor of the proposal
+        // the one with most tokens is chosen
+        let domain_list = domain.split(',');
+        let supervisor;
+        let allLobeOwners = await this.GetAllLobeOwners(ctx);
+        let mostToken = 0;
+        for(let d of domain_list){
+            let lo = allLobeOwners[d];
+            let member = members.find(member => member.ID == lo);
+            console.log(`lobe owner of ${d} is ${lo} with ${member.Tokens} tokens`);
+            if(member.Tokens>mostToken){
+                mostToken = member.Tokens;
+                supervisor = lo;
+            }
+        }
+        console.log(`cc createProposal: supervisor of ${id} is ${supervisor}`);
         let proposal = {
             ID: id,
             URI: uri,
-            Domain: domain,
+            Domain: domain_list,
             Valid: valid.toString(),
             AuthorID: author_id,
+            Supervisor: supervisor,
             Proposal_Message: message,
             Creation_Date: Date(),
             State: 'ongoing',
@@ -722,6 +763,7 @@ class DRChaincode extends Contract {
             RejectedVotes: [],
             Hash:download,
         };
+        
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(parseInt(total_proposals) + 1)));
         //the author's total proposals should increase by 1
         member.Total_Proposal = parseInt(member.Total_Proposal)+1;
@@ -760,13 +802,15 @@ class DRChaincode extends Contract {
         }
 
         let proposal = await this.GetProposal(ctx, prop_id);
-        let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
+        // let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
         console.log('proposal to vote is:' + proposal);
-        console.log('lobeowner of the domain is: ' + lobeOwner);
+        // console.log('lobeowner of the domain is: ' + lobeOwner);
+        let supervisor = proposal.Supervisor;
+        console.log('supervisor is: '+supervisor);
 
         //check whether the voter votes for his own proposal
         const ownProposal = await this.CheckOwnProposal(ctx, proposal.AuthorID, voter_id);
-        if(ownProposal === true && voter_id!=lobeOwner) {
+        if(ownProposal === true && voter_id!=supervisor) {
             result.Message = 'Sorry you can not vote for your own proposal!';
             return JSON.stringify(result);
         }
@@ -775,7 +819,12 @@ class DRChaincode extends Contract {
         // check if the voter is in the same domain as the proposal
         // const ownProposal = await this.CheckOwnProposal(ctx, proposal.AuthorID, voter_id);
         let membersInDomain = JSON.parse(await ctx.stub.getState('membersInDomain'));
-        let rightToVote = membersInDomain[proposal.Domain].includes(voter_id);
+        let allVoters = [];
+        for(let domain of proposal.Domain){
+            allVoters = allVoters.concat(membersInDomain[domain]);
+        }
+        // let rightToVote = membersInDomain[proposal.Domain].includes(voter_id);
+        let rightToVote = allVoters.includes(voter_id);
         if(rightToVote !== true) {
             result.Message = 'Sorry you can not vote for a proposal in another domain!';
             return JSON.stringify(result);
@@ -789,14 +838,15 @@ class DRChaincode extends Contract {
         }
         
         //check whether the vote comes from a lobe owner && within 24 hours since proposal has been ongoing
-        let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
-        console.log('The result*****' + lobeownerVote);
+        // let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
+        // console.log('The result*****' + lobeownerVote);
+        let timeOut = await this.CheckTimeOut(ctx);
         try {
-            if (lobeownerVote === 'TimeOut') {
-                result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
+            if (timeOut) {
+                result.Message = 'Supervisor cannot vote after 24 hours since the proposal is ongoing';
                 return JSON.stringify(result);
             }
-            if(lobeownerVote === 'LO') {
+            else if(proposal.Supervisor==voter_id){
                 // A lobe owner votes within 24 hour, so his vote decide the result of the proposal
                 // thus, EndProposal() is triggered. Remove the deposit of tokens for voting.
                 console.log('*******' + proposal.URI);
@@ -812,13 +862,41 @@ class DRChaincode extends Contract {
                 if(vote === 'accept') {
                     await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
                 }
-                result.Message = 'Lobe Owner Successfully Vote for proposal!';
+                result.Message = 'Supervisor Successfully Vote for proposal!';
                 result.Finished = true;
                 return JSON.stringify(result);
             }
         } catch(e){
             console.log('********Problems when checking Lobe Owners Voting power'+e);
         }
+        // try {
+        //     if (lobeownerVote === 'TimeOut') {
+        //         result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
+        //         return JSON.stringify(result);
+        //     }
+        //     if(lobeownerVote === 'LO') {
+        //         // A lobe owner votes within 24 hour, so his vote decide the result of the proposal
+        //         // thus, EndProposal() is triggered. Remove the deposit of tokens for voting.
+        //         console.log('*******' + proposal.URI);
+        //         let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
+        //         if(removeResult === -1) {
+        //             result.Message = 'Problems removing tokens';
+        //             return JSON.stringify(result);
+        //         }
+
+        //         proposal = await this.AddVoter(proposal, voter_id, vote, message);
+        //         await this.UpdateProposal(ctx, proposal, prop_id);
+                
+        //         if(vote === 'accept') {
+        //             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+        //         }
+        //         result.Message = 'Lobe Owner Successfully Vote for proposal!';
+        //         result.Finished = true;
+        //         return JSON.stringify(result);
+        //     }
+        // } catch(e){
+        //     console.log('********Problems when checking Lobe Owners Voting power'+e);
+        // }
 
         // Remove the deposit to the member 
         let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
@@ -943,7 +1021,8 @@ class DRChaincode extends Contract {
             ID: closedProposalID,
             State: result,
             EndDate: Date(),
-            Veto: false
+            Supervisor: proposal.Supervisor,
+            Veto: proposal.Type == 'vetoProposal'
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
         let closedProposalQueue = await ctx.stub.getState("closedProposalQueue");

@@ -3,7 +3,7 @@ UserInfo:
     Name: 'Hans'
     Password: '111'
     Email: '111@gmail.com'
-    Tokens: 1000
+    Tokens: 1200
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: '23.01.2023'
@@ -51,7 +51,8 @@ UserInfo:
 OngoingProposalInfo:
   - ID: 'proposal1'
     URI: 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
-    Domain: 'Product'
+    Domain: ['Product']
+    Supervisor: 'member2'
     Valid: '1'
     AuthorID: 'member2'
     Proposal_Message: 'Add a new use case in the ontology Manufacture, the use case called Danobat'

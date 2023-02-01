@@ -207,6 +207,14 @@ async function main() {
 				console.log('\n--> Submit Transaction: CreatedProposal');
 				let message = '';
 				console.log('author: '+req.body.author)
+				console.log('domain: '+req.body.domain)
+				if(req.body.domain instanceof Array){
+					console.log('domain is an array');
+					for(let i=0;i<req.body.domain.length;i++)
+						console.log(req.body.domain[i]);
+					// req.body.domain = JSON.stringify(req.body.domain);
+					// req.body.domain = req.body.domain[0];
+				}
 				let penalization = await contract.submitTransaction('CheckInactivity', req.body.author);
 				if(penalization != 0) {
 					message = 'Penalization for inactivity: ' + penalization.toString() + ' tokens removed.\n';

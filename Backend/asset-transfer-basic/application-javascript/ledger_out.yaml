@@ -1,0 +1,81 @@
+UserInfo:
+  - ID: member1
+    Name: Hans
+    Password: '111'
+    Email: 111@gmail.com
+    Tokens: 1170
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Wed Feb 01 2023 15:18:19 GMT+0000 (Coordinated Universal Time)
+    LobeOwner:
+      - Planning
+      - Time
+      - Supply Chain
+      - Organisation
+      - Semiconductor Production
+    Expert: []
+  - ID: member2
+    Name: Philipp
+    Password: '222'
+    Email: 222@gmail.com
+    Tokens: 1030
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Wed Feb 01 2023 15:19:12 GMT+0000 (Coordinated Universal Time)
+    LobeOwner:
+      - Product
+      - Power
+      - Sensor
+      - Semi-conductor Development
+    Expert: []
+  - ID: member3
+    Name: Marta
+    Password: '333'
+    Email: 333@gmail.com
+    Tokens: 1000
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LobeOwner:
+      - System
+      - Process
+      - Wired Communication
+      - Cloud
+    Expert: []
+  - ID: member4
+    Name: Yipeng
+    Password: '444'
+    Email: 444@gmail.com
+    Tokens: 1000
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LobeOwner: []
+    Expert: []
+OngoingProposalInfo:
+  - ID: proposal2
+    URI: >-
+      https://github.com/tibonto/dr/commit/08cc171ae8fe31f2c84c826b4cc42f722158e303
+    Domain:
+      - Planning
+      - Power
+      - Cloud
+    Valid: '2'
+    AuthorID: member1
+    Supervisor: member1
+    Proposal_Message: a test case of providing changes to DR
+    Creation_Date: Wed Feb 01 2023 15:18:19 GMT+0000 (Coordinated Universal Time)
+    State: ongoing
+    Type: newProposal
+    OriginalID: ''
+    NumAcceptedVotes: 0
+    NumRejectedVotes: 0
+    AcceptedVotes: []
+    RejectedVotes: []
+    Hash: >-
+      https://github.com/tibonto/dr/archive/08cc171ae8fe31f2c84c826b4cc42f722158e303.zip
+ClosedProposalInfo:
+  - ID: proposal1
+    State: accept
+    EndDate: Wed Feb 01 2023 15:19:14 GMT+0000 (Coordinated Universal Time)
+    Veto: false
