@@ -118,3 +118,4 @@ Copy the folders /bin and /config from "fabric-sample" to "DR-System-Final\Backe
 
   - **Lanyingzhu Luo**
   - **Imanol Loperena Irastorza**
+  - **Yipeng Liu**
