@@ -49,21 +49,6 @@ UserInfo:
     # AllRoles: {"Manufacturing":"Expert"}  
 
 OngoingProposalInfo:
-  - ID: 'proposal1'
-    URI: 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
-    Domain: 'Product'
-    Valid: '1'
-    AuthorID: 'member2'
-    Proposal_Message: 'Add a new use case in the ontology Manufacture, the use case called Danobat'
-    Creation_Date: '10.11.2022'
-    State: 'ongoing'
-    Type: 'newProposal'
-    OriginalID: ''
-    NumAcceptedVotes: 0
-    NumRejectedVotes: 0
-    AcceptedVotes: []
-    RejectedVotes: []
-    Hash: 'https://github.com/tibonto/dr/archive/50d0834deba2ce791772be7932055cf1a7bb9545.zip'
   
 ClosedProposalInfo:
 

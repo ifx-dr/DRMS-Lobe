@@ -169,25 +169,25 @@ const Dashboard = () => {
           >
             <TotalMembers />
           </Grid>
-
           <Grid
             item
             lg={5}
             sm={9}
-            xl={2}
-            xs={12}
-          >
-            <LatestDR />
-          </Grid>
-          <Grid
-            item
-            lg={5}
-            sm={9}
-            xl={3}
+            xl={5}
             xs={12}
           >
             <DRHash />
           </Grid>
+          <Grid
+            item
+            lg={9}
+            sm={12}
+            xl={9}
+            xs={12}
+          >
+            <LatestDR />
+          </Grid>
+          
           {/* <Grid
             item
             lg={3}

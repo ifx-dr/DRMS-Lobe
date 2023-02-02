@@ -11,7 +11,8 @@ class LatestDR extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      DR: [],
+      DR: '',
+      OngoingDR: '',
       files: null,
       open: false,
     };
@@ -19,6 +20,7 @@ class LatestDR extends Component {
 
   componentDidMount() {
     this.getLatestDR(); // .then(((response) => console.log(response)));
+    this.getOngoingDR();
   }
 
   getLatestDR = async () => {
@@ -26,6 +28,12 @@ class LatestDR extends Component {
     this.setState({
       DR: DRURI,
     }, console.log(DRURI));
+  };
+  getOngoingDR = async () => {
+    const OngoingDR = await fetch('http://localhost:3001/OngoingDR').then((response) => response.json());
+    this.setState({
+      OngoingDR: OngoingDR,
+    }, console.log(OngoingDR));
   };
   handleClose = async() => {
     this.setState({
@@ -52,9 +60,22 @@ class LatestDR extends Component {
               </Typography>
               <Typography
                 color="textPrimary"
-                variant="h4"
+                variant="h6"
               >
                 {this.state.DR}
+              </Typography>
+              <Typography
+                color="textSecondary"
+                gutterBottom
+                variant="h6"
+              >
+                Here is the DR in the ongoing proposal: 
+              </Typography>
+              <Typography
+                color="textPrimary"
+                variant="h6"
+              >
+                {this.state.OngoingDR}
               </Typography>
             </Grid>
           </Grid>

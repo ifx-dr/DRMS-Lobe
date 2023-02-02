@@ -140,6 +140,8 @@ class DRChaincode extends Contract {
                 console.info(`Proposal ${ongoingProposal.ID} initialized`);
             }
         }
+        else
+            console.log("cc: ongoingProposalQueue is null")
         await ctx.stub.putState("ongoingProposalQueue", Buffer.from(JSON.stringify(ongoingProposalQueue)));
 
         if(closedProposals!=null){
@@ -160,16 +162,24 @@ class DRChaincode extends Contract {
         const total_members = members.length ;
         await ctx.stub.putState('total_members', Buffer.from(JSON.stringify(total_members)));
         const total_proposals = ongoingProposalQueue.length + closedProposalQueue.length;
+        console.log('cc total proposals: '+total_proposals);
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(total_proposals)));
 
         // const ongoingProposal = 4;
-        const ongoingProposal = ongoingProposalQueue[0];
-        await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(ongoingProposal)));
+        if(ongoingProposalQueue.length!=0){
+            const ongoingProposal = ongoingProposalQueue[0];
+            await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(ongoingProposal)));
+        }
+        else
+            await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify('none')));
+        
 
-        const latestDR = 'http://localhost:3006/v0';
+        // const latestDR = 'http://localhost:3006/v0';
+        const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         // download link of the ongoing proposal
-        const fileHash = 'https://ipfs.io/ipfs/QmSWDa85q8FQzB8qAnuoxZ4LDoXoWKmD6t4sPszdq5FiW2?filename=test.owl';
+        // const fileHash = 'https://ipfs.io/ipfs/QmSWDa85q8FQzB8qAnuoxZ4LDoXoWKmD6t4sPszdq5FiW2?filename=test.owl';
+        const fileHash = 'https://github.com/tibonto/dr/archive/50d0834deba2ce791772be7932055cf1a7bb9545.zip'
         await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
 
         ////////////////////
@@ -470,18 +480,19 @@ class DRChaincode extends Contract {
 
     //return the latest DR
     async CheckLatestDR(ctx) {
-        // const result = await ctx.stub.getState('latestDR');
-        // return result.toString();
-        let ongoingProp = await this.GetOngoingProposal(ctx);
-        console.log('cc: CheckLatestDR '+JSON.stringify(ongoingProp));
-        if(!ongoingProp.error){
-            // console.log(JSON.stringify(ongoingProp));
-            var uri = ongoingProp.URI;
-        }
-        else{
-            var uri = "we have a empty proposal here"
-        }
-        return uri !== '' ? uri : 'The file is not uploaded by the creator yet';
+        const result = await ctx.stub.getState('latestDR');
+        return JSON.parse(result.toString());
+        // return JSON.stringify(result);
+        // let ongoingProp = await this.GetOngoingProposal(ctx);
+        // console.log('cc: CheckLatestDR '+JSON.stringify(ongoingProp));
+        // if(!ongoingProp.error){
+        //     // console.log(JSON.stringify(ongoingProp));
+        //     var uri = ongoingProp.URI;
+        // }
+        // else{
+        //     var uri = "we have a empty proposal here"
+        // }
+        // return uri !== '' ? uri : 'The file is not uploaded by the creator yet';
     }
 
     //return the proposal that is ongoing
@@ -516,16 +527,23 @@ class DRChaincode extends Contract {
     //     }
     // }
 
+    // should be the latest version of DR, i.e. not the ongoing one
     //Get the Hash of the ongoing proposal. If it is null, return a statement saying it is empty
     async CheckDRHash(ctx) {
+        const result = await ctx.stub.getState('fileHash');
+        return JSON.parse(result.toString());
+        // return JSON.stringify(result);
+    }
+
+    async CheckOngoingHash(ctx) {
         let ongoingProp = await this.GetOngoingProposal(ctx);
         console.log('cc: checkDRHash '+JSON.stringify(ongoingProp));
         if(!ongoingProp.error){
             // console.log(JSON.stringify(ongoingProp));
-            var hash = ongoingProp.Hash;
+            var hash = ongoingProp.URI;
         }
         else{
-            var hash = "we have a empty proposal here"
+            var hash = "no ongoing proposal"
         }
         return hash !== '' ? hash : 'The file is not uploaded by the creator yet';
     }
@@ -928,6 +946,9 @@ class DRChaincode extends Contract {
             blockchain.push(latestBlock);
             await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
             await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
+
+            await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+            await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));
         }
         ////////////////////
         

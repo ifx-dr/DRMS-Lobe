@@ -1,0 +1,64 @@
+UserInfo:
+  - ID: member1
+    Name: Hans
+    Password: '111'
+    Email: 111@gmail.com
+    Tokens: 1000
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Thu Feb 02 2023 13:10:57 GMT+0000 (Coordinated Universal Time)
+    LobeOwner:
+      - Planning
+      - Time
+      - Supply Chain
+      - Organisation
+      - Semiconductor Production
+    Expert: []
+  - ID: member2
+    Name: Philipp
+    Password: '222'
+    Email: 222@gmail.com
+    Tokens: 1000
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LobeOwner:
+      - Product
+      - Power
+      - Sensor
+      - Semi-conductor Development
+    Expert: []
+  - ID: member3
+    Name: Marta
+    Password: '333'
+    Email: 333@gmail.com
+    Tokens: 1000
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LobeOwner:
+      - System
+      - Process
+      - Wired Communication
+      - Cloud
+    Expert: []
+  - ID: member4
+    Name: Yipeng
+    Password: '444'
+    Email: 444@gmail.com
+    Tokens: 1000
+    Total_Proposal: 0
+    Total_Accepted_Proposal: 0
+    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LobeOwner: []
+    Expert: []
+OngoingProposalInfo: []
+ClosedProposalInfo:
+  - ID: proposal1
+    State: accept
+    EndDate: Thu Feb 02 2023 08:47:16 GMT+0000 (Coordinated Universal Time)
+    Veto: false
+  - ID: proposal2
+    State: reject
+    EndDate: Thu Feb 02 2023 13:10:59 GMT+0000 (Coordinated Universal Time)
+    Veto: false
