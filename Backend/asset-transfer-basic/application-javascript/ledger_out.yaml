@@ -3,10 +3,10 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1210
+    Tokens: 1200
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Feb 01 2023 15:58:41 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Thu Feb 02 2023 13:45:31 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Planning
       - Time
@@ -18,10 +18,10 @@ UserInfo:
     Name: Philipp
     Password: '222'
     Email: 222@gmail.com
-    Tokens: 1030
+    Tokens: 980
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Feb 01 2023 15:55:56 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Thu Feb 02 2023 13:35:36 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Product
       - Power
@@ -35,7 +35,7 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Feb 01 2023 15:58:08 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - System
       - Process
@@ -46,21 +46,26 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 1000
+    Tokens: 990
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Thu Feb 02 2023 13:33:54 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
 ClosedProposalInfo:
   - ID: proposal1
     State: accept
-    EndDate: Wed Feb 01 2023 15:55:58 GMT+0000 (Coordinated Universal Time)
-    Supervisor: member2
+    EndDate: Thu Feb 02 2023 13:34:41 GMT+0000 (Coordinated Universal Time)
+    Supervisor: member1
     Veto: false
   - ID: proposal2
     State: accept
-    EndDate: Wed Feb 01 2023 15:58:43 GMT+0000 (Coordinated Universal Time)
+    EndDate: Thu Feb 02 2023 13:36:51 GMT+0000 (Coordinated Universal Time)
+    Supervisor: member1
+    Veto: true
+  - ID: proposal3
+    State: reject
+    EndDate: Thu Feb 02 2023 13:45:33 GMT+0000 (Coordinated Universal Time)
     Supervisor: member1
     Veto: false

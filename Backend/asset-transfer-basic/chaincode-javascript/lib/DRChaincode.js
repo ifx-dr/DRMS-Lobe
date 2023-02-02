@@ -1043,7 +1043,7 @@ class DRChaincode extends Contract {
             State: result,
             EndDate: Date(),
             Supervisor: proposal.Supervisor,
-            Veto: proposal.Type == 'vetoProposal'
+            Veto: proposal.Type === 'vetoProposal'
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
         let closedProposalQueue = await ctx.stub.getState("closedProposalQueue");

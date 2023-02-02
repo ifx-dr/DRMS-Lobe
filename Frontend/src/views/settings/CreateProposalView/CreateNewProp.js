@@ -176,6 +176,7 @@ export default class CreateNewProp extends Component {
                   selected domains: 
                   {this.state.Domain.map((value, index) => {
                       return <li key={index}>{value}</li>;
+                      // return <button>{value}<button onClick={this.removeDomain}>X</button></button>;
                     }
                   )}
                   </Typography>
