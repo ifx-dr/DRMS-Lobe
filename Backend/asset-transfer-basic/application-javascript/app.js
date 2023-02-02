@@ -181,6 +181,12 @@ async function main() {
 				console.log("app CheckLatestDR: "+result.toString());
 				res.json(result.toString());
 			});
+			app.get("/OngoingDR", async (req, res) => {
+				//Get the URI of the ongoing  DR
+				let result = await contract.evaluateTransaction('CheckOngoingHash');
+				console.log("app CheckOngoingDR: "+(result));
+				res.json(result.toString());
+			});
 			app.get("/DRHash", async (req, res) => {
 				//Get the Hash value of the latest DR
 				let result = await contract.evaluateTransaction('CheckDRHash');
