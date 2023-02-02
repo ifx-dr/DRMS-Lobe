@@ -153,8 +153,12 @@ const Dashboard = () => {
         >
           <Grid
             item
+            // lg={2}
+            // sm={3}
+            // xl={2}
+            // xs={12}
             lg={2}
-            sm={3}
+            sm={6}
             xl={2}
             xs={12}
           >
@@ -162,8 +166,12 @@ const Dashboard = () => {
           </Grid>
           <Grid
             item
+            // lg={2}
+            // sm={3}
+            // xl={2}
+            // xs={12}
             lg={2}
-            sm={3}
+            sm={6}
             xl={2}
             xs={12}
           >
@@ -171,8 +179,12 @@ const Dashboard = () => {
           </Grid>
           <Grid
             item
+            // lg={5}
+            // sm={9}
+            // xl={2}
+            // xs={12}
             lg={5}
-            sm={9}
+            sm={12}
             xl={5}
             xs={12}
           >
@@ -180,6 +192,10 @@ const Dashboard = () => {
           </Grid>
           <Grid
             item
+            // lg={9}
+            // sm={12}
+            // xl={9}
+            // xs={12}
             lg={9}
             sm={12}
             xl={9}
@@ -199,7 +215,11 @@ const Dashboard = () => {
           </Grid> */}
           <Grid
             item
-            lg={8}
+            // lg={8}
+            // md={12}
+            // xl={9}
+            // xs={12}
+            lg={9}
             md={12}
             xl={9}
             xs={12}
