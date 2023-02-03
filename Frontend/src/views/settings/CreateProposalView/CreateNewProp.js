@@ -81,7 +81,21 @@ export default class CreateNewProp extends Component {
       uri: this.state.URI,
       message: this.state.Messages,
       download: this.state.Download,
-      originalID: ''}
+      originalID: ''
+    }
+    // check if input is valid
+    if(data.domain.length===0){
+      alert('Please choose a domain!');
+      return;
+    }
+    if(data.uri.length===0){
+      alert('Please input the URI!');
+      return;
+    }
+    if(data.download.length===0){
+      alert('Please input the download link!');
+      return;
+    }
       // console.log("new: "+token)
       console.log('****New Proposal invokes createProposal api*********');
       await fetch('http://localhost:3001/createProposal', {

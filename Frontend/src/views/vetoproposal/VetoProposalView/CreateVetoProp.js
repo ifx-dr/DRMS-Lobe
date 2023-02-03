@@ -85,6 +85,22 @@ export default class CreateVetoProp extends Component {
       author: token.ID,
       download: this.state.Download
     }
+    if(data.domain.length===0){
+      alert('Please choose a domain!');
+      return;
+    }
+    if(data.uri.length===0){
+      alert('Please input the URI!');
+      return;
+    }
+    if(data.download.length===0){
+      alert('Please input the download link!');
+      return;
+    }
+    if(data.originalID.length===0){
+      alert('Please input the original proposal ID!');
+      return;
+    }
     // console.log('veto: '+token);
       console.log('****New Proposal invokes createProposal api*********');
     await fetch('http://localhost:3001/createProposal', {

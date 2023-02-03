@@ -42,6 +42,12 @@ export default class Vote extends Component {
       });
       console.log(this.state.prop + this.state.prop_ID);
     }
+    else{
+      alert('No ongoing proposal now!');
+      this.setState({
+        Redirect:'Dashboard'
+      })
+    }
   };
 
   handleChangeV = async (event) => {
