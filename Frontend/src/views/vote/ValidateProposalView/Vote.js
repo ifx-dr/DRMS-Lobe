@@ -82,6 +82,10 @@ export default class Vote extends Component {
       author_ID: token.ID,
       messages: this.state.messages,
     }
+    if(data.vote.length===0){
+      alert('Please vote!');
+      return;
+    }
     console.log('Submit*******'+ JSON.stringify(data));
     fetch('http://localhost:3001/validateProposal', {
       method: 'POST',
