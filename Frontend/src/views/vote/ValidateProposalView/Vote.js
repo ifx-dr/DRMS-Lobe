@@ -42,6 +42,12 @@ export default class Vote extends Component {
       });
       console.log(this.state.prop + this.state.prop_ID);
     }
+    else{
+      alert('No ongoing proposal now!');
+      this.setState({
+        Redirect:'Dashboard'
+      })
+    }
   };
 
   handleChangeV = async (event) => {
@@ -75,6 +81,10 @@ export default class Vote extends Component {
       // author_ID: window.userID,
       author_ID: token.ID,
       messages: this.state.messages,
+    }
+    if(data.vote.length===0){
+      alert('Please vote!');
+      return;
     }
     console.log('Submit*******'+ JSON.stringify(data));
     fetch('http://localhost:3001/validateProposal', {
