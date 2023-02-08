@@ -186,16 +186,27 @@ class DRChaincode extends Contract {
         // voted voters
         var voted = [];
         await ctx.stub.putState('voted', Buffer.from(JSON.stringify(voted)));
-        
+
+        const finishedMerge = [];
+        await ctx.stub.putState('finishedMerge', Buffer.from(JSON.stringify(finishedMerge)));
+        let newBlockRequest = {
+            newBlockWaiting: 'false',
+            proposalID: 'n/a',
+            author: 'n/a',
+            lobeOwner: 'n/a',
+            supervisor: 'n/a'
+        }
+        await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
+
         console.log('*******************DRChaincode: File recovered*******************');
     }
-    async InitBlockchainFromFile(ctx, blockchain){
-        console.log('cc: retrieve blockchain from file');
+    async WriteBlockchain(ctx, blockchain){
+        console.log('cc: write blockchain');
         blockchain = JSON.parse(blockchain);
         await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
     }
-    async InitLatestBlock(ctx, latestBlock){
-        console.log('cc: latest block')
+    async WriteLatestBlock(ctx, latestBlock){
+        console.log('cc: write latest block')
         console.log(latestBlock);
         // latestBlock = JSON.parse(latestBlock);
         // ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
@@ -454,7 +465,21 @@ class DRChaincode extends Contract {
         }
         return JSON.stringify(allResults);
     }
-
+    async GetNewBlockRequest(ctx){
+        const result = await ctx.stub.getState('newBlockRequest');
+        console.log('cc newBlockRequest: '+result);
+        return JSON.parse(result.toString());
+    }
+    async CloseNewBlockRequest(ctx){
+        let newBlockRequest = {
+            newBlockWaiting: 'false',
+            proposalID: 'n/a',
+            author: 'n/a',
+            lobeOwner: 'n/a',
+            supervisor: 'n/a'
+        }
+        await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
+    }
     // async CheckTotalProposals(ctx){
     //     const total_roposal = await ctx.stub.getState('total_proposals');
     //     console.log(total_roposal + 'is read');
@@ -939,13 +964,22 @@ class DRChaincode extends Contract {
             }
             else
                 data = `commemt: ${proposal.Proposal_Message}, file hash: ${proposal.Hash}`; // Hash or URI? Hash is unique give a specific file
-            let previousHash = latestBlock.hash;
-            latestBlock = new BC.Block(index, timestamp, data, previousHash);
+            // let previousHash = latestBlock.hash;
+            // latestBlock = new BC.Block(index, timestamp, data, previousHash);
             // console.log(blockchain);
             // console.log(latestBlock);
-            blockchain.push(latestBlock);
-            await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
-            await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
+            // blockchain.push(latestBlock);
+            // await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
+            // await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
+            let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
+            let newBlockRequest = {
+                newBlockWaiting: 'true',
+                proposalID: proposalID,
+                author: proposal.AuthorID,
+                lobeOwner: lobeOwner,
+                supervisor: 'n/a'
+            }
+            await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));

@@ -78,6 +78,11 @@ const items = [
     href: '/app/validateProposal',
     icon: UserCheck,
     title: 'Vote for a Proposal'
+  },
+  {
+    href: '/app/generateBlock',
+    icon: UserCheck,
+    title: 'Generate New Block'
   }
 ];
 

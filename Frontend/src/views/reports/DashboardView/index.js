@@ -13,6 +13,7 @@ import LatestDR from './LatestDR';
 import TotalMembers from './TotalMembers';
 import UploadDR from './UploadDR';
 import DRHash from './DRHash';
+import BlockInfo from './BlockInfo';
 // import useToken from 'src/useToken';
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -203,7 +204,14 @@ const Dashboard = () => {
           >
             <LatestDR />
           </Grid>
-          
+          <Grid
+            item
+            lg={9}
+            sm={12}
+            xl={9}
+            xs={12}>
+              <BlockInfo/>
+          </Grid>
           {/* <Grid
             item
             lg={3}

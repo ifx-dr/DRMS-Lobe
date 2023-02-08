@@ -110,8 +110,8 @@ async function main() {
 				// console.log(blockchain);
 				let latestBlock = blockchain.getLatestBlock();
 				await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
-				await contract.submitTransaction('InitBlockchainFromFile', JSON.stringify(blockchain));
-				await contract.submitTransaction('InitLatestBlock', JSON.stringify(latestBlock));
+				await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
+				await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock));
 				res.json(JSON.parse('{"success":"ledger initialized from file"}'));
 			})
 			app.get("/saveStatus", async (req, res) => {
@@ -192,6 +192,24 @@ async function main() {
 				let result = await contract.evaluateTransaction('CheckDRHash');
 				console.log("app CheckDRHash: "+result.toString());
 				res.json(result.toString());
+			});
+			app.get("/checkNewBlockRequest", async (req, res) => {
+				//check if there is a new block to be generated
+				let result = await contract.evaluateTransaction('GetNewBlockRequest');
+				console.log("app GetNewBlockRequest: "+result.toString());
+				res.json(result.toString());
+			});
+			app.post("/generateBlock", async (req, res) => {
+				let result = await contract.evaluateTransaction('GetBlockchain');
+				let blockchain = new BC.Blockchain();
+				blockchain.chain = JSON.parse(result);
+				let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
+				blockchain.addBlock(newBlock)
+				console.log("view blockchain:\n"+result.toString());
+				await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
+				await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()));
+				await contract.submitTransaction('CloseNewBlockRequest');
+				res.json('Successfully generated a new block!');
 			});
 			app.post("/tokens", async (req, res) => {
 				//Get the tokens for member1

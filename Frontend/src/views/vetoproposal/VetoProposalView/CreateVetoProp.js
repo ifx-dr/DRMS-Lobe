@@ -27,9 +27,42 @@ export default class CreateVetoProp extends Component {
       Creation_Date: '',
       Messages: '',
       Download:'',
-      Redirect: ''
+      Redirect: '',
+      newBlockReq:''
     }
   }
+  componentDidMount(){
+    this.getNewBlockRequest();
+  }
+  getNewBlockRequest = async () => {
+    let token = sessionStorage.getItem('token');
+    if(token==null){
+      this.setState({
+        Redirect:'Login'
+      })
+      alert('Please login in!');
+      return;
+    }
+    token = JSON.parse(token);
+    let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
+    newBlockReq = JSON.parse(newBlockReq);
+    if(newBlockReq.newBlockWaiting==='true'){
+      if(newBlockReq.author===token.ID||newBlockReq.lobeOwner===token.ID){
+        alert('A new block is to be generated before a new proposal!');
+        this.setState({
+          Redirect:'GenerateBlock'
+        })
+      }
+      else{
+        alert('A new block is to be generated: waiting for lobe owner operation');
+        this.setState({
+          Redirect:'Dashboard'
+        })
+      }
+      return;
+    }
+  };
+
 
   handleChangeD = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
@@ -126,11 +159,14 @@ export default class CreateVetoProp extends Component {
   }
   render()
     {
-      if(this.state.Redirect=='Login'){
+      if(this.state.Redirect==='Login'){
         return <Navigate to='/app/login' state={this.state}></Navigate>
       }
-      else if(this.state.Redirect=='Dashboard'){
+      else if(this.state.Redirect==='Dashboard'){
         return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+      }
+      else if(this.state.Redirect==='GenerateBlock'){
+        return <Navigate to='/app/generateBlock' state={this.state}></Navigate>
       }
       return (
         <form onSubmit={this.handleSubmit} >

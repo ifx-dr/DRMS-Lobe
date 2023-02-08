@@ -98,6 +98,7 @@ export default class Vote extends Component {
     }).then((body)=>{
       alert(body.Message);
       console.log(body);
+      // sessionStorage.setItem('NewMerge','true');
       this.setState({
         Redirect:'Dashboard'
       })
