@@ -3,10 +3,10 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1000
+    Tokens: 1010
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Thu Feb 02 2023 13:10:57 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Fri Feb 10 2023 14:10:30 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Planning
       - Time
@@ -56,9 +56,5 @@ OngoingProposalInfo: []
 ClosedProposalInfo:
   - ID: proposal1
     State: accept
-    EndDate: Thu Feb 02 2023 08:47:16 GMT+0000 (Coordinated Universal Time)
-    Veto: false
-  - ID: proposal2
-    State: reject
-    EndDate: Thu Feb 02 2023 13:10:59 GMT+0000 (Coordinated Universal Time)
+    EndDate: Fri Feb 10 2023 14:10:32 GMT+0000 (Coordinated Universal Time)
     Veto: false

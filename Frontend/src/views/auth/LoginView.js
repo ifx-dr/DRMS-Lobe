@@ -97,10 +97,10 @@ class LoginViews extends Component {
           console.log(body);
           // re-login: update token
           // setToken(body);
-          sessionStorage.setItem('token',JSON.stringify(body));
+          sessionStorage.setItem('token',JSON.stringify(body.success));
           if(!body.error){
-            window.userID = body.ID;
-            window.userName = body.Name;
+            window.userID = body.success.ID;
+            window.userName = body.success.Name;
             // window.userRole = body.Role;
             alert(`
                    ID:   ${window.userID}\n

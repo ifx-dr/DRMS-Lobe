@@ -500,7 +500,7 @@ class DRChaincode extends Contract {
     async CheckTotalMembers(ctx){
         //Get the amount of all members. It is shown on dashboard.
         const totalMembers = await ctx.stub.getState('total_members');
-        return totalMembers.toString();
+        return JSON.parse(totalMembers.toString());
     }
 
     //return the latest DR
@@ -747,6 +747,25 @@ class DRChaincode extends Contract {
             if(vetoPower !== true){
                 return ('Sorry You are not able to create this veto proposal');
             }
+        }
+        // check if the domain is new
+        // if so, the author will be assigned to be the lobe owner
+        let allLobeOwners = await this.GetAllLobeOwners(ctx);
+        if(!(domain in allLobeOwners)){
+            console.log('cc createProposal: new domain '+domain);
+            allLobeOwners[domain] = author_id;
+            let membersInDomain = await this.GetMembersInDomain(ctx);
+            membersInDomain[domain] = [author_id];
+            members = await this.GetMembers(ctx);
+            for(let i=0;i<members.length;i++){
+                if(members[i].ID===author_id){
+                    members[i].LobeOwner.push(domain);
+                    break;
+                }
+            }
+            await this.UpdateMembers(ctx, members);
+            await this.UpdateInfo(ctx, 'membersInDomain', membersInDomain);
+            await this.UpdateAllLobeOwners(ctx, allLobeOwners);
         }
         let proposal = {
             ID: id,

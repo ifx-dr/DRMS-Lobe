@@ -45,7 +45,15 @@ export default class CreateVetoProp extends Component {
     }
     token = JSON.parse(token);
     let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
-    newBlockReq = JSON.parse(newBlockReq);
+    // newBlockReq = JSON.parse(newBlockReq);
+    if(newBlockReq.error){
+      alert(newBlockReq.error);
+      this.setState({
+        Redirect:'Dashboard'
+      })
+      return;
+    }
+    newBlockReq = newBlockReq.success;
     if(newBlockReq.newBlockWaiting==='true'){
       if(newBlockReq.author===token.ID||newBlockReq.lobeOwner===token.ID){
         alert('A new block is to be generated before a new proposal!');

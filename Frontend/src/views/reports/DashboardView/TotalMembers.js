@@ -13,10 +13,16 @@ export default class TotalMembers extends Component{
     this.getMembers();
   };
   getMembers = async () => {
-    const data = await fetch('http://localhost:3001/allMembers').then((response) =>response.json());
-    this.setState({
-      members: data
-    })
+    let data = await fetch('http://localhost:3001/allMembers').then((response) =>response.json());
+    if(!data.error){
+      this.setState({
+        members: data.success
+      })
+    }
+    else{
+      alert(data.error)
+    }
+    
   };
   render() {
     return (

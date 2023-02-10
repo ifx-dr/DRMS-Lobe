@@ -34,8 +34,13 @@ class Tokens extends Component {
         }).then(function(response){
           return response.json();
         }).then(function(body){
-          token=body;
-          console.log(body);
+          if(!body.error){
+            token=body.success;
+            console.log(body);
+          }
+          else{
+            alert(body.error)
+          }
         })
     console.log('RESULT= ' + token);
     this.setState({

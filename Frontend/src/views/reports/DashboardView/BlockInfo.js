@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Avatar, Box, Button, Card, CardContent, Grid, Typography } from '@material-ui/core';
+import { Avatar, Box, Button, Card, CardContent, Grid, Typography, Divider } from '@material-ui/core';
 
 class BlockInfo extends Component {
   constructor(props) {
@@ -19,15 +19,27 @@ class BlockInfo extends Component {
     let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
     // if(newBlockReq==='true')
     //     newBlockReq = '456';
-    this.setState({
-        newBlockReq: newBlockReq,
-    }, console.log(newBlockReq));
+    if(!newBlockReq.error){
+      this.setState({
+        newBlockReq: newBlockReq.success,
+      }, console.log(newBlockReq));
+    }
+    else{
+      alert(newBlockReq.error);
+    }
+    
   };
   getLatestBlock = async () => {
     const latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
-    this.setState({
-        latestBlock: JSON.parse(latestBlock),
-    }, console.log(latestBlock));
+    if(!latestBlock.error){
+      this.setState({
+        latestBlock: JSON.parse(latestBlock.success),
+      }, console.log(latestBlock));
+    }
+    else{
+      alert(latestBlock.error);
+    }
+    
   };
 
   render() {
@@ -77,6 +89,7 @@ class BlockInfo extends Component {
               >
                 hash: {this.state.latestBlock?this.state.latestBlock.hash:'n/a'}
               </Typography>
+              <Divider />
               <Typography
                 color="textSecondary"
                 gutterBottom
@@ -88,7 +101,19 @@ class BlockInfo extends Component {
                 color="textPrimary"
                 variant="h6"
               >
-                {this.state.newBlockReq}
+                newBlockWaiting: {this.state.newBlockReq?.newBlockWaiting}
+              </Typography>
+              <Typography
+                color="textPrimary"
+                variant="h6"
+              >
+                proposalID: {this.state.newBlockReq?.proposalID}
+              </Typography>
+              <Typography
+                color="textPrimary"
+                variant="h6"
+              >
+                author: {this.state.newBlockReq?.author}
               </Typography>
             </Grid>
           </Grid>

@@ -34,19 +34,27 @@ export default class Vote extends Component {
   }
   getOnGoingProp = async () => {
     const data = await fetch('http://localhost:3001/ongoingProp').then((response) => response.json());
-    if(!data.error){
-      this.setState({
-        prop: data,
-        prop_ID: data.ID,
-        // eslint-disable-next-line react/destructuring-assignment
-      });
-      console.log(this.state.prop + this.state.prop_ID);
-    }
-    else{
-      alert('No ongoing proposal now!');
+    if(data.error){
+      alert(data.error);
       this.setState({
         Redirect:'Dashboard'
       })
+    }
+    else{
+      if(!data.success.error){
+        this.setState({
+          prop: data.success,
+          prop_ID: data.success.ID,
+          // eslint-disable-next-line react/destructuring-assignment
+        });
+        console.log(this.state.prop + this.state.prop_ID);
+      }
+      else{
+        alert('No ongoing proposal now!');
+        this.setState({
+          Redirect:'Dashboard'
+        })
+      }
     }
   };
 
@@ -96,7 +104,9 @@ export default class Vote extends Component {
     }).then(function(response){
       return response.json();
     }).then((body)=>{
-      alert(body.Message);
+      // body = JSON.parse(body.success)
+      // alert(JSON.stringify(body));
+      alert(body.success.Message);
       console.log(body);
       // sessionStorage.setItem('NewMerge','true');
       this.setState({
@@ -132,19 +142,19 @@ export default class Vote extends Component {
                 xs={12}
               >
                 <p>
-                  Domain: {this.state.prop.Domain},
+                  Domain: {this.state.prop.Domain}
                 </p>
                 <p>
-                  AuthorID: {this.state.prop.AuthorID},
+                  AuthorID: {this.state.prop.AuthorID}
                 </p>
                 <p>
-                  ProposalType: {this.state.prop.Type},
+                  ProposalType: {this.state.prop.Type}
                 </p>
                 <p>
-                  AcceptedVotes: {this.state.prop.NumAcceptedVotes},
+                  AcceptedVotes: {this.state.prop.NumAcceptedVotes}
                 </p>
                 <p>
-                  RejectedVotes: {this.state.prop.NumRejectedVotes},
+                  RejectedVotes: {this.state.prop.NumRejectedVotes}
                 </p>
               </Grid>
 
@@ -157,14 +167,14 @@ export default class Vote extends Component {
                 Proposal ID: {this.state.prop.ID}
                 </p>
                 <p>
-                Proposal_Message: {this.state.prop.Proposal_Message},
+                Proposal_Message: {this.state.prop.Proposal_Message}
                 </p>
 
                 <p>
-                Creation_Date: {this.state.prop.Creation_Date},
+                Creation_Date: {this.state.prop.Creation_Date}
                 </p>
                 <p>
-                  URI: {this.state.prop.URI},
+                  URI: {this.state.prop.URI}
                 </p>
               </Grid>
             </Grid>

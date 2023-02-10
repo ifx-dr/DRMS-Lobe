@@ -21,9 +21,14 @@ class DRHash extends Component {
 
   getDRHash = async () => {
     const DRHash = await fetch('http://localhost:3001/DRHash').then((response) => response.json());
-    this.setState({
-      Hash: DRHash,
-    }, console.log(DRHash));
+    if(!DRHash.error){
+      this.setState({
+        Hash: DRHash.success,
+      }, console.log(DRHash));
+    }
+    else{
+      alert(DRHash.error)
+    }
   };
   handleClose = async() => {
     this.setState({

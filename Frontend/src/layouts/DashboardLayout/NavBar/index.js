@@ -83,6 +83,11 @@ const items = [
     href: '/app/generateBlock',
     icon: UserCheck,
     title: 'Generate New Block'
+  },
+  {
+    href: '/app/testPage',
+    icon: UserCheck,
+    title: 'test page'
   }
 ];
 

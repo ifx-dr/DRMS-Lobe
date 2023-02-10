@@ -121,44 +121,33 @@ async function main() {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
 						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock));
-						let res = `ledger initialized from file, time: ${Date()}`;
-						console.log(`SUCCESS app initiate: ${res}`)
-						result = {"success":res};
+						console.log('app initiate: success ')
 						flag = true;
 						break;
 					} catch (error) {
-						let res = error;
-						result = {"error":error}
-						console.log(`FAILED ${i} app initiate, time: ${Date()}, ${res}`)
+						console.log('app initiate: failed '+i)
+						result = error;
 					}
 				}
-				res.json(result);
+				if(flag)
+					res.json(JSON.parse('{"success":"ledger initialized from file"}'));
+				else
+					res.json(JSON.parse(`{"error":"initialize failed, error:${result}"}`));
 			})
 			app.get("/saveStatus", async (req, res) => {
 				console.log('*****save system status: members, ongoing and closed proposals****');
 				// await contract.submitTransaction('SaveSystemStatus');
-				let result;
-				for(let i=0;i<retry_cnt;i++){
-					try {
-						let ledger = {};
-						ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
-						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
-						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));;
-						let yamlStr = yaml.dump(ledger);
-						fs.writeFileSync('ledger_out.yaml', yamlStr, 'utf8');
+				let ledger = {};
+				ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
+				ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
+				ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));;
+				let yamlStr = yaml.dump(ledger);
+				fs.writeFileSync('ledger_out.yaml', yamlStr, 'utf8');
 
-						let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
-						BC.exportChainOnlyToExcel(chain, './blockchain/blockchain_hist_out.xlsx');
-						// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
-						result = {"success":"ledger saved"};
-						console.log(`SUCCESS app saveStatus, time: ${Date()}`);
-						break;
-					} catch (error) {
-						console.log(`FAILED ${i} app saveStatus, time: ${Date()}, ${error}`);
-						result = {"error":error}
-					}
-				}
-				res.json(result);
+				let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
+				BC.exportChainOnlyToExcel(chain, './blockchain/blockchain_hist_out.xlsx');
+				// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
+				res.json(JSON.parse('{"success":"ledger saved"}'));
 			});
 			app.get("/initiate_origin", async (req, res) => {
 				// Initialize a set of data on the channel using the chaincode 'Init_Ledger' function.
@@ -206,110 +195,113 @@ async function main() {
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
-						let res = await contract.evaluateTransaction('CheckTotalMembers');
-						console.log(`SUCCESS app allMembers: ${res}`);
-						result = {"success":JSON.parse(res)};
+						result = await contract.evaluateTransaction('CheckTotalMembers');
+						console.log(`app allMembers: success, `+result);
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app allMembers: ${error}`);
-						result = {"error":error};
+						console.log(`app allMembers: failed ${i}, `+error)
+						result = error;
 					}
 				}
-				res.json(result);
+				res.json(JSON.parse(result.toString()));
 			});
 			app.get("/DR", async (req, res) => {
 				//Get the URI of the latest  DR
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {	
-						let res = await contract.evaluateTransaction('CheckLatestDR');
-						console.log(`SUCCESS app CheckLatestDR: ${res}`);
-						result = {"success":res.toString()};
+						result = await contract.evaluateTransaction('CheckLatestDR');
+						console.log("app CheckLatestDR: "+result.toString());
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app CheckLatestDR: ${error}`);
-						result = {"error":error};
+						console.log("app CheckLatestDR: failed, error: "+result.toString());
+						result += error;
 					}
 				}
-				res.json(result);
+				res.json(result.toString());
 			});
 			app.get("/OngoingDR", async (req, res) => {
 				//Get the URI of the ongoing  DR
 				let result;
+				let flag = false;
 				for(let i=0;i<retry_cnt;i++){
 					try {
-						let res = await contract.evaluateTransaction('CheckOngoingHash');
-						console.log(`SUCCESS app CheckOngoingDR: ${res}`);
-						result = {"success":res.toString()};
+						result = await contract.evaluateTransaction('CheckOngoingHash');
+						console.log("app CheckOngoingDR: success, "+(result));
+						flag = true;
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app CheckOngoingDR: ${error}`);
-						result = {"error":error};
+						console.log(`app CheckOngoingDR: failed ${i}, `+(error));
+						result = error;
 					}
 				}
-				res.json(result);
+				res.json(result.toString());
 			});
 			app.get("/DRHash", async (req, res) => {
 				//Get the Hash value of the latest DR
 				let result;
+				let flag = false;
 				for(let i=0;i<retry_cnt;i++){
 					try {
-						let res = await contract.evaluateTransaction('CheckDRHash');
-						console.log(`SUCCESS app CheckDRHash: ${res}`);
-						result = {"success":res.toString()};
+						result = await contract.evaluateTransaction('CheckDRHash');
+						console.log("app CheckDRHash: success, "+result.toString());
+						flag = true;
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app CheckDRHash: ${error}`);
-						result = {"error":error};
+						console.log(`app CheckDRHash: failed ${i}, `+(error));
+						result = error;
 					}
 				}
-				res.json(result);
+				res.json(result.toString());
 			});
 			app.get("/checkNewBlockRequest", async (req, res) => {
 				//check if there is a new block to be generated
 				let result;
+				let flag = false;
 				for(let i=0;i<retry_cnt;i++){
 					try {
-						let res = await contract.evaluateTransaction('GetNewBlockRequest');
-						console.log(`SUCCESS app GetNewBlockRequest: ${res}`);
-						result = {"success":JSON.parse(res)};
+						result = await contract.evaluateTransaction('GetNewBlockRequest');
+						console.log("app GetNewBlockRequest: success, "+result.toString());
+						flag = true;
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app GetNewBlockRequest: ${error}`);
-						result = {"error":error};
+						console.log(`app GetNewBlockRequest: failed ${i}, `+(error));
+						result = error;
 					}
 				}
-				res.json(result);
+				res.json(result.toString());
 			});
 			app.post("/generateBlock", async (req, res) => {
 				if(!NewBlockLock){
-					res.json({"success":"please wait"});
+					res.json('please wait');
 				}
 				else{
 					NewBlockLock = !NewBlockLock;
 					let result;
+					let flag = false;
 					for(let i=0;i<retry_cnt;i++){
 						try {
-							let res = await contract.evaluateTransaction('GetBlockchain');
+							result = await contract.evaluateTransaction('GetBlockchain');
 							let blockchain = new BC.Blockchain();
-							blockchain.chain = JSON.parse(res);
+							blockchain.chain = JSON.parse(result);
 							let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
 							blockchain.addBlock(newBlock)
-							// console.log("view blockchain:\n"+res.toString());
+							console.log("view blockchain:\n"+result.toString());
 							await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
 							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()));
 							await contract.submitTransaction('CloseNewBlockRequest');
-							res = 'Successfully generated a new block!'
-							console.log(`SUCCESS app generateBlock: ${res}`)
-							result = {"success":res.toString()};
+							flag = true;
 							break;
 						} catch (error) {
-							console.log(`FAILED ${i} app generateBlock: ${error}`);
-							result = {"error":error}
+							result = `app generateBlock failed ${i}, error: `+error;
+							console.log(result);
 						}
 					}
 					NewBlockLock = !NewBlockLock;
-					res.json(result);
+					if(flag)
+						res.json('Successfully generated a new block!');
+					else
+						res.json(result);
 				}
 			});
 			app.post("/tokens", async (req, res) => {
@@ -317,34 +309,37 @@ async function main() {
 				console.log('membersId from frontend: '+ req.body.id);
 				let result;
 				if(req.body.id!=='visitor'){
+					let flag = false;
 					for(let i=0;i<retry_cnt;i++){
 						try {
-							let res = await contract.submitTransaction('CheckTokens', req.body.id);
-							console.log(`SUCCESS app tokens: ${res}`);
-							result = {"success":JSON.parse(res)};
+							result = await contract.submitTransaction('CheckTokens', req.body.id);
+							flag = true;
 							break;
 						} catch (error) {
-							console.log(`FAILED ${i} app tokens: ${error}`);
-							result = {"error":error};
+							console.log(`app tokens: failed ${i}, `+error);
+							result = error;
 						}
 					}
 				}
 				else{
-					result = {"success":"please login"};
+					result = "please login";
 				}
-				res.json(result);
+				// let result = await contract.submitTransaction('CheckTokens', req.body.id);
+				res.json(result.toString());
+				console.log('token amount: '+ result);
 			});
 			// For submitTransaction, the transaction will be sent to both peers and if both peers endorse the transaction, the endorsed proposal will be sent
 			// to the orderer to be committed by each of the peer's to the channel ledger.
 			app.post("/createProposal", async (req, res) => {
 				if(!NewProposalLock){
-					res.json({"success":`please wait`});
+					res.json(`please wait`);
 				}
 				else{
 					NewProposalLock = !NewProposalLock;
 					console.log('\n--> Submit Transaction: CreatedProposal');
 					let message = '';
 					console.log('author: '+req.body.author)
+					let flag = false;
 					let result;
 					for(let i=0;i<retry_cnt;i++){
 						try {
@@ -354,24 +349,24 @@ async function main() {
 								console.log(message);
 							}
 
-							let res = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID, req.body.download);
-							console.log('******The creation result is:' + res);
-							if (message != '') res += message + '\n';
-							console.log(`SUCCESS app createProposal: ${res}`);
-							result = {"success":res.toString()};
+							result = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID, req.body.download);
+							console.log('******The creation result is:' + result);
+							if (message != '') result += message + '\n';
+							console.log('app createProposal: success, '+result.toString());
+							flag = true;
 							break;
 						} catch (error) {
-							console.log(`FAILED ${i} app createProposal: ${error}`);
-							result = {"error":error};
+							console.log(`app createProposal: failed ${i}, `+error)
+							result = error;
 						}
 					}
 					NewProposalLock = !NewProposalLock;
-					res.json(result);
+					res.json(result.toString());
 				}
 			});
 			app.post("/validateProposal", async (req, res) => {
 				if(!VaidateProposalLock){
-					res.json({"success":`please wait`});
+					res.json(`please wait`);
 				}
 				else{
 					VaidateProposalLock = !VaidateProposalLock;
@@ -385,26 +380,24 @@ async function main() {
 								console.log(message);
 							} 
 							
-							let res = await contract.submitTransaction('ValidateProposal', req.body.prop_ID, req.body.author_ID, req.body.vote, req.body.messages);
-							res = JSON.parse(res.toString());
-							console.log(res.Message);
+							result = await contract.submitTransaction('ValidateProposal', req.body.prop_ID, req.body.author_ID, req.body.vote, req.body.messages);
+							result = JSON.parse(result.toString());
+							console.log(result.Message);
 
-							if (res.Finished === true) {
-								let endProposalResult = await contract.submitTransaction('EndProposal', res.ProposalID, res.Result);
+							if (result.Finished === true) {
+								let endProposalResult = await contract.submitTransaction('EndProposal', result.ProposalID, result.Result);
 								console.log(endProposalResult.toString());
 
 								let checkLobeOwnerResult = await contract.submitTransaction('CheckNewLobOwner');
 								console.log(checkLobeOwnerResult.toString());
 							}
 
-							res.Message = message + res.Message;
-							console.log(`SUCCESS app validateProposal: ${JSON.stringify(res)}`);
-							result = {"success":res};
+							result.Message = message + result.Message;
+							console.log('app validateProposal: success, '+result);
 							break;
 						} catch (error) {
-							console.log(`FAILED ${i} app validateProposal: ${error}`);
-							// result.Message = error;
-							result = {"error":error};
+							console.log(`app validateProposal: failed ${i}, `+error);
+							result.Message = error;
 						}
 					}
 					VaidateProposalLock = !VaidateProposalLock;
@@ -415,34 +408,31 @@ async function main() {
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
-						let res = await contract.evaluateTransaction('GetOngoingProposal');
-						console.log(`SUCCESS app ongoingProp: ${res}`);
-						
-						result = {"success":JSON.parse(res)};
+						result = await contract.evaluateTransaction('GetOngoingProposal');
+						console.log('app ongoingProp: success, '+result.toString());
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app ongoingProp: ${error}`);
-						result = {"error":error};
+						console.log(`app ongoingProp: failed ${i}, `+error);
+						result = `{"error":${error}}`;
 					}
 				}
-				res.json(result);
+				res.json(JSON.parse(result.toString()));
 			});
 			
 			app.get("/checkUpload", async (req, res) => {
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
-						let res = await contract.evaluateTransaction('DRUpload_Available');
-						console.log(`SUCCESS app checkUpload: ${res}`);
-						result = {"success":res.toString()};
+						result = await contract.evaluateTransaction('DRUpload_Available');
+						console.log('app checkUpload: success, '+result.toString());
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app checkUpload: ${error}`);
-						result = {"error":error};
+						console.log(`app checkUpload: failed ${i}, `+error);
+						result = error;
 					}
 				}
-				res.json(result);
-				// console.log("The DRUpload is visible*********"+ result.toString());
+				res.json(result.toString());
+				console.log("The DRUpload is visible*********"+ result.toString());
 			});
 			
 			// app.post("/downloadDecryptedDR", async (req, res) =>{
@@ -473,16 +463,15 @@ async function main() {
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
-						let res = await contract.evaluateTransaction('GetMemberById', req.body.memberID);
-						console.log(`SUCCESS app memberInfo: ${res}`);
-						result = {"success":JSON.parse(res)};
+						result = await contract.evaluateTransaction('GetMemberById', req.body.memberID);
+						console.log('app memberInfo: success, '+JSON.stringify(result.toString()));
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app memberInfo: ${error}`);
-						result = {"error":error};
+						console.log(`app memberInfo: failed ${i}, `+error);
+						result = `{"error":${error}}`;
 					}
 				}
-				res.json(result);
+				res.json(JSON.parse(result.toString()));
 			});
 
 			// check blockchain
@@ -492,20 +481,9 @@ async function main() {
 				console.log("view blockchain:\n"+result.toString());
 			});
 			app.get("/checkLatestBlock", async (req, res) => {
-				let result;
-				for(let i=0;i<retry_cnt;i++){
-					try {
-						let res = await contract.evaluateTransaction('GetLatestBlock');
-						console.log(`SUCCESS app checkLatestBlock: ${res}`);
-						result = {"success":res.toString()}
-						break;
-					} catch (error) {
-						console.log(`FAILED ${i} app checkLatestBlock: ${error}`);
-						result = {"error":error};
-					}
-				}
-				res.json(result);
-				// console.log("view latest block:\n"+ result.toString());
+				let result = await contract.evaluateTransaction('GetLatestBlock');
+				res.json(result.toString());
+				console.log("view latest block:\n"+ result.toString());
 			});
 			app.get("/checkAllLobeOwners", async (req, res) => {
 				let result = await contract.evaluateTransaction('GetAllLobeOwners');

@@ -25,15 +25,25 @@ class LatestDR extends Component {
 
   getLatestDR = async () => {
     const DRURI = await fetch('http://localhost:3001/DR').then((response) => response.json());
-    this.setState({
-      DR: DRURI,
-    }, console.log(DRURI));
+    if(!DRURI.error){
+      this.setState({
+        DR: DRURI.success,
+      }, console.log(DRURI));
+    }
+    else{
+      alert(DRURI.error);
+    }
   };
   getOngoingDR = async () => {
     const OngoingDR = await fetch('http://localhost:3001/OngoingDR').then((response) => response.json());
-    this.setState({
-      OngoingDR: OngoingDR,
-    }, console.log(OngoingDR));
+    if(!OngoingDR.error){
+      this.setState({
+        OngoingDR: OngoingDR.success,
+      }, console.log(OngoingDR));
+    }
+    else{
+      alert(OngoingDR.error);
+    }
   };
   handleClose = async() => {
     this.setState({

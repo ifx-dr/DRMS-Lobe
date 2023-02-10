@@ -47,7 +47,15 @@ export default class GenerateBlock extends Component {
     }
     token = JSON.parse(token);
     let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
-    newBlockReq = JSON.parse(newBlockReq);
+    // newBlockReq = JSON.parse(newBlockReq);
+    if(newBlockReq.error){
+      alert(newBlockReq.error)
+      return;
+    }
+    
+    newBlockReq = newBlockReq.success;
+    // alert(JSON.stringify(newBlockReq.success))
+    // alert(newBlockReq.newBlockWaiting)
     if(newBlockReq.newBlockWaiting==='true'){
       if(newBlockReq.author!==token.ID&&newBlockReq.lobeOwner!==token.ID){
         alert('A new block is to be generated: waiting for lobe owner operation!');
@@ -72,7 +80,12 @@ export default class GenerateBlock extends Component {
   };
   getLatestBlock = async () => {
     let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
-    latestBlock = JSON.parse(latestBlock)
+    // latestBlock = JSON.parse(latestBlock)
+    if(latestBlock.error){
+      alert(latestBlock.error)
+      return;
+    }
+    latestBlock = JSON.parse(latestBlock.success);
     this.setState({
       latestBlock: latestBlock,
     }, console.log(latestBlock.index));
@@ -82,8 +95,8 @@ export default class GenerateBlock extends Component {
   };
   getCommitInfo = async() => {
     // using GitHub api to get commit info
-    let link = 'https://api.github.com/repos/tibonto/dr/commits/master';
-    let prefix = 'https://github.com/tibonto/dr/commit/';
+    const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
+    const prefix = 'https://github.com/tibonto/dr/commit/';
     fetch(link, {
           method: 'GET',
         //   headers: {
@@ -140,6 +153,10 @@ export default class GenerateBlock extends Component {
       timestamp: this.state.nextTimestamp,
       data: this.state.nextCommitHash
     }
+    // const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
+    // const prefix = 'https://github.com/tibonto/dr/commit/';
+
+
     console.log('****Generate new block invokes generateBlock api*********');
     await fetch('http://localhost:3001/generateBlock', {
         method: 'POST',
@@ -154,11 +171,20 @@ export default class GenerateBlock extends Component {
         // return body;
         return response.json();
       }).then((body)=>{
-        alert(body);
-        console.log(body);
-        this.setState({
-          Redirect:'Dashboard'
-        });
+        if(body.error){
+          alert(body.error)
+          this.setState({
+            Redirect:'Dashboard'
+          });
+        }
+        else{
+          alert(body.success)
+          console.log(body);
+          if(body!=='please wait')
+            this.setState({
+              Redirect:'Dashboard'
+            });
+        }
       });
 
   }
