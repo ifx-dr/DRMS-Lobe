@@ -54,7 +54,7 @@ export default class GenerateBlock extends Component {
     }
     
     newBlockReq = newBlockReq.success;
-    // alert(JSON.stringify(newBlockReq.success))
+    // alert(JSON.stringify(newBlockReq))
     // alert(newBlockReq.newBlockWaiting)
     if(newBlockReq.newBlockWaiting==='true'){
       if(newBlockReq.author!==token.ID&&newBlockReq.lobeOwner!==token.ID){
@@ -190,7 +190,10 @@ export default class GenerateBlock extends Component {
   }
   render()
     {
-      if(this.state.Redirect=='Dashboard'){
+      if(this.state.Redirect==='Login'){
+        return <Navigate to='/app/login' state={this.state}></Navigate>
+      }
+      if(this.state.Redirect==='Dashboard'){
         return <Navigate to='/app/dashboard' state={this.state}></Navigate>
       }
       return (

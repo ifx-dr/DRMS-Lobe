@@ -128,7 +128,7 @@ async function main() {
 						break;
 					} catch (error) {
 						let res = error;
-						result = {"error":error}
+						result = {"error":error.toString()}
 						console.log(`FAILED ${i} app initiate, time: ${Date()}, ${res}`)
 					}
 				}
@@ -155,7 +155,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app saveStatus, time: ${Date()}, ${error}`);
-						result = {"error":error}
+						result = {"error":error.toString()}
 					}
 				}
 				res.json(result);
@@ -212,7 +212,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app allMembers: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -228,7 +228,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app CheckLatestDR: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -244,7 +244,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app CheckOngoingDR: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -260,7 +260,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app CheckDRHash: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -276,7 +276,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app GetNewBlockRequest: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -305,7 +305,7 @@ async function main() {
 							break;
 						} catch (error) {
 							console.log(`FAILED ${i} app generateBlock: ${error}`);
-							result = {"error":error}
+							result = {"error":error.toString()}
 						}
 					}
 					NewBlockLock = !NewBlockLock;
@@ -325,7 +325,7 @@ async function main() {
 							break;
 						} catch (error) {
 							console.log(`FAILED ${i} app tokens: ${error}`);
-							result = {"error":error};
+							result = {"error":error.toString()};
 						}
 					}
 				}
@@ -362,7 +362,7 @@ async function main() {
 							break;
 						} catch (error) {
 							console.log(`FAILED ${i} app createProposal: ${error}`);
-							result = {"error":error};
+							result = {"error":error.toString()};
 						}
 					}
 					NewProposalLock = !NewProposalLock;
@@ -404,7 +404,7 @@ async function main() {
 						} catch (error) {
 							console.log(`FAILED ${i} app validateProposal: ${error}`);
 							// result.Message = error;
-							result = {"error":error};
+							result = {"error":error.toString()};
 						}
 					}
 					VaidateProposalLock = !VaidateProposalLock;
@@ -422,7 +422,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app ongoingProp: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -438,7 +438,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app checkUpload: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -479,7 +479,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app memberInfo: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
@@ -501,7 +501,7 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app checkLatestBlock: ${error}`);
-						result = {"error":error};
+						result = {"error":error.toString()};
 					}
 				}
 				res.json(result);
