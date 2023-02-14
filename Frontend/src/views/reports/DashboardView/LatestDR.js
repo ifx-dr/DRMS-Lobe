@@ -66,7 +66,7 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none","rel":"noopener noreferrer"}} target="_blank">check</a></button>
+                Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
               </Typography>
               <Typography
                 color="textPrimary"
@@ -79,7 +79,7 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here is the DR in the ongoing proposal: <button><a href={this.state.OngoingDR} style={{"text-decoration":"none","rel":"noopener noreferrer"}} target="_blank">check</a></button>
+                Here is the DR in the ongoing proposal: <button><a href={this.state.OngoingDR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
               </Typography>
               <Typography
                 color="textPrimary"

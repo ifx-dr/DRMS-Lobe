@@ -75,7 +75,7 @@ class BlockInfo extends Component {
                 color="textPrimary"
                 variant="h6"
               >
-                data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} style={{"text-decoration":"none","rel":"noopener noreferrer"}} target="_blank">check</a></button>
+                data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
               </Typography>
               <Typography
                 color="textPrimary"

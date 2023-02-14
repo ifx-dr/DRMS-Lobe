@@ -183,7 +183,7 @@ export default class Vote extends Component {
                 Creation_Date: {this.state.prop.Creation_Date}
                 </p>
                 <p>
-                  URI: {this.state.prop.URI} <button><a href={this.state.prop.URI} style={{"text-decoration":"none","rel":"noopener noreferrer"}} target="_blank">check</a></button>
+                  URI: {this.state.prop.URI} <button><a href={this.state.prop.URI} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
                 </p>
               </Grid>
             </Grid>

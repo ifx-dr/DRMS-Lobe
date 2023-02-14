@@ -36,7 +36,7 @@ export default class GenerateBlock extends Component {
     this.getLatestBlock();
     this.getTimeStamp();
   }
-  async getNewBlockRequest(){
+  getNewBlockRequest = async () => {
     let token = sessionStorage.getItem('token');
     if(token===null){
       this.setState({
@@ -138,9 +138,23 @@ export default class GenerateBlock extends Component {
     //   alert('No new block request now!');
     //   return;
     // }
-    await this.getNewBlockRequest();
+    event.preventDefault();
+    let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
+    // newBlockReq = JSON.parse(newBlockReq);
+    if(newBlockReq.error){
+      alert(newBlockReq.error)
+      return;
+    }
+    newBlockReq = newBlockReq.success;
+    if(newBlockReq.newBlockWaiting!=='true'){
+      alert('No new block waiting!');
+      this.setState({
+        Redirect:'Dashboard'
+      })
+      return;
+    }
     let token = sessionStorage.getItem('token');
-    if(token==null){
+    if(token===null){
       this.setState({
         Redirect:'Login'
       })
@@ -148,7 +162,7 @@ export default class GenerateBlock extends Component {
       return;
     }
     token = JSON.parse(token);
-    event.preventDefault();
+    
     const data = {
       index: this.state.nextIndex,
       timestamp: this.state.nextTimestamp,
@@ -168,6 +182,7 @@ export default class GenerateBlock extends Component {
           },
           body: JSON.stringify(data)
         }).then((response) =>response.json());
+      // alert(JSON.stringify(result));
       if(!result.error){
         alert(result.success);
         if(result.success!=='please wait'){

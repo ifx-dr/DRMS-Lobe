@@ -891,7 +891,7 @@ class DRChaincode extends Contract {
         } 
 
         let total_members = await ctx.stub.getState('total_members');
-        total_members = JSON.parse(total_members);
+        total_members = JSON.parse(total_members) - 1;
 
         // Add the vote inside the proposal
         proposal = await this.AddVoter(proposal, voter_id, vote, message);
