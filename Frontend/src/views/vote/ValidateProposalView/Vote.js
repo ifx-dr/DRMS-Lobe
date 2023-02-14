@@ -106,20 +106,29 @@ export default class Vote extends Component {
     }).then((body)=>{
       // body = JSON.parse(body.success)
       // alert(JSON.stringify(body));
-      alert(body.success.Message);
-      console.log(body);
-      // sessionStorage.setItem('NewMerge','true');
-      this.setState({
-        Redirect:'Dashboard'
-      })
+      if(body.error){
+        alert(body.error);
+        return;
+      }
+      else{
+        if(body.success==='please wait')
+          alert(body.success)
+        else{
+          alert(body.success.Message);
+          console.log(body);
+          this.setState({
+            Redirect:'Dashboard'
+          })
+        }
+      }
     });
   }
   render()
   {
-    if(this.state.Redirect=='Login'){
+    if(this.state.Redirect==='Login'){
       return <Navigate to='/app/login' state={this.state}></Navigate>
     }
-    else if(this.state.Redirect=='Dashboard'){
+    else if(this.state.Redirect==='Dashboard'){
       return <Navigate to='/app/dashboard' state={this.state}></Navigate>
     }
     return (
@@ -174,7 +183,7 @@ export default class Vote extends Component {
                 Creation_Date: {this.state.prop.Creation_Date}
                 </p>
                 <p>
-                  URI: {this.state.prop.URI}
+                  URI: {this.state.prop.URI} <button><a href={this.state.prop.URI} style={{"text-decoration":"none","rel":"noopener noreferrer"}} target="_blank">check</a></button>
                 </p>
               </Grid>
             </Grid>

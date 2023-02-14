@@ -193,7 +193,7 @@ export default class CreateNewProp extends Component {
       alert('Please input the download link!');
       return;
     }
-    alert(JSON.stringify(data));
+    // alert(JSON.stringify(data));
     // return;
       // console.log("new: "+token)
       console.log('****New Proposal invokes createProposal api*********');

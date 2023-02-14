@@ -53,7 +53,7 @@ class DRHash extends Component {
                 variant="h6"
               >
                 Here you can download the DR:
-                <button><a href={this.state.Hash} style={{"text-decoration":"none",}} target="_blank">download DR</a></button>
+                <button><a href={this.state.Hash} style={{"text-decoration":"none","rel":"noopener noreferrer"}} target="_blank">download DR</a></button>
               </Typography>
               <Typography
                 color="textPrimary"

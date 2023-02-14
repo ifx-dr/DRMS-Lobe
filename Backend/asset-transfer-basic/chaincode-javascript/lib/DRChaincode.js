@@ -836,12 +836,13 @@ class DRChaincode extends Contract {
         ////////////////////
         // check if the voter is in the same domain as the proposal
         // const ownProposal = await this.CheckOwnProposal(ctx, proposal.AuthorID, voter_id);
-        let membersInDomain = JSON.parse(await ctx.stub.getState('membersInDomain'));
-        let rightToVote = membersInDomain[proposal.Domain].includes(voter_id);
-        if(rightToVote !== true) {
-            result.Message = 'Sorry you can not vote for a proposal in another domain!';
-            return JSON.stringify(result);
-        }
+
+        // let membersInDomain = JSON.parse(await ctx.stub.getState('membersInDomain'));
+        // let rightToVote = membersInDomain[proposal.Domain].includes(voter_id);
+        // if(rightToVote !== true) {
+        //     result.Message = 'Sorry you can not vote for a proposal in another domain!';
+        //     return JSON.stringify(result);
+        // }
         ////////////////////
 
         const voteTwice = await this.CheckVoteTwice(proposal, voter_id);

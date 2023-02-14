@@ -36,7 +36,7 @@ export default class GenerateBlock extends Component {
     this.getLatestBlock();
     this.getTimeStamp();
   }
-  getNewBlockRequest = async () => {
+  async getNewBlockRequest(){
     let token = sessionStorage.getItem('token');
     if(token===null){
       this.setState({
@@ -138,6 +138,7 @@ export default class GenerateBlock extends Component {
     //   alert('No new block request now!');
     //   return;
     // }
+    await this.getNewBlockRequest();
     let token = sessionStorage.getItem('token');
     if(token==null){
       this.setState({
@@ -158,35 +159,72 @@ export default class GenerateBlock extends Component {
 
 
     console.log('****Generate new block invokes generateBlock api*********');
-    await fetch('http://localhost:3001/generateBlock', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }).then(function(response){
-        // alert(response);
-        // let body = response.json();
-        // alert(body);
-        // return body;
-        return response.json();
-      }).then((body)=>{
-        if(body.error){
-          alert(body.error)
+    const retry_cnt = 3;
+    for(let i=0;i<retry_cnt;i++){
+      let result = await fetch('http://localhost:3001/generateBlock', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }).then((response) =>response.json());
+      if(!result.error){
+        alert(result.success);
+        if(result.success!=='please wait'){
           this.setState({
-            Redirect:'Dashboard'
-          });
+            Redirect: "Dashboard"
+          })
         }
-        else{
-          alert(body.success)
-          console.log(body);
-          if(body!=='please wait')
-            this.setState({
-              Redirect:'Dashboard'
-            });
+        return;
+      }
+      else{
+        // if error, check if the block is "somehow" added
+        // alert(result.error)
+        alert("checking & retrying ...")
+        let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
+        // latestBlock = JSON.parse(latestBlock)
+        if(latestBlock.error){
+          alert(latestBlock.error)
+          return;
         }
-      });
-
+        latestBlock = JSON.parse(latestBlock.success);
+        if(data.index===latestBlock.index){
+          alert('New block added');
+          this.setState({
+            Redirect: "Dashboard"
+          })
+          return;
+        }
+      }
+      // await fetch('http://localhost:3001/generateBlock', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json'
+      //   },
+      //   body: JSON.stringify(data)
+      // }).then(function(response){
+      //   // alert(response);
+      //   // let body = response.json();
+      //   // alert(body);
+      //   // return body;
+      //   return response.json();
+      // }).then((body)=>{
+      //   if(body.error){
+      //     alert(body.error)
+      //     this.setState({
+      //       Redirect:'Dashboard'
+      //     });
+      //   }
+      //   else{
+      //     alert(body.success)
+      //     console.log(body);
+      //     if(body!=='please wait')
+      //       this.setState({
+      //         Redirect:'Dashboard'
+      //       });
+      //   }
+      // });
+    }
   }
   render()
     {
@@ -223,7 +261,7 @@ export default class GenerateBlock extends Component {
                     gutterBottom
                     variant="h6"
                   >
-                    data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} target={"_blank"}>check</a></button>
+                    data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
                 </Typography>
                 <Typography
                     color="textPrimary"
@@ -286,7 +324,7 @@ export default class GenerateBlock extends Component {
                     gutterBottom
                     variant="h6"
                   >
-                    data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"}>check</a></button>
+                    data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
                 </Typography>
                 <Typography
                     color="textSecondary"

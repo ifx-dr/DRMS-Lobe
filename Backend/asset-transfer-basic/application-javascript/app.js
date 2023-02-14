@@ -288,7 +288,7 @@ async function main() {
 				else{
 					NewBlockLock = !NewBlockLock;
 					let result;
-					for(let i=0;i<retry_cnt;i++){
+					for(let i=0;i<1;i++){
 						try {
 							let res = await contract.evaluateTransaction('GetBlockchain');
 							let blockchain = new BC.Blockchain();
