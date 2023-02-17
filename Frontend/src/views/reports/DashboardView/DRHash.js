@@ -12,13 +12,25 @@ class DRHash extends Component {
     super(props);
     this.state = {
       Hash: '',
+      OngoingDR: ''
     };
   }
 
   componentDidMount() {
-    this.getDRHash(); // .then(((response) => console.log(response)));
+    // this.getDRHash(); // .then(((response) => console.log(response)));
+    this.getOngoingDR()
   }
-
+  getOngoingDR = async () => {
+    const OngoingDR = await fetch('http://localhost:3001/OngoingDR').then((response) => response.json());
+    if(!OngoingDR.error){
+      this.setState({
+        OngoingDR: OngoingDR.success,
+      }, console.log(OngoingDR));
+    }
+    else{
+      alert(OngoingDR.error);
+    }
+  };
   getDRHash = async () => {
     const DRHash = await fetch('http://localhost:3001/DRHash').then((response) => response.json());
     if(!DRHash.error){
@@ -52,14 +64,15 @@ class DRHash extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here you can download the DR:
-                <button><a href={this.state.Hash} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>download DR</a></button>
+                {/* Here you can download the DR:
+                <button><a href={this.state.Hash} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>download DR</a></button> */}
+                Here is the DR in the ongoing proposal: <button><a href={this.state.OngoingDR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
               </Typography>
               <Typography
                 color="textPrimary"
                 variant="h6"
               >
-                {this.state.Hash}
+                {this.state.OngoingDR}
               </Typography>
               {/* <button>
               <a style='text-decoration:none;' href="https://www.w3schools.com" 

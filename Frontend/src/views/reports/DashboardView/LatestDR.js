@@ -20,7 +20,8 @@ class LatestDR extends Component {
 
   componentDidMount() {
     this.getLatestDR(); // .then(((response) => console.log(response)));
-    this.getOngoingDR();
+    // this.getOngoingDR();
+    this.getDRHash();
   }
 
   getLatestDR = async () => {
@@ -32,6 +33,17 @@ class LatestDR extends Component {
     }
     else{
       alert(DRURI.error);
+    }
+  };
+  getDRHash = async () => {
+    const DRHash = await fetch('http://localhost:3001/DRHash').then((response) => response.json());
+    if(!DRHash.error){
+      this.setState({
+        Hash: DRHash.success,
+      }, console.log(DRHash));
+    }
+    else{
+      alert(DRHash.error)
     }
   };
   getOngoingDR = async () => {
@@ -53,6 +65,7 @@ class LatestDR extends Component {
   updateDR = async() => {
     const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
     const prefix = 'https://github.com/tibonto/dr/commit/';
+    const downloadPrefix = 'https://github.com/tibonto/dr/archive/'
     fetch(link, {
           method: 'GET',
         //   headers: {
@@ -65,10 +78,26 @@ class LatestDR extends Component {
         }).then((body)=>{
             console.log(body.sha)
             console.log(body.commit.message)
-            this.setState({
-              DR: prefix+body.sha,
-              // commitMessage: body.commit.message
-            })
+            let newDR = prefix+body.sha;
+            let newHash = downloadPrefix + body.sha + '.zip';
+            if(this.state.DR!==newDR){
+              let req = {
+                DR: newDR,
+                Hash: newHash
+              }
+              let result = fetch('http://localhost:3001/updateDR', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(req)
+                }).then((response) =>response.json());
+              this.setState({
+                DR: newDR,
+                // commitMessage: body.commit.message
+                Hash: newHash
+              })
+            }
         })
   }
 
@@ -100,13 +129,15 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here is the DR in the ongoing proposal: <button><a href={this.state.OngoingDR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
+                {/* Here is the DR in the ongoing proposal: <button><a href={this.state.OngoingDR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> */}
+                Here you can download the DR:
+                <button><a href={this.state.Hash} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>download DR</a></button>
               </Typography>
               <Typography
                 color="textPrimary"
                 variant="h6"
               >
-                {this.state.OngoingDR}
+                {this.state.Hash}
               </Typography>
             </Grid>
           </Grid>

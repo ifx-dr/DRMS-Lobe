@@ -507,6 +507,24 @@ async function main() {
 				res.json(result);
 				// console.log("view latest block:\n"+ result.toString());
 			});
+			app.post("/updateDR", async (req, res) => {
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						console.log(`app updateDR ${req.body.DR} ${req.body.Hash}`)
+						await contract.submitTransaction('UpdateDRfromGithub', req.body.DR, req.body.Hash);
+						let resp = `LatestDR and fileHash updated, time: ${Date()}`;
+						console.log(`SUCCESS app updateDR: ${resp}`)
+						result = {"success":resp};
+						break;
+					} catch (error) {
+						let resp = error;
+						result = {"error":error.toString()}
+						console.log(`FAILED ${i} app updateDR, time: ${Date()}, ${resp}`)
+					}
+				}
+				res.json(result);
+			})
 			app.get("/checkAllLobeOwners", async (req, res) => {
 				let result = await contract.evaluateTransaction('GetAllLobeOwners');
 				res.json(result.toString());

@@ -503,6 +503,13 @@ class DRChaincode extends Contract {
         return JSON.parse(totalMembers.toString());
     }
 
+    async UpdateDRfromGithub(ctx, newDR, newHash){
+        console.log(`cc UpdateDRfromGithub: ${newDR}`);
+        console.log(`cc UpdateDRfromGithub: ${newHash}`);
+        await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(newDR)));
+        await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(newHash)));
+        // return JSON.parse(result.toString());
+    }
     //return the latest DR
     async CheckLatestDR(ctx) {
         const result = await ctx.stub.getState('latestDR');
