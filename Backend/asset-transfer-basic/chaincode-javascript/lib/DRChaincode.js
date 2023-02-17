@@ -972,14 +972,14 @@ class DRChaincode extends Contract {
 
         ////////////////////
         // if approved, update the blockchain and latest block
-        if(result=='accept'){
+        if(result==='accept'){
             let blockchain = await this.GetBlockchain(ctx);
             // console.log(blockchain);
             let latestBlock = await this.GetLatestBlock(ctx);
             let index = latestBlock.index+1;
             let timestamp = Date();
             let data = null;
-            if(proposal.Type=='vetoProposal'){
+            if(proposal.Type==='vetoProposal'){
                 data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
             }
             else
@@ -1001,7 +1001,7 @@ class DRChaincode extends Contract {
             }
             await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
-            await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+            // await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));
         }
         ////////////////////

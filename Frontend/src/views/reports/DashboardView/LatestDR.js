@@ -50,6 +50,27 @@ class LatestDR extends Component {
       open: false
     })
   };
+  updateDR = async() => {
+    const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
+    const prefix = 'https://github.com/tibonto/dr/commit/';
+    fetch(link, {
+          method: 'GET',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify(data)
+        }).then(function(resp){
+            // console.log(resp.json());
+            return resp.json();
+        }).then((body)=>{
+            console.log(body.sha)
+            console.log(body.commit.message)
+            this.setState({
+              DR: prefix+body.sha,
+              // commitMessage: body.commit.message
+            })
+        })
+  }
 
   render() {
     return (
@@ -66,7 +87,7 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
+                Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> <button onClick={this.updateDR}>update</button>
               </Typography>
               <Typography
                 color="textPrimary"
