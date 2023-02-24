@@ -84,11 +84,11 @@ const items = [
     icon: UserCheck,
     title: 'Generate New Block'
   },
-  {
-    href: '/app/testPage',
-    icon: UserCheck,
-    title: 'test page'
-  }
+  // {
+  //   href: '/app/testPage',
+  //   icon: UserCheck,
+  //   title: 'test page'
+  // }
 ];
 
 const useStyles = makeStyles(() => ({
