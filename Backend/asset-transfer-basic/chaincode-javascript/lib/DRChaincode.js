@@ -63,8 +63,15 @@ class DRChaincode extends Contract {
         let ongoingProposals = ledgerTXT['OngoingProposalInfo'];
         console.log(ongoingProposals)
         let closedProposals = ledgerTXT['ClosedProposalInfo'];
+        let domains = ledgerTXT['OntologyInfo']['Domains'];;
 
-        let membersInDomain = {
+        let membersInDomain = {};
+        let allLobeOwners = {};
+        for(let domain of domains){
+            membersInDomain[domain] = [];
+            allLobeOwners[domain] = null;
+        }
+        membersInDomain = {
             "Planning": [],
             "Time":[],
             "Supply Chain":[],
@@ -79,7 +86,7 @@ class DRChaincode extends Contract {
             "Wired Communication":[],
             "Cloud":[],
         }
-        let allLobeOwners = {
+        allLobeOwners = {
             "Planning": null,
             "Time":null,
             "Supply Chain":null,

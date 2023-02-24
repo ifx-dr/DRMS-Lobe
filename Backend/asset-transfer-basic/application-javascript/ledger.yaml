@@ -1,3 +1,10 @@
+OntologyInfo:
+  Name: 'DigitalReference2.ttl'
+  Domains: ['Planning','Time','Supply Chain','Organisation','Semiconductor Production',
+            'Product','Power','Sensor','Semi-conductor Development',
+            'System','Process','Wired Communication','Cloud']
+
+
 UserInfo:
   - ID: 'member1'
     Name: 'Hans'

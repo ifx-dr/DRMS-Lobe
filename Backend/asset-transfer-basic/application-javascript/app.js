@@ -41,6 +41,8 @@ const retry_cnt = 3;
 var NewProposalLock = true;
 var VaidateProposalLock = true;
 var NewBlockLock = true;
+var allDomains = [];
+var ontologyName = '';
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -107,10 +109,20 @@ async function main() {
 			// 	console.log(cryptoMaterials.IV);
 			// 	res.json(JSON.parse(`{"success":${JSON.stringify(result)}}`));
 			// })
+
+			// let fileContents = fs.readFileSync('ledger.yaml', 'utf8');
+			// let ledger = yaml.load(fileContents);
+			
+			// allDomains = ledger['OntologyInfo']['Domains'];
+			// ontologyName = ledger['OntologyInfo']['Name'];
+			// console.log(allDomains)
+			// console.log(ontologyName)
 			app.get("/initiate", async (req, res) => {
 				console.log('*****read ledger file*****')
 				let fileContents = fs.readFileSync('ledger.yaml', 'utf8');
 				let ledger = yaml.load(fileContents);
+				allDomains = ledger['OntologyInfo']['Domains'];
+				ontologyName = ledger['OntologyInfo']['Name'];
 				let blockchain = BC.loadChainFromExcel('./blockchain/blockchain_hist.xlsx');
 				// console.log(blockchain);
 				let latestBlock = blockchain.getLatestBlock();
@@ -141,9 +153,13 @@ async function main() {
 				for(let i=0;i<retry_cnt;i++){
 					try {
 						let ledger = {};
+						ledger["OntologyInfo"] = {
+							Name: ontologyName,
+							Domains: allDomains
+						}
 						ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
-						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));;
+						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
 						let yamlStr = yaml.dump(ledger);
 						fs.writeFileSync('ledger_out.yaml', yamlStr, 'utf8');
 
@@ -538,15 +554,16 @@ async function main() {
 			// (temporary) load/save the domains for frontend
 			app.get("/loadDomainsInFrontend", async (req, res) => {
 				console.log("app load domain");
-				let fileContents = fs.readFileSync('../../../Frontend/src/config.json', 'utf8');
-				console.log(fileContents);
-				let allDomains =JSON.parse(fileContents)["allDomains"];
+				// let fileContents = fs.readFileSync('../../../Frontend/src/config.json', 'utf8');
+				// console.log(fileContents);
+				// let allDomains =JSON.parse(fileContents)["allDomains"];
 				console.log(allDomains);
 				res.json(JSON.stringify(allDomains));
 			})
 			app.post("/saveDomainsInFrontend", async (req, res) => {
 				console.log("app save domain");
-				fs.writeFileSync('../../../Frontend/src/config.json', JSON.stringify(req.body), 'utf8');
+				// fs.writeFileSync('../../../Frontend/src/config.json', JSON.stringify(req.body), 'utf8');
+				allDomains = req.body["allDomains"];
 				res.json('done');
 			})
 			async function parseFile(req) {
@@ -640,6 +657,15 @@ async function main() {
 					})
 				});
 			});
+			app.get("/ontologyInfo", async (req, res) => {
+				console.log("app ontologyInfo");
+				// multiple layers can be added
+				let result = {
+					Name: ontologyName,
+					Domains: allDomains
+				};
+				res.json(JSON.stringify(result));
+			})
 		} finally {
 			// Disconnect from the gateway when the application is closing
 			// This will close all connections to the network

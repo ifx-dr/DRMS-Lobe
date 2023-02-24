@@ -1,18 +1,36 @@
+OntologyInfo:
+  Name: DigitalReference2.ttl
+  Domains:
+    - Planning
+    - Time
+    - Supply Chain
+    - Organisation
+    - Semiconductor Production
+    - Product
+    - Power
+    - Sensor
+    - Semi-conductor Development
+    - System
+    - Process
+    - Wired Communication
+    - Cloud
+    - Battery Management System
 UserInfo:
   - ID: member1
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1010
+    Tokens: 990
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Fri Feb 10 2023 14:10:30 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Fri Feb 24 2023 12:30:26 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Planning
       - Time
       - Supply Chain
       - Organisation
       - Semiconductor Production
+      - Battery Management System
     Expert: []
   - ID: member2
     Name: Philipp
@@ -52,9 +70,21 @@ UserInfo:
     LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
-OngoingProposalInfo: []
-ClosedProposalInfo:
+OngoingProposalInfo:
   - ID: proposal1
-    State: accept
-    EndDate: Fri Feb 10 2023 14:10:32 GMT+0000 (Coordinated Universal Time)
-    Veto: false
+    URI: https://github.com/tibonto/dr/commit/<new branch hash>
+    Domain: Battery Management System
+    Valid: '1'
+    AuthorID: member1
+    Proposal_Message: new proposal from a branch
+    Creation_Date: Fri Feb 24 2023 12:30:28 GMT+0000 (Coordinated Universal Time)
+    State: ongoing
+    Type: newProposal
+    OriginalID: ''
+    NumAcceptedVotes: 0
+    NumRejectedVotes: 0
+    AcceptedVotes: []
+    RejectedVotes: []
+    Hash: >-
+      https://github.com/tibonto/dr/archive/08cc171ae8fe31f2c84c826b4cc42f722158e303.zip
+ClosedProposalInfo: []
