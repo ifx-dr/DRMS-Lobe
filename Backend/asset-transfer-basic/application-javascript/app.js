@@ -43,6 +43,10 @@ var VaidateProposalLock = true;
 var NewBlockLock = true;
 var allDomains = [];
 var ontologyName = '';
+var repo = '';
+var fileName = '';
+var outFileName = '';
+var ledgerFile = 'ledger.yaml';
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -119,11 +123,17 @@ async function main() {
 			// console.log(ontologyName)
 			app.get("/initiate", async (req, res) => {
 				console.log('*****read ledger file*****')
-				let fileContents = fs.readFileSync('ledger.yaml', 'utf8');
+				let fileContents = fs.readFileSync(ledgerFile, 'utf8');
 				let ledger = yaml.load(fileContents);
 				allDomains = ledger['OntologyInfo']['Domains'];
 				ontologyName = ledger['OntologyInfo']['Name'];
-				let blockchain = BC.loadChainFromExcel('./blockchain/blockchain_hist.xlsx');
+				repo = ledger['OntologyInfo']['Repo'];
+				fileName = ledger['BlockchainInfo']['FileName'];
+				outFileName = ledger['BlockchainInfo']['OutFileName'];
+				if(!fs.existsSync(fileName)){
+					fs.writeFileSync(fileName, '', 'utf8');
+				}
+				let blockchain = BC.loadChainFromExcel(fileName);
 				// console.log(blockchain);
 				let latestBlock = blockchain.getLatestBlock();
 				let flag = false;
@@ -155,16 +165,21 @@ async function main() {
 						let ledger = {};
 						ledger["OntologyInfo"] = {
 							Name: ontologyName,
-							Domains: allDomains
+							Domains: allDomains,
+							Repo: repo
 						}
+						ledger["BlockchainInfo"] = {
+							FileName: fileName,
+							OutFileName: outFileName
+						};
 						ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
 						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
 						let yamlStr = yaml.dump(ledger);
-						fs.writeFileSync('ledger_out.yaml', yamlStr, 'utf8');
+						fs.writeFileSync(ledgerFile, yamlStr, 'utf8');
 
 						let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
-						BC.exportChainOnlyToExcel(chain, './blockchain/blockchain_hist_out.xlsx');
+						BC.exportChainOnlyToExcel(chain, outFileName);
 						// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
 						result = {"success":"ledger saved"};
 						console.log(`SUCCESS app saveStatus, time: ${Date()}`);
@@ -231,6 +246,10 @@ async function main() {
 						result = {"error":error.toString()};
 					}
 				}
+				res.json(result);
+			});
+			app.get("/Repo", async (req, res) => {
+				let result = {"success":repo};
 				res.json(result);
 			});
 			app.get("/DR", async (req, res) => {
@@ -505,7 +524,7 @@ async function main() {
 			app.get("/checkBlockchain", async (req, res) => {
 				let result = await contract.evaluateTransaction('GetBlockchain');
 				res.json(result.toString());
-				console.log("view blockchain:\n"+result.toString());
+				// console.log("view blockchain:\n"+result.toString());
 			});
 			app.get("/checkLatestBlock", async (req, res) => {
 				let result;

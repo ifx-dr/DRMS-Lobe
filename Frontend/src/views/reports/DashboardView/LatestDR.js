@@ -13,17 +13,29 @@ class LatestDR extends Component {
     this.state = {
       DR: '',
       OngoingDR: '',
+      Repo: '',
       files: null,
       open: false,
     };
   }
 
   componentDidMount() {
+    this.getRepo();
     this.getLatestDR(); // .then(((response) => console.log(response)));
     // this.getOngoingDR();
     this.getDRHash();
   }
-
+  getRepo = async () => {
+    const Repo = await fetch('http://localhost:3001/Repo').then((response) => response.json());
+    if(!Repo.error){
+      this.setState({
+        Repo: Repo.success,
+      }, console.log(Repo));
+    }
+    else{
+      alert(Repo.error);
+    }
+  }
   getLatestDR = async () => {
     const DRURI = await fetch('http://localhost:3001/DR').then((response) => response.json());
     if(!DRURI.error){
@@ -63,9 +75,9 @@ class LatestDR extends Component {
     })
   };
   updateDR = async() => {
-    const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
-    const prefix = 'https://github.com/tibonto/dr/commit/';
-    const downloadPrefix = 'https://github.com/tibonto/dr/archive/'
+    const link = `https://api.github.com/repos/${this.state.Repo}/commits/master`;
+    const prefix = `https://github.com/${this.state.Repo}/commit/`;
+    const downloadPrefix = `https://github.com/${this.state.Repo}/archive/`;
     fetch(link, {
           method: 'GET',
         //   headers: {
@@ -116,7 +128,7 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> <button onClick={this.updateDR}>update</button>
+                Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> {/* <button onClick={this.updateDR}>update</button> */}
               </Typography>
               <Typography
                 color="textPrimary"

@@ -14,23 +14,25 @@ OntologyInfo:
     - Process
     - Wired Communication
     - Cloud
-    - Battery Management System
+  Repo: tibonto/dr
+BlockchainInfo:
+  FileName: ./blockchain/blockchain_hist2.xlsx
+  OutFileName: ./blockchain/blockchain_hist2.xlsx
 UserInfo:
   - ID: member1
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 990
+    Tokens: 1010
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Fri Feb 24 2023 12:30:26 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Planning
       - Time
       - Supply Chain
       - Organisation
       - Semiconductor Production
-      - Battery Management System
     Expert: []
   - ID: member2
     Name: Philipp
@@ -70,21 +72,9 @@ UserInfo:
     LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
-OngoingProposalInfo:
+OngoingProposalInfo: []
+ClosedProposalInfo:
   - ID: proposal1
-    URI: https://github.com/tibonto/dr/commit/<new branch hash>
-    Domain: Battery Management System
-    Valid: '1'
-    AuthorID: member1
-    Proposal_Message: new proposal from a branch
-    Creation_Date: Fri Feb 24 2023 12:30:28 GMT+0000 (Coordinated Universal Time)
-    State: ongoing
-    Type: newProposal
-    OriginalID: ''
-    NumAcceptedVotes: 0
-    NumRejectedVotes: 0
-    AcceptedVotes: []
-    RejectedVotes: []
-    Hash: >-
-      https://github.com/tibonto/dr/archive/08cc171ae8fe31f2c84c826b4cc42f722158e303.zip
-ClosedProposalInfo: []
+    State: accept
+    EndDate: Fri Feb 24 2023 15:05:24 GMT+0000 (Coordinated Universal Time)
+    Veto: false

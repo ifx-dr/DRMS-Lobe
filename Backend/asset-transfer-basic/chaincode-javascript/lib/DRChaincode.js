@@ -63,7 +63,7 @@ class DRChaincode extends Contract {
         let ongoingProposals = ledgerTXT['OngoingProposalInfo'];
         console.log(ongoingProposals)
         let closedProposals = ledgerTXT['ClosedProposalInfo'];
-        let domains = ledgerTXT['OntologyInfo']['Domains'];;
+        let domains = ledgerTXT['OntologyInfo']['Domains'];
 
         let membersInDomain = {};
         let allLobeOwners = {};
@@ -71,36 +71,36 @@ class DRChaincode extends Contract {
             membersInDomain[domain] = [];
             allLobeOwners[domain] = null;
         }
-        membersInDomain = {
-            "Planning": [],
-            "Time":[],
-            "Supply Chain":[],
-            "Organisation":[],
-            "Semiconductor Production":[],
-            "Product":[],
-            "Power":[],
-            "Sensor":[],
-            "Semi-conductor Development":[],
-            "System":[],
-            "Process":[],
-            "Wired Communication":[],
-            "Cloud":[],
-        }
-        allLobeOwners = {
-            "Planning": null,
-            "Time":null,
-            "Supply Chain":null,
-            "Organisation":null,
-            "Semiconductor Production":null,
-            "Product":null,
-            "Power":null,
-            "Sensor":null,
-            "Semi-conductor Development":null,
-            "System":null,
-            "Process":null,
-            "Wired Communication":null,
-            "Cloud":null,
-        }
+        // membersInDomain = {
+        //     "Planning": [],
+        //     "Time":[],
+        //     "Supply Chain":[],
+        //     "Organisation":[],
+        //     "Semiconductor Production":[],
+        //     "Product":[],
+        //     "Power":[],
+        //     "Sensor":[],
+        //     "Semi-conductor Development":[],
+        //     "System":[],
+        //     "Process":[],
+        //     "Wired Communication":[],
+        //     "Cloud":[],
+        // }
+        // allLobeOwners = {
+        //     "Planning": null,
+        //     "Time":null,
+        //     "Supply Chain":null,
+        //     "Organisation":null,
+        //     "Semiconductor Production":null,
+        //     "Product":null,
+        //     "Power":null,
+        //     "Sensor":null,
+        //     "Semi-conductor Development":null,
+        //     "System":null,
+        //     "Process":null,
+        //     "Wired Communication":null,
+        //     "Cloud":null,
+        // }
         
         for(let member of members){
             let date_part = member.LastParticipation.split('.');
@@ -181,12 +181,13 @@ class DRChaincode extends Contract {
             await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify('none')));
         
 
-        // const latestDR = 'http://localhost:3006/v0';
-        const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
+        const latestDR = '';
+        // const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         // download link of the ongoing proposal
         // const fileHash = 'https://ipfs.io/ipfs/QmSWDa85q8FQzB8qAnuoxZ4LDoXoWKmD6t4sPszdq5FiW2?filename=test.owl';
-        const fileHash = 'https://github.com/tibonto/dr/archive/50d0834deba2ce791772be7932055cf1a7bb9545.zip'
+        // const fileHash = 'https://github.com/tibonto/dr/archive/50d0834deba2ce791772be7932055cf1a7bb9545.zip'
+        const fileHash = '';
         await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
 
         ////////////////////
@@ -217,7 +218,17 @@ class DRChaincode extends Contract {
         console.log(latestBlock);
         // latestBlock = JSON.parse(latestBlock);
         // ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
-        ctx.stub.putState('latestBlock', Buffer.from(latestBlock));
+        await ctx.stub.putState('latestBlock', Buffer.from(latestBlock));
+        latestBlock = JSON.parse(latestBlock);
+        let latestDR = 'New project: please upload ontology file';
+        let fileHash = 'New project: please upload ontology file';
+        if(latestBlock.data!=='Genesis Block'){
+            latestDR = latestBlock.data;
+            let hash = latestDR.split('/').pop();
+            fileHash = `https://github.com/tibonto/dr/archive/${hash}.zip`;
+        }
+        await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
+        await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
     }
 
     // async Init_Ledger(ctx) {
@@ -1015,7 +1026,7 @@ class DRChaincode extends Contract {
             }
             await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
-            // await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+            await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));
         }
         ////////////////////

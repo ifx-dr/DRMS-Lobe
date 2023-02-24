@@ -25,7 +25,8 @@ export default class GenerateBlock extends Component {
       nextCommitHash: '',
       commitMessage: '', 
       Redirect: '',
-      newBlockReq: '' 
+      newBlockReq: '',
+      Repo: ''
     }
   }
 
@@ -94,26 +95,35 @@ export default class GenerateBlock extends Component {
     })
   };
   getCommitInfo = async() => {
-    // using GitHub api to get commit info
-    const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
-    const prefix = 'https://github.com/tibonto/dr/commit/';
-    fetch(link, {
-          method: 'GET',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify(data)
-        }).then(function(resp){
-            // console.log(resp.json());
-            return resp.json();
-        }).then((body)=>{
-            console.log(body.sha)
-            console.log(body.commit.message)
-            this.setState({
-              nextCommitHash: prefix+body.sha,
-              commitMessage: body.commit.message
-            })
-        })
+    const Repo = await fetch('http://localhost:3001/Repo').then((response) => response.json());
+    if(!Repo.error){
+      this.setState({
+        Repo: Repo.success,
+      }, console.log(Repo));
+      // using GitHub api to get commit info
+      const link = `https://api.github.com/repos/${this.state.Repo}/commits/master`;
+      const prefix = `https://github.com/${this.state.Repo}/commit/`;
+      fetch(link, {
+            method: 'GET',
+          //   headers: {
+          //     'Content-Type': 'application/json'
+          //   },
+          //   body: JSON.stringify(data)
+          }).then(function(resp){
+              // console.log(resp.json());
+              return resp.json();
+          }).then((body)=>{
+              console.log(body.sha)
+              console.log(body.commit.message)
+              this.setState({
+                nextCommitHash: prefix+body.sha,
+                commitMessage: body.commit.message
+              })
+      })
+    }
+    else{
+      alert(Repo.error);
+    }
   }
   getTimeStamp = async () => {
     let d = new Date();
