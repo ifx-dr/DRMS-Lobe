@@ -26,7 +26,7 @@ export default class GenerateBlock extends Component {
       commitMessage: '', 
       Redirect: '',
       newBlockReq: '',
-      Repo: ''
+      Repo: null
     }
   }
 
@@ -101,8 +101,8 @@ export default class GenerateBlock extends Component {
         Repo: Repo.success,
       }, console.log(Repo));
       // using GitHub api to get commit info
-      const link = `https://api.github.com/repos/${this.state.Repo}/commits/master`;
-      const prefix = `https://github.com/${this.state.Repo}/commit/`;
+      const link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
+      const prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
       fetch(link, {
             method: 'GET',
           //   headers: {
@@ -177,6 +177,10 @@ export default class GenerateBlock extends Component {
       index: this.state.nextIndex,
       timestamp: this.state.nextTimestamp,
       data: this.state.nextCommitHash
+    }
+    if(data.data===this.state.latestBlock.data){
+      alert('New branch is to be merged before block generation!');
+      return;
     }
     // const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
     // const prefix = 'https://github.com/tibonto/dr/commit/';

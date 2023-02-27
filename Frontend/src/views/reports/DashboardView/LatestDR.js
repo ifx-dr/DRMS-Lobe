@@ -13,7 +13,7 @@ class LatestDR extends Component {
     this.state = {
       DR: '',
       OngoingDR: '',
-      Repo: '',
+      Repo: null,
       files: null,
       open: false,
     };
@@ -75,9 +75,9 @@ class LatestDR extends Component {
     })
   };
   updateDR = async() => {
-    const link = `https://api.github.com/repos/${this.state.Repo}/commits/master`;
-    const prefix = `https://github.com/${this.state.Repo}/commit/`;
-    const downloadPrefix = `https://github.com/${this.state.Repo}/archive/`;
+    const link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
+    const prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
+    const downloadPrefix = `https://github.com/${this.state.Repo.RepoName}/archive/`;
     fetch(link, {
           method: 'GET',
         //   headers: {

@@ -44,6 +44,7 @@ var NewBlockLock = true;
 var allDomains = [];
 var ontologyName = '';
 var repo = '';
+var defaultBranch = '';
 var fileName = '';
 var outFileName = '';
 var ledgerFile = 'ledger.yaml';
@@ -128,6 +129,7 @@ async function main() {
 				allDomains = ledger['OntologyInfo']['Domains'];
 				ontologyName = ledger['OntologyInfo']['Name'];
 				repo = ledger['OntologyInfo']['Repo'];
+				defaultBranch = ledger['OntologyInfo']['Default'];
 				fileName = ledger['BlockchainInfo']['FileName'];
 				outFileName = ledger['BlockchainInfo']['OutFileName'];
 				if(!fs.existsSync(fileName)){
@@ -166,7 +168,8 @@ async function main() {
 						ledger["OntologyInfo"] = {
 							Name: ontologyName,
 							Domains: allDomains,
-							Repo: repo
+							Repo: repo,
+							Default: defaultBranch
 						}
 						ledger["BlockchainInfo"] = {
 							FileName: fileName,
@@ -249,7 +252,10 @@ async function main() {
 				res.json(result);
 			});
 			app.get("/Repo", async (req, res) => {
-				let result = {"success":repo};
+				let result = {"success":{
+					RepoName: repo,
+					DefaultBranch: defaultBranch
+				}};
 				res.json(result);
 			});
 			app.get("/DR", async (req, res) => {

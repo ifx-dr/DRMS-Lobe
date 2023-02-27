@@ -223,9 +223,15 @@ class DRChaincode extends Contract {
         let latestDR = 'New project: please upload ontology file';
         let fileHash = 'New project: please upload ontology file';
         if(latestBlock.data!=='Genesis Block'){
+            https://github.com/ifx-dr/Update-Test-DR-Sub-Onto/commit/ac9aef219f062221dc147d65b4fdfc5e5930804d
             latestDR = latestBlock.data;
-            let hash = latestDR.split('/').pop();
-            fileHash = `https://github.com/tibonto/dr/archive/${hash}.zip`;
+            let latestDRSplit = latestDR.split('/');
+            let hash = latestDRSplit.pop();
+            latestDRSplit.pop();
+            let repoName = latestDRSplit.pop();
+            let repoAuthor = latestDRSplit.pop();
+            let repo = repoAuthor + '/' + repoName;
+            fileHash = `https://github.com/${repo}/archive/${hash}.zip`;
         }
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
@@ -750,7 +756,8 @@ class DRChaincode extends Contract {
     async CreateProposal(ctx, domain, uri, author_id, message, type, originalID, download){
         //get amount of total proposals, for later update
         let total_proposals = await ctx.stub.getState('total_proposals');
-        let valid = parseInt(total_proposals) + 1;
+        // let valid = parseInt(total_proposals) + 1;
+        let valid = parseInt(total_proposals);
         //generate a new id
         let id = 'proposal'+ valid;
         //get the author
