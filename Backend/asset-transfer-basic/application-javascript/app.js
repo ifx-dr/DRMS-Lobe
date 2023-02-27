@@ -47,7 +47,8 @@ var repo = '';
 var defaultBranch = '';
 var fileName = '';
 var outFileName = '';
-var ledgerFile = 'ledger.yaml';
+// specify the config file to change project
+var ledgerFile = 'ledger_sub.yaml';
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded

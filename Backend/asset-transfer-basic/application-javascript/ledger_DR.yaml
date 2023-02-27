@@ -1,5 +1,5 @@
 OntologyInfo:
-  Name: DigitalReference2.ttl
+  Name: DigitalReference.ttl
   Domains:
     - Planning
     - Time
@@ -15,15 +15,16 @@ OntologyInfo:
     - Wired Communication
     - Cloud
   Repo: tibonto/dr
+  Default: master
 BlockchainInfo:
-  FileName: ./blockchain/blockchain_hist2.xlsx
-  OutFileName: ./blockchain/blockchain_hist2.xlsx
+  FileName: ./blockchain/blockchain_hist_DR.xlsx
+  OutFileName: ./blockchain/blockchain_hist_DR.xlsx
 UserInfo:
   - ID: member1
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1010
+    Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
@@ -74,7 +75,7 @@ UserInfo:
     Expert: []
 OngoingProposalInfo: []
 ClosedProposalInfo:
-  - ID: proposal1
+  - ID: proposal0
     State: accept
     EndDate: Fri Feb 24 2023 15:05:24 GMT+0000 (Coordinated Universal Time)
     Veto: false

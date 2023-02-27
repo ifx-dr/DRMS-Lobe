@@ -18,8 +18,8 @@ OntologyInfo:
   Repo: ifx-dr/Update-Test-DR-Sub-Onto
   Default: main
 BlockchainInfo:
-  FileName: ./blockchain/blockchain_hist_sub_arrowhead.xlsx
-  OutFileName: ./blockchain/blockchain_hist_sub_arrowhead.xlsx
+  FileName: ./blockchain/blockchain_hist_sub.xlsx
+  OutFileName: ./blockchain/blockchain_hist_sub.xlsx
 UserInfo:
   - ID: member1
     Name: Hans
