@@ -18,17 +18,17 @@ OntologyInfo:
   Repo: ifx-dr/Update-Test-DR-Sub-Onto
   Default: main
 BlockchainInfo:
-  FileName: ./blockchain/blockchain_hist_sub.xlsx
-  OutFileName: ./blockchain/blockchain_hist_sub.xlsx
+  FileName: ./blockchain/blockchain_hist_sub_arrowhead.xlsx
+  OutFileName: ./blockchain/blockchain_hist_sub_arrowhead.xlsx
 UserInfo:
   - ID: member1
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1000
+    Tokens: 1010
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Feb 27 2023 08:27:20 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Mon Feb 27 2023 08:31:34 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Arrowhead
       - Automation Technologies
@@ -43,7 +43,7 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Mon Feb 27 2023 08:31:53 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - PRIMA
       - PMV
@@ -58,7 +58,7 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Mon Feb 27 2023 08:31:04 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - SemiOps
       - Sensor
@@ -80,4 +80,8 @@ ClosedProposalInfo:
   - ID: proposal0
     State: accept
     EndDate: Mon Feb 27 2023 08:27:22 GMT+0000 (Coordinated Universal Time)
+    Veto: false
+  - ID: proposal1
+    State: accept
+    EndDate: Mon Feb 27 2023 08:31:55 GMT+0000 (Coordinated Universal Time)
     Veto: false
