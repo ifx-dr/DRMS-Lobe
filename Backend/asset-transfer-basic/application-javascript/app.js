@@ -387,6 +387,16 @@ async function main() {
 					console.log('\n--> Submit Transaction: CreatedProposal');
 					let message = '';
 					console.log('author: '+req.body.author)
+					if(req.body.domain instanceof Array){
+						console.log('domain is an array');
+						let allDomains = '';
+						for(let i=0;i<req.body.domain.length;i++)
+							allDomains += req.body.domain[i] + '|'
+						// req.body.domain = JSON.stringify(req.body.domain);
+						req.body.domain = allDomains;
+					}
+					else
+						req.body.domain += '|';
 					let result;
 					for(let i=0;i<retry_cnt;i++){
 						try {
@@ -395,7 +405,7 @@ async function main() {
 								message = 'Penalization for inactivity: ' + penalization.toString() + ' tokens removed.\n';
 								console.log(message);
 							}
-
+							console.log(`app createProposal domain: ${req.body.domain}`)
 							let res = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID, req.body.download);
 							console.log('******The creation result is:' + res);
 							if (message != '') res += message + '\n';

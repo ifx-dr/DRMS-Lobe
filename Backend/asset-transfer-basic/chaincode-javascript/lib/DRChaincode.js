@@ -774,37 +774,86 @@ class DRChaincode extends Contract {
         //Check whether this proposal is a veto proposal
         if(type !== 'newProposal'){
             //Check whether the author is able to create a veto proposal
-            let vetoPower = await this.CheckVetoProposal(ctx, domain, author_id, originalID);
-            console.log('*****It is a veto proposal'+vetoPower + type + author_id);
+            // let vetoPower = await this.CheckVetoProposal(ctx, domain, author_id, originalID);
+            // console.log('*****It is a veto proposal'+vetoPower + type + author_id);
+
+            // only the supervisor of the previous proposal has veto power
+            let originalProposal = await this.GetProposal(ctx, originalID);
+            if(originalProposal.error){
+                return ('Sorry You are not able to create this veto proposal: \n\
+                         cannot get the original proposal');
+            }
+            let vetoPower = originalProposal.Supervisor == author_id;
             if(vetoPower !== true){
-                return ('Sorry You are not able to create this veto proposal');
+                return ('Sorry You are not able to create this veto proposal: \n\
+                         you are not the supervisor of the original proposal');
             }
         }
-        // check if the domain is new
-        // if so, the author will be assigned to be the lobe owner
+        
         let allLobeOwners = await this.GetAllLobeOwners(ctx);
-        if(!(domain in allLobeOwners)){
-            console.log('cc createProposal: new domain '+domain);
-            allLobeOwners[domain] = author_id;
-            let membersInDomain = await this.GetMembersInDomain(ctx);
-            membersInDomain[domain] = [author_id];
-            members = await this.GetMembers(ctx);
-            for(let i=0;i<members.length;i++){
-                if(members[i].ID===author_id){
-                    members[i].LobeOwner.push(domain);
-                    break;
+        let membersInDomain = await this.GetMembersInDomain(ctx);
+        members = await this.GetMembers(ctx);
+        
+        let domain_list = domain.split(domain[domain.length-1]);
+        domain_list.pop()
+        console.log(`cc createProposal: ${domain_list}`);
+
+        for(let domain of domain_list){
+            if(!(domain in allLobeOwners)){
+                console.log(`cc createProposal: new domain ${domain}`);
+                allLobeOwners[domain] = author_id;
+                membersInDomain[domain] = [author_id];
+                for(let i=0;i<members.length;i++){
+                    if(members[i].ID===author_id){
+                        members[i].LobeOwner.push(domain);
+                        break;
+                    }
                 }
             }
-            await this.UpdateMembers(ctx, members);
-            await this.UpdateInfo(ctx, 'membersInDomain', membersInDomain);
-            await this.UpdateAllLobeOwners(ctx, allLobeOwners);
         }
+        await this.UpdateMembers(ctx, members);
+        await this.UpdateInfo(ctx, 'membersInDomain', membersInDomain);
+        await this.UpdateAllLobeOwners(ctx, allLobeOwners);
+
+        let supervisor;
+        let mostToken = 0;
+        for(let d of domain_list){
+            let lo = allLobeOwners[d];
+            let member = members.find(member => member.ID == lo);
+            console.log(`lobe owner of ${d} is ${lo} with ${member.Tokens} tokens`);
+            if(member.Tokens>mostToken){
+                mostToken = member.Tokens;
+                supervisor = lo;
+            }
+        }
+        console.log(`cc createProposal: supervisor of ${id} is ${supervisor}`);
+
+        // check if the domain is new
+        // if so, the author will be assigned to be the lobe owner
+        // let allLobeOwners = await this.GetAllLobeOwners(ctx);
+        // if(!(domain in allLobeOwners)){
+        //     console.log('cc createProposal: new domain '+domain);
+        //     allLobeOwners[domain] = author_id;
+        //     let membersInDomain = await this.GetMembersInDomain(ctx);
+        //     membersInDomain[domain] = [author_id];
+        //     members = await this.GetMembers(ctx);
+        //     for(let i=0;i<members.length;i++){
+        //         if(members[i].ID===author_id){
+        //             members[i].LobeOwner.push(domain);
+        //             break;
+        //         }
+        //     }
+        //     await this.UpdateMembers(ctx, members);
+        //     await this.UpdateInfo(ctx, 'membersInDomain', membersInDomain);
+        //     await this.UpdateAllLobeOwners(ctx, allLobeOwners);
+        // }
         let proposal = {
             ID: id,
             URI: uri,
             Domain: domain,
             Valid: valid.toString(),
             AuthorID: author_id,
+            Supervisor: supervisor,
             Proposal_Message: message,
             Creation_Date: Date(),
             State: 'ongoing',
@@ -854,13 +903,16 @@ class DRChaincode extends Contract {
         }
 
         let proposal = await this.GetProposal(ctx, prop_id);
-        let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
+        // let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
         console.log('proposal to vote is:' + proposal);
-        console.log('lobeowner of the domain is: ' + lobeOwner);
+        // console.log('lobeowner of the domain is: ' + lobeOwner);
+
+        let supervisor = proposal.Supervisor;
+        console.log('supervisor is: '+supervisor);
 
         //check whether the voter votes for his own proposal
         const ownProposal = await this.CheckOwnProposal(ctx, proposal.AuthorID, voter_id);
-        if(ownProposal === true && voter_id!=lobeOwner) {
+        if(ownProposal === true && voter_id!=supervisor) {
             result.Message = 'Sorry you can not vote for your own proposal!';
             return JSON.stringify(result);
         }
@@ -884,14 +936,15 @@ class DRChaincode extends Contract {
         }
         
         //check whether the vote comes from a lobe owner && within 24 hours since proposal has been ongoing
-        let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
-        console.log('The result*****' + lobeownerVote);
+        // let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
+        // console.log('The result*****' + lobeownerVote);
+        let timeOut = await this.CheckTimeOut(ctx);
         try {
-            if (lobeownerVote === 'TimeOut') {
-                result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
+            if (timeOut) {
+                result.Message = 'Supervisor cannot vote after 24 hours since the proposal is ongoing';
                 return JSON.stringify(result);
             }
-            if(lobeownerVote === 'LO') {
+            else if(proposal.Supervisor==voter_id){
                 // A lobe owner votes within 24 hour, so his vote decide the result of the proposal
                 // thus, EndProposal() is triggered. Remove the deposit of tokens for voting.
                 console.log('*******' + proposal.URI);
@@ -907,7 +960,7 @@ class DRChaincode extends Contract {
                 if(vote === 'accept') {
                     await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
                 }
-                result.Message = 'Lobe Owner Successfully Vote for proposal!';
+                result.Message = 'Supervisor Successfully Vote for proposal!';
                 result.Finished = true;
                 return JSON.stringify(result);
             }
@@ -1023,13 +1076,14 @@ class DRChaincode extends Contract {
             // blockchain.push(latestBlock);
             // await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
             // await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
-            let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
+            
+            // let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
             let newBlockRequest = {
                 newBlockWaiting: 'true',
                 proposalID: proposalID,
                 author: proposal.AuthorID,
-                lobeOwner: lobeOwner,
-                supervisor: 'n/a'
+                // lobeOwner: lobeOwner,
+                supervisor: proposal.Supervisor
             }
             await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
@@ -1050,6 +1104,7 @@ class DRChaincode extends Contract {
             ID: closedProposalID,
             State: result,
             EndDate: Date(),
+            Supervisor: proposal.Supervisor,
             Veto: false
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
@@ -1235,7 +1290,18 @@ class DRChaincode extends Contract {
             }
         }
     }
-    
+    async CheckTimeOut(ctx) {
+        //check whether the vote is timed out
+        //Check whether within 24 Hours min since proposal is ongoing
+        let startTime = await ctx.stub.getState('time');
+        startTime = new Date(startTime);
+        let currentT = new Date().getTime();
+        if( (currentT - startTime) > 86400000) {
+            console.log('Out of time' + (currentT - startTime));
+            return true;
+        }
+        return false;
+    }
     async DRUpload_Available(ctx) {
         console.log('checking the DRUpload Right');
         let ongoingProp_ID = JSON.parse(await ctx.stub.getState('ongoingProposal'));

@@ -29,6 +29,8 @@ export default class CreateNewProp extends Component {
       Download: '',
       Redirect:'',
       allDomains: [],
+      chosenDomains: [],
+      newDomains: [],
       newBlockReq:''
     }
   }
@@ -99,11 +101,15 @@ export default class CreateNewProp extends Component {
     }
   };
 
-  handleChangeD = async (event) => {
+  handleChooseDomain = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
-    this.setState({
-      Domain: value,
-    });
+    let chosenDomains = this.state.chosenDomains;
+    if(!chosenDomains.includes(value[0])){
+      chosenDomains.push(value[0]);
+      this.setState({
+        chosenDomains: chosenDomains,
+      });
+    }
   };
   handleChangeU = async (event) => {
     let value = event.target.value;
@@ -131,6 +137,27 @@ export default class CreateNewProp extends Component {
       NewDomain: value
     })
   }
+  handleInputNewDomain = async (event) => {
+    let chosenDomains = this.state.chosenDomains;
+    if(this.state.NewDomain.length!==0 && !chosenDomains.includes(this.state.NewDomain)){
+      chosenDomains.push(this.state.NewDomain);
+      this.setState({
+        chosenDomains:chosenDomains
+      });
+    }
+  }
+  handleRemoveDomain = async (value, event) => {
+    let chosenDomains = this.state.chosenDomains;
+    for (var i = 0; i < chosenDomains.length; i++) {
+      if (chosenDomains[i] === value) {
+        chosenDomains.splice(i, 1);
+        break;
+      }
+    }
+    this.setState({
+      chosenDomains: chosenDomains
+    })
+  }
 
   async handleSubmit(event){
     // const {token, setToken} = useToken();
@@ -148,26 +175,26 @@ export default class CreateNewProp extends Component {
     // console.log("author: "+token.ID);
     event.preventDefault();
 
-    let domain;
-    if(this.state.NewDomain!==''){
-      // this.setState({
-      //   Domain: this.state.NewDomain
-      // })
-      // console.log(this.state.Domain)
-      // console.log(this.state.NewDomain)
-      domain = this.state.NewDomain;
-      if(!(this.state.allDomains.find(d => d==domain))){
-        let newConfig = {
-          allDomains: this.state.allDomains
-        };
-        newConfig["allDomains"].push(domain);
-        await this.saveDomains(newConfig);
-        await this.loadDomains();
-      }
-    }
-    else
-      domain = this.state.Domain;
-
+    // let domain;
+    // if(this.state.NewDomain!==''){
+    //   // this.setState({
+    //   //   Domain: this.state.NewDomain
+    //   // })
+    //   // console.log(this.state.Domain)
+    //   // console.log(this.state.NewDomain)
+    //   domain = this.state.NewDomain;
+    //   if(!(this.state.allDomains.find(d => d==domain))){
+    //     let newConfig = {
+    //       allDomains: this.state.allDomains
+    //     };
+    //     newConfig["allDomains"].push(domain);
+    //     await this.saveDomains(newConfig);
+    //     await this.loadDomains();
+    //   }
+    // }
+    // else
+    //   domain = this.state.Domain;
+    let domain = this.state.chosenDomains;
     const data = {
       type: this.state.Type,
       // domain: this.state.Domain,
@@ -260,7 +287,7 @@ export default class CreateNewProp extends Component {
                   >
                     Knowledge Domain
                   </Typography>
-                  <select value={this.state.Domain} onChange={this.handleChangeD}>
+                  <select value={this.state.Domain} onChange={this.handleChooseDomain}>
                     <option></option>
                     {
                       this.state.allDomains.map((value, index) => {
@@ -268,6 +295,21 @@ export default class CreateNewProp extends Component {
                       })
                     }
                   </select>
+                  <Typography
+                    color="textPrimary"
+                    gutterBottom
+                    variant="h6"
+                  >
+                  selected domains: 
+                  {this.state.chosenDomains.map((value, index) => {
+                      return (
+                        // <li key={index}>{value}</li>
+                        <button type="button" onClick={this.handleRemoveDomain.bind(this, value)}>{value}</button>
+                      );
+                      // return <button>{value}<button onClick={this.removeDomain}>X</button></button>;
+                    }
+                  )}
+                  </Typography>
                 </Grid>
               </Grid>
                 <TextField
@@ -280,6 +322,7 @@ export default class CreateNewProp extends Component {
                   value={this.state.NewDomain}
                   variant="outlined"
                 />
+                <button type="button" onClick={this.handleInputNewDomain}>add new domain</button>
                 <TextField
                   fullWidth
                   onChange={this.handleChangeU}
