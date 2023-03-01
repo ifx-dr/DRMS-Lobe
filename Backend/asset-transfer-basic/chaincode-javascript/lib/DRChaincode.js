@@ -723,6 +723,16 @@ class DRChaincode extends Contract {
         return ('LO');
     }
 
+    async CheckTimeOut(ctx, startTimeString, maxHours){
+        let endTime = new Date();
+        let startTime = new Date(startTimeString);
+        let diff = (startTime.getTime() - endTime.getTime())/(1000*3600);
+        if(diff > maxHours)
+            return true;
+        else
+            return false;
+    }
+
     async CheckVetoProposal(ctx, domain, author_id, originalID){
         // To create a veto proposal, the author should be a lobe owner
         // and the original proposal has been accepted within 30 days
@@ -883,17 +893,19 @@ class DRChaincode extends Contract {
             return JSON.stringify(result);
         }
         
-        //check whether the vote comes from a lobe owner && within 24 hours since proposal has been ongoing
-        let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
-        console.log('The result*****' + lobeownerVote);
-        try {
-            if (lobeownerVote === 'TimeOut') {
+
+        // check role & time: 
+        // 1. lobe owner, time out: cannot vote any more
+        // 2. lobe owner, not time out: lobe owner permission
+        // 3. expert, time out: expert voting
+        // 4. expert, not time out: wait for lobe owner voting
+        let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date, 24);
+        if(voter_id===lobeOwner){
+            if(isTimeOut){
                 result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
                 return JSON.stringify(result);
             }
-            if(lobeownerVote === 'LO') {
-                // A lobe owner votes within 24 hour, so his vote decide the result of the proposal
-                // thus, EndProposal() is triggered. Remove the deposit of tokens for voting.
+            else{
                 console.log('*******' + proposal.URI);
                 let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
                 if(removeResult === -1) {
@@ -911,9 +923,44 @@ class DRChaincode extends Contract {
                 result.Finished = true;
                 return JSON.stringify(result);
             }
-        } catch(e){
-            console.log('********Problems when checking Lobe Owners Voting power'+e);
         }
+        else{
+            if(!isTimeOut){
+                result.Message = 'Please wait: Lobe Owner has not voted yet!';
+                return JSON.stringify(result);
+            }
+        }
+        // //check whether the vote comes from a lobe owner && within 24 hours since proposal has been ongoing
+        // let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
+        // console.log('The result*****' + lobeownerVote);
+        // try {
+        //     if (lobeownerVote === 'TimeOut') {
+        //         result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
+        //         return JSON.stringify(result);
+        //     }
+        //     if(lobeownerVote === 'LO') {
+        //         // A lobe owner votes within 24 hour, so his vote decide the result of the proposal
+        //         // thus, EndProposal() is triggered. Remove the deposit of tokens for voting.
+        //         console.log('*******' + proposal.URI);
+        //         let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
+        //         if(removeResult === -1) {
+        //             result.Message = 'Problems removing tokens';
+        //             return JSON.stringify(result);
+        //         }
+
+        //         proposal = await this.AddVoter(proposal, voter_id, vote, message);
+        //         await this.UpdateProposal(ctx, proposal, prop_id);
+                
+        //         if(vote === 'accept') {
+        //             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+        //         }
+        //         result.Message = 'Lobe Owner Successfully Vote for proposal!';
+        //         result.Finished = true;
+        //         return JSON.stringify(result);
+        //     }
+        // } catch(e){
+        //     console.log('********Problems when checking Lobe Owners Voting power'+e);
+        // }
 
         // Remove the deposit to the member 
         let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
@@ -923,7 +970,7 @@ class DRChaincode extends Contract {
         } 
 
         let total_members = await ctx.stub.getState('total_members');
-        total_members = JSON.parse(total_members) - 1;
+        // total_members = JSON.parse(total_members) - 1;
 
         // Add the vote inside the proposal
         proposal = await this.AddVoter(proposal, voter_id, vote, message);
@@ -933,7 +980,15 @@ class DRChaincode extends Contract {
         // Check whether already majority members have voted fo the proposal
         // If yes, the will check the result of the proposal and then close it.
         // Here we take 50% as majority
-        if(totalVotes > total_members/2) {
+        // base: the number of experts who can vote
+        let base = total_members;
+        if(lobeOwner===proposal.AuthorID)
+            // lobe owner don't act in the expert voting
+            base -= 1;
+        else
+            // lobe owner and the author don't act in the expert voting
+            base -= 2;
+        if(totalVotes > base/2) {
             let finalResult = await this.ProposalVoteResult(ctx, proposal);
             return finalResult;
         }
@@ -1146,8 +1201,9 @@ class DRChaincode extends Contract {
         let currentDate = new Date();
         let lastParticipation = new Date(member.LastParticipation);
         
-        let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
-
+        // let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
+        // 1 month = 4 weeks
+        let difference = (currentDate.getTime()-lastParticipation.getTime())/(1000*86400*28);
         return difference;
     }
 

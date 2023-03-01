@@ -77,8 +77,6 @@ UserInfo:
     Expert: []
 OngoingProposalInfo: []
 ClosedProposalInfo:
-  - null
-  - null
   - ID: proposal2
     State: reject
     EndDate: Wed Mar 01 2023 16:01:39 GMT+0000 (Coordinated Universal Time)
