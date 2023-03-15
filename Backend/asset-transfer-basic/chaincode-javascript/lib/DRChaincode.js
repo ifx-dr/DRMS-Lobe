@@ -838,7 +838,10 @@ class DRChaincode extends Contract {
         };
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(parseInt(total_proposals) + 1)));
         //the author's total proposals should increase by 1
+        members = await this.GetMembers(ctx);
+        member = members.find(member => member.ID == author_id);
         member.Total_Proposal = parseInt(member.Total_Proposal)+1;
+        await this.UpdateMembers(ctx, members);
         //add new proposal to the world state
 
         let ongoingProposalQueue = JSON.parse(await ctx.stub.getState('ongoingProposalQueue'));
@@ -1100,6 +1103,11 @@ class DRChaincode extends Contract {
 
             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));
+
+            let members = await this.GetMembers(ctx);
+            let member = members.find(member => member.ID == proposal.AuthorID);
+            member.Total_Accepted_Proposal = parseInt(member.Total_Accepted_Proposal)+1;
+            await this.UpdateMembers(ctx, members);
         }
         ////////////////////
         
