@@ -1,25 +1,13 @@
 OntologyInfo:
-  Name: DigitalReference.ttl
+  Name: time.owl
   Domains:
-    - Planning
     - Time
-    - Supply Chain
-    - Organisation
-    - Semiconductor Production
-    - Product
-    - Power
-    - Sensor
-    - Semi-conductor Development
-    - System
-    - Process
-    - Wired Communication
-    - Cloud
-    - Battery Management System
-  Repo: tibonto/dr
-  Default: master
+  Platform: GitLab
+  Repo: digital-reference/Time
+  Default: main
 BlockchainInfo:
-  FileName: ./blockchain/blockchain_hist_DR.xlsx
-  OutFileName: ./blockchain/blockchain_hist_DR.xlsx
+  FileName: ./blockchain/blockchain_hist_sub_Time.xlsx
+  OutFileName: ./blockchain/blockchain_hist_sub_Time.xlsx
 UserInfo:
   - ID: member1
     Name: Hans
@@ -30,11 +18,7 @@ UserInfo:
     Total_Accepted_Proposal: 0
     LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
-      - Planning
       - Time
-      - Supply Chain
-      - Organisation
-      - Semiconductor Production
     Expert: []
   - ID: member2
     Name: Philipp
@@ -44,11 +28,7 @@ UserInfo:
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
-    LobeOwner:
-      - Product
-      - Power
-      - Sensor
-      - Semi-conductor Development
+    LobeOwner: []
     Expert: []
   - ID: member3
     Name: Marta
@@ -58,12 +38,7 @@ UserInfo:
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
-    LobeOwner:
-      - System
-      - Process
-      - Wired Communication
-      - Cloud
-      - Battery Management System
+    LobeOwner: []
     Expert: []
   - ID: member4
     Name: Yipeng
@@ -76,18 +51,5 @@ UserInfo:
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
-ClosedProposalInfo:
-  - ID: proposal0
-    State: accept
-    EndDate: Fri Feb 24 2023 15:05:24 GMT+0000 (Coordinated Universal Time)
-    Veto: false
-  - ID: proposal1
-    State: accept
-    EndDate: Thu Mar 09 2023 10:02:04 GMT+0000 (Coordinated Universal Time)
-    Veto: false
-NewBlockRequest:
-  newBlockWaiting: 'false'
-  proposalID: n/a
-  author: n/a
-  lobeOwner: n/a
-  supervisor: n/a
+ClosedProposalInfo: []
+NewBlockRequest: null

@@ -10,7 +10,8 @@ import {
   Divider,
   useTheme,
   makeStyles,
-  colors
+  colors,
+  Typography
 } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
@@ -46,17 +47,23 @@ const WebVowl = ({ className, ...rest }) => {
       {...rest}
     >
       <CardHeader
-        title="WebVOWL"
+        title="Visualization"
       />
       <Divider />
       <CardContent>
         <Box
-          height={600}
+          // height={600}
           position="relative"
         >
           {/* <iframe src="http://www.visualdataweb.de/webvowl/" height="600" width="1200"/> */}
           {/* <iframe src="http://vowl.visualdataweb.org/webvowl-old/webvowl-old.html" height="600" width="1200"/> */}
-          <iframe src="http://vowl.visualdataweb.org/webvowl-old/webvowl-old.html" height="100%" width="100%"/>
+          {/* <iframe src="http://vowl.visualdataweb.org/webvowl-old/webvowl-old.html" height="100%" width="100%"/> */}
+          <Typography
+            color="textPrimary"
+            variant="h6"
+          >
+            For ontology visualization, please check: <a href='https://service.tib.eu/sc3/' target="_blank" rel={"noopener noreferrer"}>https://service.tib.eu/sc3/</a>
+          </Typography>
         </Box>
       </CardContent>
       <Divider />

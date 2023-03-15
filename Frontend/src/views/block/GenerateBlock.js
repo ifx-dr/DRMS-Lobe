@@ -35,7 +35,7 @@ export default class GenerateBlock extends Component {
     this.getCommitInfo();
     // if(sessionStorage.getItem('latestBlock')===null)
     this.getLatestBlock();
-    this.getTimeStamp();
+    // this.getTimeStamp();
   }
   getNewBlockRequest = async () => {
     let token = sessionStorage.getItem('token');
@@ -101,8 +101,18 @@ export default class GenerateBlock extends Component {
         Repo: Repo.success,
       }, console.log(Repo));
       // using GitHub api to get commit info
-      const link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
-      const prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
+      var link = '';
+      var prefix = '';
+      if(this.state.Repo.Platform==='GitHub'){
+        link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
+        prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
+      }
+      else{
+        // '/' in author/repo needs to be replaced with %2F
+        let rp = this.state.Repo.RepoName.split('/')[0] + '%2F' + this.state.Repo.RepoName.split('/')[1];
+        link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${this.state.Repo.DefaultBranch}`;
+        prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
+      }
       fetch(link, {
             method: 'GET',
           //   headers: {
@@ -113,20 +123,36 @@ export default class GenerateBlock extends Component {
               // console.log(resp.json());
               return resp.json();
           }).then((body)=>{
+            if(this.state.Repo.Platform==='GitHub'){
               console.log(body.sha)
               console.log(body.commit.message)
+              console.log(body.commit.author.date)
+              this.getTimeStamp(body.commit.author.date);
               this.setState({
                 nextCommitHash: prefix+body.sha,
+                nextTimestamp:'',
                 commitMessage: body.commit.message
               })
+            }
+            else{
+              console.log(body.id)
+              console.log(body.message)
+              console.log(body.committed_date)
+              this.getTimeStamp(body.committed_date);
+              this.setState({
+                nextCommitHash: prefix+body.id,
+                nextTimestamp:',',
+                commitMessage: body.message
+              })
+            }  
       })
     }
     else{
       alert(Repo.error);
     }
   }
-  getTimeStamp = async () => {
-    let d = new Date();
+  getTimeStamp = async (t) => {
+    let d = new Date(t);
     let date, month, year;
     if(d.getDate()<10)
       date = '0' + d.getDate();

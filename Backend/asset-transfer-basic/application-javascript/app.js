@@ -22,6 +22,7 @@ const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
 const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../test-application/javascript/CAUtil.js');
 const { buildCCPOrg1, buildWallet } = require('../../test-application/javascript/AppUtil.js');
+const { json } = require("express");
 
 const channelName = 'mychannel';
 const chaincodeName = 'basic';
@@ -48,7 +49,9 @@ var defaultBranch = '';
 var fileName = '';
 var outFileName = '';
 // specify the config file to change project
-var ledgerFile = 'ledger_sub.yaml';
+var ledgerFile = 'ledger_sub_OrderManagement.yaml';
+var platform = '';
+var newBlockRequest = null;
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -133,6 +136,8 @@ async function main() {
 				defaultBranch = ledger['OntologyInfo']['Default'];
 				fileName = ledger['BlockchainInfo']['FileName'];
 				outFileName = ledger['BlockchainInfo']['OutFileName'];
+				platform = ledger['OntologyInfo']['Platform'];
+				newBlockRequest = ledger['NewBlockRequest'];
 				if(!fs.existsSync(fileName)){
 					fs.writeFileSync(fileName, '', 'utf8');
 				}
@@ -145,7 +150,7 @@ async function main() {
 					try {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock));
+						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName);
 						let res = `ledger initialized from file, time: ${Date()}`;
 						console.log(`SUCCESS app initiate: ${res}`)
 						result = {"success":res};
@@ -170,7 +175,8 @@ async function main() {
 							Name: ontologyName,
 							Domains: allDomains,
 							Repo: repo,
-							Default: defaultBranch
+							Default: defaultBranch,
+							Platform: platform,
 						}
 						ledger["BlockchainInfo"] = {
 							FileName: fileName,
@@ -179,6 +185,7 @@ async function main() {
 						ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
 						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
+						ledger['NewBlockRequest'] = JSON.parse(await contract.evaluateTransaction("GetNewBlockRequest"));
 						let yamlStr = yaml.dump(ledger);
 						fs.writeFileSync(ledgerFile, yamlStr, 'utf8');
 
@@ -254,6 +261,7 @@ async function main() {
 			});
 			app.get("/Repo", async (req, res) => {
 				let result = {"success":{
+					Platform: platform,
 					RepoName: repo,
 					DefaultBranch: defaultBranch
 				}};
@@ -339,7 +347,7 @@ async function main() {
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());
 							await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()));
+							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()), platform, ontologyName);
 							await contract.submitTransaction('CloseNewBlockRequest');
 							res = 'Successfully generated a new block!'
 							console.log(`SUCCESS app generateBlock: ${res}`)

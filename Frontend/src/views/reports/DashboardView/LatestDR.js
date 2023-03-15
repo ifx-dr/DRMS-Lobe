@@ -75,8 +75,19 @@ class LatestDR extends Component {
     })
   };
   updateDR = async() => {
-    const link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
-    const prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
+    let link = '';
+    let prefix = '';
+    if(this.state.Repo.Platform==='GitHub'){
+      link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
+      prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
+    }
+    else{
+      // '/' in author/repo needs to be replaced with %2F
+      let rp = this.state.Repo.RepoName.split('/')[0] + '%2F' + this.state.Repo.RepoName.split('/')[1];
+      link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${this.state.Repo.DefaultBranch}`;
+      prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
+    }
+     
     const downloadPrefix = `https://github.com/${this.state.Repo.RepoName}/archive/`;
     fetch(link, {
           method: 'GET',
@@ -88,28 +99,39 @@ class LatestDR extends Component {
             // console.log(resp.json());
             return resp.json();
         }).then((body)=>{
+          let newDR = '';
+          let newHash = '';
+          if(this.state.Repo.Platform==='GitHub'){
             console.log(body.sha)
             console.log(body.commit.message)
-            let newDR = prefix+body.sha;
-            let newHash = downloadPrefix + body.sha + '.zip';
-            if(this.state.DR!==newDR){
-              let req = {
-                DR: newDR,
-                Hash: newHash
-              }
-              let result = fetch('http://localhost:3001/updateDR', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(req)
-                }).then((response) =>response.json());
-              this.setState({
-                DR: newDR,
-                // commitMessage: body.commit.message
-                Hash: newHash
-              })
+            newDR = prefix+body.sha;
+            newHash = downloadPrefix + body.sha + '.zip';
+          }
+          else{
+            console.log(body.id)
+            console.log(body.message)
+            newDR = prefix+body.id;
+            // fake: GitLab download link is different
+            newHash = downloadPrefix + body.id + '.zip';
+          }
+          if(this.state.DR!==newDR){
+            let req = {
+              DR: newDR,
+              Hash: newHash
             }
+            let result = fetch('http://localhost:3001/updateDR', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(req)
+              }).then((response) =>response.json());
+            this.setState({
+              DR: newDR,
+              // commitMessage: body.commit.message
+              Hash: newHash
+            })
+          }
         })
   }
 

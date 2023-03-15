@@ -1,25 +1,13 @@
 OntologyInfo:
-  Name: DigitalReference.ttl
+  Name: OrderManagement.owl
   Domains:
-    - Planning
-    - Time
     - Supply Chain
-    - Organisation
-    - Semiconductor Production
-    - Product
-    - Power
-    - Sensor
-    - Semi-conductor Development
-    - System
-    - Process
-    - Wired Communication
-    - Cloud
-    - Battery Management System
-  Repo: tibonto/dr
-  Default: master
+  Repo: digital-reference/order_management
+  Default: main
+  Platform: GitLab
 BlockchainInfo:
-  FileName: ./blockchain/blockchain_hist_DR.xlsx
-  OutFileName: ./blockchain/blockchain_hist_DR.xlsx
+  FileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
+  OutFileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
 UserInfo:
   - ID: member1
     Name: Hans
@@ -30,11 +18,7 @@ UserInfo:
     Total_Accepted_Proposal: 0
     LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
-      - Planning
-      - Time
       - Supply Chain
-      - Organisation
-      - Semiconductor Production
     Expert: []
   - ID: member2
     Name: Philipp
@@ -44,11 +28,7 @@ UserInfo:
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
-    LobeOwner:
-      - Product
-      - Power
-      - Sensor
-      - Semi-conductor Development
+    LobeOwner: []
     Expert: []
   - ID: member3
     Name: Marta
@@ -58,33 +38,37 @@ UserInfo:
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
-    LobeOwner:
-      - System
-      - Process
-      - Wired Communication
-      - Cloud
-      - Battery Management System
+    LobeOwner: []
     Expert: []
   - ID: member4
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 1000
+    Tokens: 960
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Wed Mar 15 2023 14:37:10 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
-OngoingProposalInfo: []
-ClosedProposalInfo:
+OngoingProposalInfo:
   - ID: proposal0
-    State: accept
-    EndDate: Fri Feb 24 2023 15:05:24 GMT+0000 (Coordinated Universal Time)
-    Veto: false
-  - ID: proposal1
-    State: accept
-    EndDate: Thu Mar 09 2023 10:02:04 GMT+0000 (Coordinated Universal Time)
-    Veto: false
+    URI: >-
+      https://gitlab.intra.infineon.com/digital-reference/order_management/-/commit/0cbfa12b1b13a926ec82b1efb039e4e4134d2053
+    Domain: Supply Chain
+    Valid: '0'
+    AuthorID: member4
+    Proposal_Message: 'update test 04: Order Management, GitLab'
+    Creation_Date: Wed Mar 15 2023 14:37:10 GMT+0000 (Coordinated Universal Time)
+    State: ongoing
+    Type: newProposal
+    OriginalID: ''
+    NumAcceptedVotes: 0
+    NumRejectedVotes: 0
+    AcceptedVotes: []
+    RejectedVotes: []
+    Hash: >-
+      https://gitlab.intra.infineon.com/digital-reference/order_management/-/raw/0cbfa12b1b13a926ec82b1efb039e4e4134d2053/OrderManagement.owl
+ClosedProposalInfo: []
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a

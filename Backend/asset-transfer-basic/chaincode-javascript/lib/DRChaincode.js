@@ -160,7 +160,7 @@ class DRChaincode extends Contract {
                 // closedProposal.docType = 'closedProposal';
                 await ctx.stub.putState(closedProposal.ID, Buffer.from(JSON.stringify(closedProposal)));
                 console.info(`ClosedProposal ${closedProposal.ID} initialized`);
-                closedProposalQueue.push(closedProposal);
+                closedProposalQueue.push(closedProposal.ID);
             }
         }
         await ctx.stub.putState("closedProposalQueue", Buffer.from(JSON.stringify(closedProposalQueue)));
@@ -195,14 +195,17 @@ class DRChaincode extends Contract {
         var voted = [];
         await ctx.stub.putState('voted', Buffer.from(JSON.stringify(voted)));
 
-        const finishedMerge = [];
-        await ctx.stub.putState('finishedMerge', Buffer.from(JSON.stringify(finishedMerge)));
+        // const finishedMerge = [];
+        // await ctx.stub.putState('finishedMerge', Buffer.from(JSON.stringify(finishedMerge)));
         let newBlockRequest = {
             newBlockWaiting: 'false',
             proposalID: 'n/a',
             author: 'n/a',
             lobeOwner: 'n/a',
             supervisor: 'n/a'
+        }
+        if(ledgerTXT['NewBlockRequest']!==null){
+            newBlockRequest = ledgerTXT['NewBlockRequest'];
         }
         await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
@@ -213,7 +216,7 @@ class DRChaincode extends Contract {
         blockchain = JSON.parse(blockchain);
         await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
     }
-    async WriteLatestBlock(ctx, latestBlock){
+    async WriteLatestBlock(ctx, latestBlock, platform, ontologyName){
         console.log('cc: write latest block')
         console.log(latestBlock);
         // latestBlock = JSON.parse(latestBlock);
@@ -223,15 +226,22 @@ class DRChaincode extends Contract {
         let latestDR = 'New project: please upload ontology file';
         let fileHash = 'New project: please upload ontology file';
         if(latestBlock.data!=='Genesis Block'){
-            https://github.com/ifx-dr/Update-Test-DR-Sub-Onto/commit/ac9aef219f062221dc147d65b4fdfc5e5930804d
             latestDR = latestBlock.data;
-            let latestDRSplit = latestDR.split('/');
-            let hash = latestDRSplit.pop();
-            latestDRSplit.pop();
-            let repoName = latestDRSplit.pop();
-            let repoAuthor = latestDRSplit.pop();
-            let repo = repoAuthor + '/' + repoName;
-            fileHash = `https://github.com/${repo}/archive/${hash}.zip`;
+            if(platform==='GitHub'){
+                // https://github.com/ifx-dr/Update-Test-DR-Sub-Onto/commit/ac9aef219f062221dc147d65b4fdfc5e5930804d
+                let latestDRSplit = latestDR.split('/');
+                let hash = latestDRSplit.pop();
+                latestDRSplit.pop();
+                let repoName = latestDRSplit.pop();
+                let repoAuthor = latestDRSplit.pop();
+                let repo = repoAuthor + '/' + repoName;
+                fileHash = `https://github.com/${repo}/archive/${hash}.zip`;
+            }
+            else{
+                // https://gitlab.intra.infineon.com/digital-reference/order_management/-/commit/802222735fe9a7fa2b0feb3ad198dbbb30342ac9
+                // https://gitlab.intra.infineon.com/digital-reference/Order_Management/-/raw/802222735fe9a7fa2b0feb3ad198dbbb30342ac9/OrderManagement.owl?inline=false
+                fileHash = `${latestDR.split('/commit/')[0]}/raw/${latestDR.split('/commit/')[1]}/${ontologyName}?inline=false`;
+            }
         }
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
@@ -1204,7 +1214,7 @@ class DRChaincode extends Contract {
         // let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
         // 1 month = 4 weeks
         let difference = (currentDate.getTime()-lastParticipation.getTime())/(1000*86400*28);
-        return difference;
+        return Math.floor(difference);
     }
 
     //Check if a member who is not the lobe owner but has the highest tokens under a domain
