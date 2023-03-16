@@ -113,7 +113,7 @@ class BlockInfo extends Component {
                 color="textPrimary"
                 variant="h6"
               >
-                author: {this.state.newBlockReq?.author}
+                lobe owner: {this.state.newBlockReq?.lobeOwner}
               </Typography>
             </Grid>
           </Grid>
