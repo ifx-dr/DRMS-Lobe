@@ -14,10 +14,10 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1000
+    Tokens: 1010
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Thu Mar 16 2023 15:38:25 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Supply Chain
     Expert: []
@@ -45,31 +45,18 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 960
+    Tokens: 990
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: Wed Mar 15 2023 14:37:10 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
-OngoingProposalInfo:
+OngoingProposalInfo: []
+ClosedProposalInfo:
   - ID: proposal0
-    URI: >-
-      https://gitlab.intra.infineon.com/digital-reference/order_management/-/commit/0cbfa12b1b13a926ec82b1efb039e4e4134d2053
-    Domain: Supply Chain
-    Valid: '0'
-    AuthorID: member4
-    Proposal_Message: 'update test 04: Order Management, GitLab'
-    Creation_Date: Wed Mar 15 2023 14:37:10 GMT+0000 (Coordinated Universal Time)
-    State: ongoing
-    Type: newProposal
-    OriginalID: ''
-    NumAcceptedVotes: 0
-    NumRejectedVotes: 0
-    AcceptedVotes: []
-    RejectedVotes: []
-    Hash: >-
-      https://gitlab.intra.infineon.com/digital-reference/order_management/-/raw/0cbfa12b1b13a926ec82b1efb039e4e4134d2053/OrderManagement.owl
-ClosedProposalInfo: []
+    State: accept
+    EndDate: Thu Mar 16 2023 14:38:27 GMT+0000 (Coordinated Universal Time)
+    Veto: false
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a
