@@ -5,6 +5,7 @@ OntologyInfo:
   Repo: digital-reference/process_model_version
   Default: main
   Platform: GitLab
+  AccessToken: glpat-tbi7Q9X_rsrZZg8zC9Cw
 BlockchainInfo:
   FileName: ./blockchain/blockchain_hist_sub_PMV.xlsx
   OutFileName: ./blockchain/blockchain_hist_sub_PMV.xlsx
@@ -33,10 +34,10 @@ UserInfo:
     Name: Marta
     Password: '333'
     Email: 333@gmail.com
-    Tokens: 1020
+    Tokens: 1030
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Thu Mar 16 2023 08:16:48 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Process
     Expert: []
@@ -44,31 +45,18 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 960
+    Tokens: 990
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: Wed Mar 15 2023 14:32:41 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
-OngoingProposalInfo:
+OngoingProposalInfo: []
+ClosedProposalInfo:
   - ID: proposal0
-    URI: >-
-      https://gitlab.intra.infineon.com/digital-reference/process_model_version/-/commit/df5060fc500aec83fbe145ce1d6665869c1f6a52
-    Domain: Process
-    Valid: '0'
-    AuthorID: member4
-    Proposal_Message: 'update test 03: PMV, GitLab'
-    Creation_Date: Wed Mar 15 2023 14:32:41 GMT+0000 (Coordinated Universal Time)
-    State: ongoing
-    Type: newProposal
-    OriginalID: ''
-    NumAcceptedVotes: 0
-    NumRejectedVotes: 0
-    AcceptedVotes: []
-    RejectedVotes: []
-    Hash: >-
-      https://gitlab.intra.infineon.com/digital-reference/process_model_version/-/raw/df5060fc500aec83fbe145ce1d6665869c1f6a52/PMV.owl
-ClosedProposalInfo: []
+    State: accept
+    EndDate: Thu Mar 16 2023 08:16:50 GMT+0000 (Coordinated Universal Time)
+    Veto: false
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a

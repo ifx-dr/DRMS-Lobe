@@ -45,11 +45,13 @@ var NewBlockLock = true;
 var allDomains = [];
 var ontologyName = '';
 var repo = '';
+var accessToken = '';
 var defaultBranch = '';
 var fileName = '';
 var outFileName = '';
 // specify the config file to change project
-var ledgerFile = 'ledger_sub_OrderManagement.yaml';
+// var ledgerFile = 'ledger_sub_OrderManagement.yaml';
+var ledgerFile = 'ledger_sub_PMV.yaml';
 var platform = '';
 var newBlockRequest = null;
 
@@ -138,6 +140,8 @@ async function main() {
 				outFileName = ledger['BlockchainInfo']['OutFileName'];
 				platform = ledger['OntologyInfo']['Platform'];
 				newBlockRequest = ledger['NewBlockRequest'];
+				if(platform==='GitLab')
+					accessToken = ledger['OntologyInfo']['AccessToken'];
 				if(!fs.existsSync(fileName)){
 					fs.writeFileSync(fileName, '', 'utf8');
 				}
@@ -186,6 +190,8 @@ async function main() {
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
 						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
 						ledger['NewBlockRequest'] = JSON.parse(await contract.evaluateTransaction("GetNewBlockRequest"));
+						if(platform==='GitLab')
+							ledger['OntologyInfo']['AccessToken'] = accessToken;
 						let yamlStr = yaml.dump(ledger);
 						fs.writeFileSync(ledgerFile, yamlStr, 'utf8');
 
@@ -263,7 +269,8 @@ async function main() {
 				let result = {"success":{
 					Platform: platform,
 					RepoName: repo,
-					DefaultBranch: defaultBranch
+					DefaultBranch: defaultBranch,
+					AccessToken: accessToken
 				}};
 				res.json(result);
 			});

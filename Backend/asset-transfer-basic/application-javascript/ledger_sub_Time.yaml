@@ -5,6 +5,7 @@ OntologyInfo:
   Platform: GitLab
   Repo: digital-reference/Time
   Default: main
+  AccessToken: glpat-tbi7Q9X_rsrZZg8zC9Cw
 BlockchainInfo:
   FileName: ./blockchain/blockchain_hist_sub_Time.xlsx
   OutFileName: ./blockchain/blockchain_hist_sub_Time.xlsx

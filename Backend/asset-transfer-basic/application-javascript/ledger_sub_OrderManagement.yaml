@@ -5,6 +5,7 @@ OntologyInfo:
   Repo: digital-reference/order_management
   Default: main
   Platform: GitLab
+  AccessToken: glpat-tbi7Q9X_rsrZZg8zC9Cw
 BlockchainInfo:
   FileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
   OutFileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx

@@ -111,13 +111,15 @@ export default class GenerateBlock extends Component {
         // '/' in author/repo needs to be replaced with %2F
         let rp = this.state.Repo.RepoName.split('/')[0] + '%2F' + this.state.Repo.RepoName.split('/')[1];
         link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${this.state.Repo.DefaultBranch}`;
-        prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
+        // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
+        prefix = `https://gitlab.intra.infineon.com/${this.state.Repo.RepoName}/-/commit/`
       }
       fetch(link, {
             method: 'GET',
-          //   headers: {
-          //     'Content-Type': 'application/json'
-          //   },
+            headers: {
+              'Content-Type': 'application/json',
+              "PRIVATE-TOKEN":this.state.Repo.AccessToken,
+            },
           //   body: JSON.stringify(data)
           }).then(function(resp){
               // console.log(resp.json());
@@ -130,7 +132,7 @@ export default class GenerateBlock extends Component {
               this.getTimeStamp(body.commit.author.date);
               this.setState({
                 nextCommitHash: prefix+body.sha,
-                nextTimestamp:'',
+                // nextTimestamp:'',
                 commitMessage: body.commit.message
               })
             }
@@ -141,7 +143,7 @@ export default class GenerateBlock extends Component {
               this.getTimeStamp(body.committed_date);
               this.setState({
                 nextCommitHash: prefix+body.id,
-                nextTimestamp:',',
+                // nextTimestamp:',',
                 commitMessage: body.message
               })
             }  
