@@ -175,7 +175,7 @@ export default class GenerateBlock extends Component {
           // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
           prefix = `https://gitlab.intra.infineon.com/${RepoName}/-/commit/`
         }
-        alert(`link: ${link}`)
+        // alert(`link: ${link}`)
         await fetch(link, {
               method: 'GET',
               headers: {
@@ -400,7 +400,7 @@ export default class GenerateBlock extends Component {
         }).then((response) =>response.json());
       // alert(JSON.stringify(result));
       if(!result.error){
-        alert(result.success);
+        // alert(result.success);
         if(result.success!=='please wait'){
           this.setState({
             Redirect: "Dashboard"

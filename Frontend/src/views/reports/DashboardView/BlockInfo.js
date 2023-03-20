@@ -34,15 +34,6 @@ class BlockInfo extends Component {
     }
   };
   getAllNewBlockRequests = async () => {
-    let token = sessionStorage.getItem('token');
-    if(token===null){
-      this.setState({
-        Redirect:'Login'
-      })
-      alert('Please login in!');
-      return;
-    }
-    token = JSON.parse(token);
     let allNewBlockReq = await fetch('http://localhost:3001/checkAllNewBlockRequests').then((response) => response.json());
     // newBlockReq = JSON.parse(newBlockReq);
     if(allNewBlockReq.error){
@@ -97,7 +88,7 @@ class BlockInfo extends Component {
       this.setState({
         blockInfoSorted: blockInfoSorted,
       });
-      alert(JSON.stringify(this.state.blockInfoSorted))
+      // alert(JSON.stringify(this.state.blockInfoSorted))
     }
     else{
       alert(allLatestBlocks.error);
