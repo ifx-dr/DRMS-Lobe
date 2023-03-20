@@ -51,9 +51,16 @@ var fileName = '';
 var outFileName = '';
 // specify the config file to change project
 // var ledgerFile = 'ledger_sub_OrderManagement.yaml';
-var ledgerFile = 'ledger_sub_PMV.yaml';
+// var ledgerFile = 'ledger_sub_PMV.yaml';
+var ledgerFile = 'ledger_sub.yaml';
 var platform = '';
 var newBlockRequest = null;
+
+var layerInfo = null;
+var latestBlockInfo = [];
+
+var layerInfoShort = {};
+let allRepos = {};
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -142,12 +149,58 @@ async function main() {
 				newBlockRequest = ledger['NewBlockRequest'];
 				if(platform==='GitLab')
 					accessToken = ledger['OntologyInfo']['AccessToken'];
+
+				layerInfo = ledger['LayerInfo'];
+				for(let layer of layerInfo){
+					
+					let data = {
+						ID: layer['ID'],
+						LayerName: layer["LayerName"],
+						BlockInfo: []
+					}
+					for(let ontology of layer["OntologyInfo"]){
+						let blockchain_file = ontology['BlockchainInfo']['FileName'];
+						let blockchain = BC.loadChainFromExcel(blockchain_file);
+						data.BlockInfo.push({
+							Ontology: ontology['Name'],
+							Block: blockchain.getLatestBlock()
+						});
+					}
+					latestBlockInfo.push(data);
+				}
+				console.log(latestBlockInfo)
+				
 				if(!fs.existsSync(fileName)){
 					fs.writeFileSync(fileName, '', 'utf8');
 				}
+				
 				let blockchain = BC.loadChainFromExcel(fileName);
 				// console.log(blockchain);
 				let latestBlock = blockchain.getLatestBlock();
+
+				let allBlockchains = {};
+				let allLatestBlocks = {};
+				
+				for(let layer of layerInfo){
+					for(let ontology of layer["OntologyInfo"]){
+						let ontologyKey = `[${layer.LayerName}] ${ontology.Name}`;
+						let blockchain_file = ontology['BlockchainInfo']['FileName'];
+						let blockchain = BC.loadChainFromExcel(blockchain_file);
+						allBlockchains[ontologyKey] = blockchain.chain;
+						allLatestBlocks[ontologyKey] = blockchain.getLatestBlock();
+						allRepos[ontologyKey] = {
+							Name: ontology.Name,
+							Platform: ontology.Platform,
+							Repo: ontology.Repo,
+							Default: ontology.Default,
+							AccessToken: ontology.AccessToken,
+						}
+					}
+				}
+				console.log(`allBlockchains: ${JSON.stringify(allBlockchains)}\n`)
+				console.log(`allLatestBlocks: ${JSON.stringify(allLatestBlocks)}\n`)
+				console.log(`allRepos: ${JSON.stringify(allRepos)}\n`)
+
 				let flag = false;
 				let result;
 				for(let i=0;i<retry_cnt;i++){
@@ -155,6 +208,11 @@ async function main() {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
 						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName);
+						
+						await contract.submitTransaction('WriteAllBlockchains', JSON.stringify(allBlockchains))
+						await contract.submitTransaction('WriteAllLatestBlocks', JSON.stringify(allLatestBlocks), JSON.stringify(allRepos))
+						
+						
 						let res = `ledger initialized from file, time: ${Date()}`;
 						console.log(`SUCCESS app initiate: ${res}`)
 						result = {"success":res};
@@ -186,17 +244,26 @@ async function main() {
 							FileName: fileName,
 							OutFileName: outFileName
 						};
+						ledger["LayerInfo"] = layerInfo
 						ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
 						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
-						ledger['NewBlockRequest'] = JSON.parse(await contract.evaluateTransaction("GetNewBlockRequest"));
-						if(platform==='GitLab')
-							ledger['OntologyInfo']['AccessToken'] = accessToken;
+						ledger['AllNewBlockRequests'] = JSON.parse(await contract.evaluateTransaction("GetAllNewBlockRequests"));
+						// if(platform==='GitLab')
+						ledger['OntologyInfo']['AccessToken'] = accessToken;
+						ledger['NewBlockRequest'] = newBlockRequest;
 						let yamlStr = yaml.dump(ledger);
 						fs.writeFileSync(ledgerFile, yamlStr, 'utf8');
+						
 
-						let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
-						BC.exportChainOnlyToExcel(chain, outFileName);
+						for(let layer of layerInfo){
+							for(let ontology of layer['OntologyInfo']){
+								let outFileName = ontology['BlockchainInfo']['OutFileName'];
+								let ontologyKey = `[${layer['LayerName']}] ${ontology['Name']}`
+								let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchainByKey", ontologyKey))
+								BC.exportChainOnlyToExcel(chain, outFileName);
+							}
+						}
 						// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
 						result = {"success":"ledger saved"};
 						console.log(`SUCCESS app saveStatus, time: ${Date()}`);
@@ -274,6 +341,27 @@ async function main() {
 				}};
 				res.json(result);
 			});
+			app.get("/AllRepos", async (req, res) => {
+				let result = {"success": allRepos};
+				console.log(`SUCCESS app AllRepos: ${JSON.stringify(allRepos)}`)
+				res.json(result);
+			});
+			app.get("/LayerInfo", async (req, res) => {
+				let result = {"success":{
+					LayerInfo: layerInfo
+				}};
+				res.json(result);
+			});
+			app.get("/LayerInfoShort", async (req, res) => {
+				let result = {"success":layerInfoShort};
+				res.json(result);
+			});
+			app.get("/AllLatestBlocks", async (req, res) => {
+				let result = {"success":{
+					data: latestBlockInfo
+				}};
+				res.json(result);
+			});
 			app.get("/DR", async (req, res) => {
 				//Get the URI of the latest  DR
 				let result;
@@ -282,6 +370,22 @@ async function main() {
 						let res = await contract.evaluateTransaction('CheckLatestDR');
 						console.log(`SUCCESS app CheckLatestDR: ${res}`);
 						result = {"success":res.toString()};
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app CheckLatestDR: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
+			});
+			app.get("/AllLatestDR", async (req, res) => {
+				//Get the URI of the latest  DR
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {	
+						let res = await contract.evaluateTransaction('GetAllLatestDR');
+						console.log(`SUCCESS app AllLatestDR: ${res}`);
+						result = {"success":JSON.parse(res)};
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app CheckLatestDR: ${error}`);
@@ -320,6 +424,21 @@ async function main() {
 						result = {"error":error.toString()};
 					}
 				}
+				res.json(result);})
+			app.get("/AllFileHashes", async (req, res) => {
+				//Get the Hash value of the latest DR
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let res = await contract.evaluateTransaction('GetAllFileHashes');
+						console.log(`SUCCESS app AllFileHashes: ${res}`);
+						result = {"success":JSON.parse(res)};
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app AllFileHashes: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
 				res.json(result);
 			});
 			app.get("/checkNewBlockRequest", async (req, res) => {
@@ -338,6 +457,22 @@ async function main() {
 				}
 				res.json(result);
 			});
+			app.get("/checkAllNewBlockRequests", async (req, res) => {
+				//check all new block requests, return a list
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let res = await contract.evaluateTransaction('GetAllNewBlockRequests');
+						console.log(`SUCCESS app GetAllNewBlockRequests: ${res}`);
+						result = {"success":JSON.parse(res)};
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app GetAllNewBlockRequests: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
+			});
 			app.post("/generateBlock", async (req, res) => {
 				if(!NewBlockLock){
 					res.json({"success":"please wait"});
@@ -347,15 +482,15 @@ async function main() {
 					let result;
 					for(let i=0;i<1;i++){
 						try {
-							let res = await contract.evaluateTransaction('GetBlockchain');
+							let res = await contract.evaluateTransaction('GetBlockchainByKey', req.body.ontologyKey);
 							let blockchain = new BC.Blockchain();
 							blockchain.chain = JSON.parse(res);
 							let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());
-							await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()), platform, ontologyName);
-							await contract.submitTransaction('CloseNewBlockRequest');
+							await contract.submitTransaction('WriteBlockchainByKey', JSON.stringify(blockchain), req.body.ontologyKey);
+							await contract.submitTransaction('WriteLatestBlockByKey', JSON.stringify(blockchain.getLatestBlock()), req.body.ontologyKey, JSON.stringify(allRepos));
+							await contract.submitTransaction('FinishNewBlockRequest', req.body.ontologyKey);
 							res = 'Successfully generated a new block!'
 							console.log(`SUCCESS app generateBlock: ${res}`)
 							result = {"success":res.toString()};
@@ -411,7 +546,7 @@ async function main() {
 								console.log(message);
 							}
 
-							let res = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID, req.body.download);
+							let res = await contract.submitTransaction('CreateProposal', req.body.layer, req.body.ontology, req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID, req.body.download);
 							console.log('******The creation result is:' + res);
 							if (message != '') res += message + '\n';
 							console.log(`SUCCESS app createProposal: ${res}`);
@@ -479,6 +614,22 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app ongoingProp: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
+			});
+			app.get("/allOngoingProp", async (req, res) => {
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let res = await contract.evaluateTransaction('GetAllOngoingProposal');
+						console.log(`SUCCESS app allOngoingProp: ${res}`);
+						
+						result = {"success":JSON.parse(res)};
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app allOngoingProp: ${error}`);
 						result = {"error":error.toString()};
 					}
 				}
@@ -558,6 +709,22 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app checkLatestBlock: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
+				// console.log("view latest block:\n"+ result.toString());
+			});
+			app.get("/checkAllLatestBlocks", async (req, res) => {
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let res = await contract.evaluateTransaction('GetAllLatestBlocks');
+						console.log(`SUCCESS app checkAllLatestBlocks: ${res}`);
+						result = {"success":res.toString()}
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app checkAllLatestBlocks: ${error}`);
 						result = {"error":error.toString()};
 					}
 				}

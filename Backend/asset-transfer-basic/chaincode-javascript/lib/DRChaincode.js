@@ -63,7 +63,20 @@ class DRChaincode extends Contract {
         let ongoingProposals = ledgerTXT['OngoingProposalInfo'];
         console.log(ongoingProposals)
         let closedProposals = ledgerTXT['ClosedProposalInfo'];
-        let domains = ledgerTXT['OntologyInfo']['Domains'];
+
+        // let domains = ledgerTXT['OntologyInfo']['Domains'];
+        let domains = [];
+        let layerInfo = {};
+        for(let layer of ledgerTXT['LayerInfo']){
+            layerInfo[layer.LayerName] = [];
+            for(let ontology of layer["OntologyInfo"]){
+                layerInfo[layer.LayerName].push(ontology.Name);
+                for(let d of ontology['Domains'])
+                    domains.push(d);
+            }
+        }
+        console.log(`cc layerInfo: ${layerInfo}`);
+        await ctx.stub.putState('layerInfo', Buffer.from(JSON.stringify(layerInfo))); 
 
         let membersInDomain = {};
         let allLobeOwners = {};
@@ -181,7 +194,7 @@ class DRChaincode extends Contract {
             await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify('none')));
         
 
-        const latestDR = '';
+        let latestDR = [];
         // const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         // download link of the ongoing proposal
@@ -209,12 +222,78 @@ class DRChaincode extends Contract {
         }
         await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
+        let allNewBlockRequests = {};
+        if(ledgerTXT['AllNewBlockRequests']!==null){
+            newBlockRequest = ledgerTXT['AllNewBlockRequest'];
+        }
+        await ctx.stub.putState('allNewBlockRequests', Buffer.from(JSON.stringify(allNewBlockRequests)));
+
         console.log('*******************DRChaincode: File recovered*******************');
     }
     async WriteBlockchain(ctx, blockchain){
         console.log('cc: write blockchain');
         blockchain = JSON.parse(blockchain);
         await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
+    }
+    async WriteBlockchainByKey(ctx, blockchain, ontologyKey){
+        console.log('cc: write WriteBlockchainByKey');
+        let allBlockchains = JSON.parse(await ctx.stub.getState('allBlockchains'));
+        blockchain = JSON.parse(blockchain);
+        allBlockchains[ontologyKey] = blockchain.chain;
+        await ctx.stub.putState('allBlockchains', Buffer.from(JSON.stringify(allBlockchains)));
+    }
+    async WriteAllBlockchains(ctx, allBlockchains){
+        console.log('cc: write allBlockchains');
+        allBlockchains = JSON.parse(allBlockchains);
+        // await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
+        await ctx.stub.putState('allBlockchains', Buffer.from(JSON.stringify(allBlockchains)));
+    }
+    async WriteLatestBlockByKey(ctx, latestBlock, ontologyKey, allRepos){
+        console.log('cc: write WriteLatestBlockByKey');
+        let allLatestBlocks = await this.GetAllLatestBlocks(ctx);
+        console.log(`cc: WriteLatestBlockByKey ${JSON.stringify(allLatestBlocks)}`)
+        allLatestBlocks[ontologyKey] = JSON.parse(latestBlock);
+        console.log(`cc allRepos: ${allRepos}`)
+        // console.log(`cc allRepos str: ${JSON.stringify(allRepos)}`)
+        // allRepos = JSON.parse(allRepos);
+        await this.WriteAllLatestBlocks(ctx, JSON.stringify(allLatestBlocks), allRepos);
+    }
+    async WriteAllLatestBlocks(ctx, allLatestBlocks, allRepos){
+        console.log('cc: write allLatestBlocks');
+        allLatestBlocks = JSON.parse(allLatestBlocks);
+        allRepos = JSON.parse(allRepos);
+        console.log(`cc allRepos: ${JSON.stringify(allRepos)}`)
+        // await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
+        await ctx.stub.putState('allLatestBlocks', Buffer.from(JSON.stringify(allLatestBlocks)));
+        let allLatestDRs = {};
+        let allFileHashes = {};
+        for(let ontologyKey in allLatestBlocks){
+            console.log(`cc WriteAllLatestBlocks ontologyKey: ${ontologyKey}`)
+            console.log(`cc WriteAllLatestBlocks repo: ${JSON.stringify(allRepos[ontologyKey])}`)
+            allLatestDRs[ontologyKey] = 'New project: please upload ontology file';
+            allFileHashes[ontologyKey] = 'New project: please upload ontology file';
+            if(allLatestBlocks[ontologyKey].data!=='Genesis Block'){
+                allLatestDRs[ontologyKey] = allLatestBlocks[ontologyKey].data;
+                if(allRepos[ontologyKey].Platform==='GitHub'){
+                    let latestDRSplit = allLatestDRs[ontologyKey].split('/');
+                    let hash = latestDRSplit.pop();
+                    latestDRSplit.pop();
+                    let repoName = latestDRSplit.pop();
+                    let repoAuthor = latestDRSplit.pop();
+                    let repo = repoAuthor + '/' + repoName;
+                    allFileHashes[ontologyKey] = `https://github.com/${repo}/archive/${hash}.zip`;
+                }
+                else{
+                    // https://gitlab.intra.infineon.com/digital-reference/order_management/-/commit/802222735fe9a7fa2b0feb3ad198dbbb30342ac9
+                    // https://gitlab.intra.infineon.com/digital-reference/Order_Management/-/raw/802222735fe9a7fa2b0feb3ad198dbbb30342ac9/OrderManagement.owl?inline=false
+                    allFileHashes[ontologyKey] = `${allLatestDRs[ontologyKey].split('/commit/')[0]}/raw/${allLatestDRs[ontologyKey].split('/commit/')[1]}/${allRepos[ontologyKey].Name}?inline=false`;
+                }
+            }
+        }
+        console.log(`cc allLatestDRs: ${JSON.stringify(allLatestDRs)}`);
+        console.log(`cc allFileHashes: ${JSON.stringify(allFileHashes)}`);
+        await ctx.stub.putState('allLatestDRs', Buffer.from(JSON.stringify(allLatestDRs)));
+        await ctx.stub.putState('allFileHashes', Buffer.from(JSON.stringify(allFileHashes)));    
     }
     async WriteLatestBlock(ctx, latestBlock, platform, ontologyName){
         console.log('cc: write latest block')
@@ -504,6 +583,11 @@ class DRChaincode extends Contract {
         console.log('cc newBlockRequest: '+result);
         return JSON.parse(result.toString());
     }
+    async GetAllNewBlockRequests(ctx){
+        const result = await ctx.stub.getState('allNewBlockRequests');
+        console.log('cc allNewBlockRequests: '+result);
+        return JSON.parse(result.toString());
+    }
     async CloseNewBlockRequest(ctx){
         let newBlockRequest = {
             newBlockWaiting: 'false',
@@ -513,6 +597,15 @@ class DRChaincode extends Contract {
             supervisor: 'n/a'
         }
         await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
+    }
+    async FinishNewBlockRequest(ctx, ontologyKey){
+        let allNewBlockRequests = JSON.parse(await ctx.stub.getState('allNewBlockRequests'));
+        delete allNewBlockRequests[ontologyKey];
+        await ctx.stub.putState('allNewBlockRequests', Buffer.from(JSON.stringify(allNewBlockRequests)));
+    }
+    async GetLayerInfo(ctx){
+        let layerInfo = await ctx.stub.getState('layerInfo');
+        return JSON.parse(layerInfo);
     }
     // async CheckTotalProposals(ctx){
     //     const total_roposal = await ctx.stub.getState('total_proposals');
@@ -560,7 +653,14 @@ class DRChaincode extends Contract {
         // }
         // return uri !== '' ? uri : 'The file is not uploaded by the creator yet';
     }
-
+    async GetAllLatestDR(ctx) {
+        const result = await ctx.stub.getState('allLatestDRs');
+        return JSON.parse(result);
+    }
+    async GetAllFileHashes(ctx) {
+        const result = await ctx.stub.getState('allFileHashes');
+        return JSON.parse(result);
+    }
     //return the proposal that is ongoing
     async GetOngoingProposal(ctx) {
         // let ongoingProp_ID = await ctx.stub.getState('ongoingProposal');
@@ -693,7 +793,7 @@ class DRChaincode extends Contract {
             let pos = members.indexOf(member);
             member.Tokens -= numTokens;
             if (member.Tokens < voteDeposit) member.Tokens = voteDeposit;
-            member.LastParticipation = Date();
+            member.LastParticipation = Date('CET');
             members[pos] = member;
             await this.UpdateMembers(ctx, members);
             result = 1;
@@ -725,7 +825,7 @@ class DRChaincode extends Contract {
         //Check whether within 24 Hours min since proposal is ongoing
         let startTime = await ctx.stub.getState('time');
         startTime = new Date(startTime);
-        let currentT = new Date().getTime();
+        let currentT = new Date('CET').getTime();
         if( (currentT - startTime) > 86400000) {
             console.log('Out of time' + (currentT - startTime));
             return 'TimeOut';
@@ -734,7 +834,7 @@ class DRChaincode extends Contract {
     }
 
     async CheckTimeOut(ctx, startTimeString, maxHours){
-        let endTime = new Date();
+        let endTime = new Date('CET');
         let startTime = new Date(startTimeString);
         let diff = (startTime.getTime() - endTime.getTime())/(1000*3600);
         if(diff > maxHours)
@@ -765,7 +865,7 @@ class DRChaincode extends Contract {
             proposal = JSON.parse(proposal);
             let EndDate = proposal.EndDate;
             EndDate = new Date(EndDate);
-            const currentT = new Date().getTime();
+            const currentT = new Date('CET').getTime();
             return (currentT - EndDate.getTime()) >= 2592000000;
         } catch (e) {
             console.log('Error when getting the creation date of the proposal'+ originalID + e);
@@ -773,7 +873,7 @@ class DRChaincode extends Contract {
     }
     
     //create a new proposal or a veto proposal
-    async CreateProposal(ctx, domain, uri, author_id, message, type, originalID, download){
+    async CreateProposal(ctx, layer, ontology, domain, uri, author_id, message, type, originalID, download){
         //get amount of total proposals, for later update
         let total_proposals = await ctx.stub.getState('total_proposals');
         // let valid = parseInt(total_proposals) + 1;
@@ -823,10 +923,12 @@ class DRChaincode extends Contract {
             ID: id,
             URI: uri,
             Domain: domain,
+            Layer: layer,
+            Ontology: ontology,
             Valid: valid.toString(),
             AuthorID: author_id,
             Proposal_Message: message,
-            Creation_Date: Date(),
+            Creation_Date: Date('CET'),
             State: 'ongoing',
             Type: type,
             OriginalID: originalID,
@@ -1066,7 +1168,7 @@ class DRChaincode extends Contract {
         // await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(parseInt(ongoingprop) + 1)));
 
         // Update the start time for ongoing proposal
-        await ctx.stub.putState('time', Buffer.from(Date()));
+        await ctx.stub.putState('time', Buffer.from(Date('CET')));
 
         let proposal = await this.GetProposal(ctx, proposalID);
 
@@ -1077,7 +1179,7 @@ class DRChaincode extends Contract {
             // console.log(blockchain);
             let latestBlock = await this.GetLatestBlock(ctx);
             let index = latestBlock.index+1;
-            let timestamp = Date();
+            let timestamp = Date('CET');
             let data = null;
             if(proposal.Type==='vetoProposal'){
                 data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
@@ -1101,6 +1203,19 @@ class DRChaincode extends Contract {
             }
             await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
+
+            let NBReq = {
+                proposalID: proposalID,
+                Layer: proposal.Layer,
+                Ontology: proposal.Ontology,
+                lobeOwner: lobeOwner,
+                supervisor: 'n/a'
+            }
+            let allNewBlockRequests = JSON.parse(await ctx.stub.getState('allNewBlockRequests'));
+            allNewBlockRequests[`[${NBReq.Layer}] ${NBReq.Ontology}`] = NBReq;
+            await ctx.stub.putState('allNewBlockRequests', Buffer.from(JSON.stringify(allNewBlockRequests)));
+
+
             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));
 
@@ -1121,8 +1236,10 @@ class DRChaincode extends Contract {
         console.log(closedProposalID + '**********ClosedProposalID');
         const closedProposal = {
             ID: closedProposalID,
+            Layer: proposal.Layer,
+            Ontology: proposal.Ontology, 
             State: result,
-            EndDate: Date(),
+            EndDate: Date('CET'),
             Veto: false
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
@@ -1216,7 +1333,7 @@ class DRChaincode extends Contract {
     }
 
     async CalculateMonthDifference (member) {
-        let currentDate = new Date();
+        let currentDate = new Date('CET');
         let lastParticipation = new Date(member.LastParticipation);
         
         // let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
@@ -1298,7 +1415,7 @@ class DRChaincode extends Contract {
         let lastingTime = 300000;
         let ongoingtime = await ctx.stub.getState('time');
         ongoingtime = new Date(ongoingtime);
-        let currentT = new Date().getTime();
+        let currentT = new Date('CET').getTime();
         let time = ongoingtime.getTime() + lastingTime- currentT;
         console.log(time);
         if(time <= 0) {
@@ -1343,7 +1460,21 @@ class DRChaincode extends Contract {
         // console.log(latestBlock);
         return latestBlock;
     }
-
+    async GetBlockchainByKey(ctx, ontologyKey){
+        let allBlockchains = JSON.parse(await ctx.stub.getState('allBlockchains'));
+        // console.log(latestBlock);
+        return allBlockchains[ontologyKey];
+    }
+    async GetAllBlockchains(ctx){
+        let allBlockchains = JSON.parse(await ctx.stub.getState('allBlockchains'));
+        // console.log(latestBlock);
+        return allBlockchains;
+    }
+    async GetAllLatestBlocks(ctx){
+        let allLatestBlocks = JSON.parse(await ctx.stub.getState('allLatestBlocks'));
+        console.log(`cc GetAllLatestBlocks: ${allLatestBlocks}`);
+        return allLatestBlocks;
+    }
     /////////////////////
 
     /////////////////////

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Avatar, Box, Button, Card, CardContent, Grid, Typography } from '@material-ui/core';
+import { Avatar, Box, Button, Card, CardContent, Divider, Grid, Typography, CardHeader } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/PeopleOutlined';
 import { DropzoneDialog, DropzoneDialogBase } from 'material-ui-dropzone';
 import {DropzoneArea} from 'material-ui-dropzone';
@@ -16,6 +16,8 @@ class LatestDR extends Component {
       Repo: null,
       files: null,
       open: false,
+      allLatestDR:{},
+      allFileHashes:{},
     };
   }
 
@@ -24,6 +26,8 @@ class LatestDR extends Component {
     this.getLatestDR(); // .then(((response) => console.log(response)));
     // this.getOngoingDR();
     this.getDRHash();
+    this.getAllLatestDR();
+    this.getAllFileHashes();
   }
   getRepo = async () => {
     const Repo = await fetch('http://localhost:3001/Repo').then((response) => response.json());
@@ -56,6 +60,28 @@ class LatestDR extends Component {
     }
     else{
       alert(DRHash.error)
+    }
+  };
+  getAllLatestDR = async () => {
+    const allLatestDR = await fetch('http://localhost:3001/AllLatestDR').then((response) => response.json());
+    if(!allLatestDR.error){
+      this.setState({
+        allLatestDR: allLatestDR.success,
+      }, console.log(allLatestDR));
+    }
+    else{
+      alert(allLatestDR.error);
+    }
+  };
+  getAllFileHashes = async () => {
+    const allFileHashes = await fetch('http://localhost:3001/AllFileHashes').then((response) => response.json());
+    if(!allFileHashes.error){
+      this.setState({
+        allFileHashes: allFileHashes.success,
+      }, console.log(allFileHashes));
+    }
+    else{
+      alert(allFileHashes.error)
     }
   };
   getOngoingDR = async () => {
@@ -138,6 +164,10 @@ class LatestDR extends Component {
   render() {
     return (
       <Card>
+        <CardHeader
+        title="Current state of ontologies"
+        />
+        <Divider />
         <CardContent>
           <Grid
             container
@@ -150,29 +180,23 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
-                Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> {/* <button onClick={this.updateDR}>update</button> */}
+                {/* Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> <button onClick={this.updateDR}>update</button> */}
+                Here is the latest DR: For ontology visualization, please check: <a href='https://service.tib.eu/sc3/' target="_blank" rel={"noopener noreferrer"}>https://service.tib.eu/sc3/</a>
               </Typography>
-              <Typography
-                color="textPrimary"
-                variant="h6"
-              >
-                {this.state.DR}
-              </Typography>
-              <Typography
-                color="textSecondary"
-                gutterBottom
-                variant="h6"
-              >
-                {/* Here is the DR in the ongoing proposal: <button><a href={this.state.OngoingDR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> */}
-                Here you can download the DR:
-                <button><a href={this.state.Hash} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>download DR</a></button>
-              </Typography>
-              <Typography
-                color="textPrimary"
-                variant="h6"
-              >
-                {this.state.Hash}
-              </Typography>
+              {
+                Object.keys(this.state.allLatestDR).map(ontologyKey => {
+                  return (
+                    <Typography
+                      color="textPrimary"
+                      variant="h6"
+                    >
+                      {ontologyKey}: <a href={this.state.allLatestDR[ontologyKey]} target="_blank" rel={"noopener noreferrer"}>{this.state.allLatestDR[ontologyKey]}</a>
+                      <button><a href={this.state.allFileHashes[ontologyKey]} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>download</a></button>
+                    
+                    </Typography>
+                  )
+                })
+              }
             </Grid>
           </Grid>
         </CardContent>

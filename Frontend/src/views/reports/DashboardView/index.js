@@ -184,9 +184,9 @@ const Dashboard = () => {
             // sm={9}
             // xl={2}
             // xs={12}
-            lg={5}
+            lg={9}
             sm={12}
-            xl={5}
+            xl={9}
             xs={12}
           >
             <DRHash />
@@ -221,7 +221,7 @@ const Dashboard = () => {
           >
             <UploadDR />
           </Grid> */}
-          <Grid
+          {/* <Grid
             item
             // lg={8}
             // md={12}
@@ -232,8 +232,8 @@ const Dashboard = () => {
             xl={9}
             xs={12}
           >
-            <WebVowl />
-          </Grid>
+            <WebVowl />dd
+          </Grid> */}
         </Grid>
       </Container>
     </Page>

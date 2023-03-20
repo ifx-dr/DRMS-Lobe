@@ -20,11 +20,14 @@ export default class Vote extends Component {
       vote: '',
       author_ID: '',
       messages: '',
-      Redirect: ''
+      Redirect: '',
+      allProps: [],
+      targetProp: '',
     };
   }
   componentDidMount() {
     this.getOnGoingProp();
+    this.getAllOnGoingProp();
     this.loadData()
     let intervalId = setInterval(this.loadData, 3001)
     this.setState({ intervalId: intervalId })
@@ -57,11 +60,43 @@ export default class Vote extends Component {
       }
     }
   };
+  getAllOnGoingProp = async () => {
+    const data = await fetch('http://localhost:3001/allOngoingProp').then((response) => response.json());
+    if(data.error){
+      alert(data.error);
+      this.setState({
+        Redirect:'Dashboard'
+      })
+    }
+    else{
+      if(data.success.length>0){
+        this.setState({
+          allProps: data.success
+          // eslint-disable-next-line react/destructuring-assignment
+        });
+        // console.log(this.state.prop + this.state.prop_ID);
+      }
+      else{
+        alert('No ongoing proposal now!');
+        this.setState({
+          Redirect:'Dashboard'
+        })
+      }
+    }
+  };
 
   handleChangeV = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
     this.setState({
       vote: value,
+    });
+  };
+  handleChangeP = async (event) => {
+    let value = Array.from(event.target.selectedOptions, option => option.value)
+    let prop = this.state.allProps.find(prop => prop.ID === value[0]);
+    this.setState({
+      targetProp: value,
+      prop: prop
     });
   };
   handleChangeM = async (event) => {
@@ -135,8 +170,8 @@ export default class Vote extends Component {
       <form onSubmit={this.handleSubmit}>
         <Card>
           <CardHeader
-          subheader="Current Ongoing Proposal:"
-          title="Ongoing Proposal"
+            subheader="Current Ongoing Proposal:"
+            title="Ongoing Proposal"
           />
           <CardContent>
             <Grid
@@ -150,6 +185,40 @@ export default class Vote extends Component {
                 sm={8}
                 xs={12}
               >
+                <Typography
+                  color="textPrimary"
+                  gutterBottom
+                  variant="h6"
+                >
+                  Choose an ongoing proposal
+                </Typography>
+                <select value={this.state.targetProp} onChange={this.handleChangeP}>
+                  <option></option>
+                  {
+                    this.state.allProps.map((value, index) => {
+                      let opt = `proposalID: ${value.ID}, Layer: ${value.Layer}, Ontology: ${value.Ontology}`
+                      return <option key={index} value={value.ID}>{opt}</option>
+                    })
+                  }
+                </select>
+              </Grid>
+            </Grid>
+            </CardContent>
+        </Card>
+        <Card>
+          <CardContent>
+              <Grid
+                item
+                md={12}
+                sm={12}
+                xs={12}
+              >
+                <p>
+                  Layer: {this.state.prop.Layer}
+                </p>
+                <p>
+                  Ontology: {this.state.prop.Ontology}
+                </p>
                 <p>
                   Domain: {this.state.prop.Domain}
                 </p>
@@ -165,13 +234,13 @@ export default class Vote extends Component {
                 <p>
                   RejectedVotes: {this.state.prop.NumRejectedVotes}
                 </p>
-              </Grid>
+              {/* </Grid>
 
               <Grid
                 item
                 md={4}
                 sm={8}
-                xs={12}>
+                xs={12}> */}
                 <p>
                 Proposal ID: {this.state.prop.ID}
                 </p>
@@ -186,7 +255,7 @@ export default class Vote extends Component {
                   URI: {this.state.prop.URI} <button><a href={this.state.prop.URI} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
                 </p>
               </Grid>
-            </Grid>
+            
           </CardContent>
           <Divider />
         </Card>

@@ -21,6 +21,8 @@ export default class CreateNewProp extends Component {
       Domain: '',
       NewDomain: '',
       URI: '',
+      Layer: '',
+      Ontology: '',
       Valid: '',
       // Author: window.userID,
       Author: '',
@@ -28,13 +30,17 @@ export default class CreateNewProp extends Component {
       Messages: '',
       Download: '',
       Redirect:'',
+      allLayers: [],
+      allOntologies: [],
       allDomains: [],
-      newBlockReq:''
+      newBlockReq:'',
+      layerInfo: null,
     }
   }
   componentDidMount(){
     this.getNewBlockRequest();
     this.loadDomains();
+    this.getLayerInfo();
   }
   loadDomains = async () => {
     await fetch('http://localhost:3001/loadDomainsInFrontend', {
@@ -98,9 +104,73 @@ export default class CreateNewProp extends Component {
       return;
     }
   };
+  getLayerInfo = async () => {
+    let token = sessionStorage.getItem('token');
+    if(token==null){
+      this.setState({
+        Redirect:'Login'
+      })
+      alert('Please login in!');
+      return;
+    }
+    token = JSON.parse(token);
+    let layerInfo = await fetch('http://localhost:3001/LayerInfo').then((response) => response.json());
+    // newBlockReq = JSON.parse(newBlockReq);
+    if(layerInfo.error){
+      alert(layerInfo.error);
+      this.setState({
+        Redirect:'Dashboard'
+      })
+      return;
+    }
+    // alert(JSON.stringify(newBlockReq));
+    layerInfo = layerInfo.success.LayerInfo;
+    // alert(JSON.stringify(layerInfo))
+    this.setState({
+      layerInfo: layerInfo
+    })
+    let allLayers = [];
+    for(let layer of layerInfo){
+      allLayers.push(layer['LayerName'])
+    }
+    this.setState({
+      allLayers:allLayers
+    })
+  };
 
+  handleChangeL = async (event) => {
+    let value = Array.from(event.target.selectedOptions, option => option.value)
+    value = value[0];
+    let allLayers = this.state.layerInfo;
+    // alert(JSON.stringify(allLayers))
+    let newLayer = allLayers.find(layer => layer.LayerName === value);
+    // alert(newLayer)
+    let allOntologies = []
+    for(let ontology of newLayer['OntologyInfo']){
+      allOntologies.push(ontology.Name)
+    }
+    this.setState({
+      Layer: value,
+      allOntologies: allOntologies,
+      allDomains: [],
+    });
+  };
+  handleChangeO = async (event) => {
+    let value = Array.from(event.target.selectedOptions, option => option.value)
+    value = value[0];
+    let allDomains = [];
+    let layerObj = this.state.layerInfo.find(layer => layer.LayerName === this.state.Layer);
+    // alert(JSON.stringify(layerObj))
+    let ontologyObj = layerObj.OntologyInfo.find(ontology => ontology.Name === value);
+    allDomains = ontologyObj.Domains;
+    this.setState({
+      Ontology: value,
+      allDomains: allDomains,
+    });
+  };
   handleChangeD = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
+    value = value[0];
     this.setState({
       Domain: value,
     });
@@ -171,6 +241,8 @@ export default class CreateNewProp extends Component {
     const data = {
       type: this.state.Type,
       // domain: this.state.Domain,
+      layer: this.state.Layer,
+      ontology: this.state.Ontology,
       domain:domain,
       // author: this.state.Author,
       author: token.ID,
@@ -180,6 +252,7 @@ export default class CreateNewProp extends Component {
       download: this.state.Download,
       originalID: ''
     }
+    alert(data);
     // check if input is valid
     if(data.domain.length===0){
       alert('Please choose a domain!');
@@ -253,6 +326,29 @@ export default class CreateNewProp extends Component {
                   sm={6}
                   xs={12}
                 >
+                  <Typography
+                    color="textPrimary"
+                    gutterBottom
+                    variant="h6"
+                  >
+                    Layer and Ontology
+                  </Typography>
+                  <select value={this.state.Layer} onChange={this.handleChangeL}>
+                    <option></option>
+                    {
+                      this.state.allLayers.map((value, index) => {
+                          return <option key={index} value={value}>{value}</option>
+                      })
+                    }
+                  </select>
+                  <select value={this.state.Ontology} onChange={this.handleChangeO}>
+                    <option></option>
+                    {
+                      this.state.allOntologies.map((value, index) => {
+                          return <option key={index} value={value}>{value}</option>
+                      })
+                    }
+                  </select>
                   <Typography
                     color="textPrimary"
                     gutterBottom

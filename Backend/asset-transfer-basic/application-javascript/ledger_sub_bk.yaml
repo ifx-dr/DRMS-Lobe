@@ -11,7 +11,7 @@ BlockchainInfo:
   OutFileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
 LayerInfo:
   - ID: L1
-    LayerName: Top-level Layer
+    LayerName: 'L1: Top-level Layer'
     Comment: domain independent knowledge
     OntologyInfo:
       - Name: time.owl
@@ -25,7 +25,7 @@ LayerInfo:
           FileName: ./blockchain/blockchain_hist_sub_Time.xlsx
           OutFileName: ./blockchain/blockchain_hist_sub_Time.xlsx
   - ID: L2
-    LayerName: Domain-specific Layer
+    LayerName: 'L2: Domain-specific Layer'
     Comment: Semiconductor Supply Chain
     OntologyInfo:
       - Name: PMV.owl
@@ -49,11 +49,11 @@ LayerInfo:
           FileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
           OutFileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
   - ID: L3
-    LayerName: General Application Layer
+    LayerName: 'L3: General Application Layer'
     Comment: ''
     OntologyInfo: []
   - ID: L4
-    LayerName: Specific Application Layer
+    LayerName: 'L4: Specific Application Layer'
     Comment: ontologies at semiconductor companies
     OntologyInfo: []
 UserInfo:
@@ -62,9 +62,9 @@ UserInfo:
     Password: '111'
     Email: 111@gmail.com
     Tokens: 1060
-    Total_Proposal: 1
+    Total_Proposal: 2
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Mar 20 2023 14:32:30 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: Mon Mar 20 2023 13:58:23 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Supply Chain
     Expert: []
@@ -100,17 +100,38 @@ UserInfo:
     LastParticipation: Wed Mar 08 2023 14:02:39 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
-OngoingProposalInfo: []
+OngoingProposalInfo:
+  - ID: proposal2
+    URI: aa
+    Domain: Time
+    Layer: 'L1: Top-level Layer'
+    Ontology: time.owl
+    Valid: '2'
+    AuthorID: member1
+    Proposal_Message: cc
+    Creation_Date: Fri Mar 17 2023 13:50:36 GMT+0000 (Coordinated Universal Time)
+    State: ongoing
+    Type: newProposal
+    OriginalID: ''
+    NumAcceptedVotes: 0
+    NumRejectedVotes: 0
+    AcceptedVotes: []
+    RejectedVotes: []
+    Hash: bb
 ClosedProposalInfo:
   - ID: proposal0
     State: accept
     EndDate: Wed Mar 08 2023 14:16:46 GMT+0000 (Coordinated Universal Time)
     Veto: false
   - ID: proposal1
-    Layer: Domain-specific Layer
+    Layer: 'L2: Domain-specific Layer'
     Ontology: OrderManagement.owl
     State: accept
-    EndDate: Mon Mar 20 2023 14:32:32 GMT+0000 (Coordinated Universal Time)
+    EndDate: Mon Mar 20 2023 13:58:25 GMT+0000 (Coordinated Universal Time)
     Veto: false
-AllNewBlockRequests: {}
-NewBlockRequest: {}
+NewBlockRequest:
+  newBlockWaiting: 'true'
+  proposalID: proposal1
+  author: member1
+  lobeOwner: member1
+  supervisor: n/a
