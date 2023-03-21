@@ -37,6 +37,28 @@ const org1PrivateCollectionName = 'Org1MSPPrivateCollection';
 function prettyJSONString(inputString) {
 	return JSON.stringify(JSON.parse(inputString), null, 2);
 }
+function getTimestamp(){
+	let d = new Date();
+    let date, month, year, hh, mm;
+    if(d.getDate()<10)
+      date = '0' + d.getDate();
+    else
+      date = d.getDate();
+    if(d.getMonth()+1<10)
+      month = '0' + (d.getMonth()+1).toString();
+    else
+      month = d.getMonth()+1;
+    year = d.getFullYear();
+    if(d.getHours()<10)
+      hh = '0' + d.getHours();
+    else
+      hh = d.getHours();
+    if(d.getMinutes()<10)
+      mm = '0' + d.getMinutes();
+    else
+      mm = d.getMinutes();
+	return `${year}${month}${date}_${hh}${mm}`
+}
 
 const retry_cnt = 3;
 var NewProposalLock = true;
@@ -155,7 +177,7 @@ async function main() {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
 						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName);
-						let res = `ledger initialized from file, time: ${Date()}`;
+						let res = `ledger initialized from file, time: ${Date('CET')}`;
 						console.log(`SUCCESS app initiate: ${res}`)
 						result = {"success":res};
 						flag = true;
@@ -163,7 +185,7 @@ async function main() {
 					} catch (error) {
 						let res = error;
 						result = {"error":error.toString()}
-						console.log(`FAILED ${i} app initiate, time: ${Date()}, ${res}`)
+						console.log(`FAILED ${i} app initiate, time: ${Date('CET')}, ${res}`)
 					}
 				}
 				res.json(result);
@@ -199,15 +221,35 @@ async function main() {
 						BC.exportChainOnlyToExcel(chain, outFileName);
 						// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
 						result = {"success":"ledger saved"};
-						console.log(`SUCCESS app saveStatus, time: ${Date()}`);
+						console.log(`SUCCESS app saveStatus, time: ${Date('CET')}`);
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app saveStatus, time: ${Date()}, ${error}`);
+						console.log(`FAILED ${i} app saveStatus, time: ${Date('CET')}, ${error}`);
 						result = {"error":error.toString()}
 					}
 				}
 				res.json(result);
 			});
+			app.get("/saveBlockchain", async (req, res) => {
+				console.log("app saveBlockchain");
+				let timestamp = getTimestamp(); // YYYYMMDD_hhmm
+				let outFileName = `blockchain_hist_${timestamp}.xlsx`;
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
+						BC.exportChainOnlyToExcel(chain, outFileName);
+						// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
+						result = {"success":JSON.stringify(chain)};
+						console.log(`SUCCESS app saveStatus, time: ${Date('CET')}`);
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app saveStatus, time: ${Date('CET')}, ${error}`);
+						result = {"error":error.toString()}
+					}
+				}
+				res.json(JSON.stringify(result));
+			})
 			app.get("/initiate_origin", async (req, res) => {
 				// Initialize a set of data on the channel using the chaincode 'Init_Ledger' function.
 				// This type of transaction would only be run once by an application the first time it was started after it
@@ -570,14 +612,14 @@ async function main() {
 					try {
 						console.log(`app updateDR ${req.body.DR} ${req.body.Hash}`)
 						await contract.submitTransaction('UpdateDRfromGithub', req.body.DR, req.body.Hash);
-						let resp = `LatestDR and fileHash updated, time: ${Date()}`;
+						let resp = `LatestDR and fileHash updated, time: ${Date('CET')}`;
 						console.log(`SUCCESS app updateDR: ${resp}`)
 						result = {"success":resp};
 						break;
 					} catch (error) {
 						let resp = error;
 						result = {"error":error.toString()}
-						console.log(`FAILED ${i} app updateDR, time: ${Date()}, ${resp}`)
+						console.log(`FAILED ${i} app updateDR, time: ${Date('CET')}, ${resp}`)
 					}
 				}
 				res.json(result);
