@@ -233,7 +233,7 @@ async function main() {
 			app.get("/saveBlockchain", async (req, res) => {
 				console.log("app saveBlockchain");
 				let timestamp = getTimestamp(); // YYYYMMDD_hhmm
-				let outFileName = `blockchain_hist_${timestamp}.xlsx`;
+				let outFileName = `./blockchain/blockchain_hist_${timestamp}.xlsx`;
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
@@ -245,6 +245,26 @@ async function main() {
 						break;
 					} catch (error) {
 						console.log(`FAILED ${i} app saveStatus, time: ${Date('CET')}, ${error}`);
+						result = {"error":error.toString()}
+					}
+				}
+				res.json(JSON.stringify(result));
+			})
+			app.get("/exportBlockchain", async (req, res) => {
+				console.log("app exportBlockchain");
+				let timestamp = getTimestamp(); // YYYYMMDD_hhmm
+				let outFileName = `./blockchain/blockchain_hist_${timestamp}.docx`;
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
+						BC.exportChainToWord(chain, outFileName);
+						// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
+						result = {"success":JSON.stringify(chain)};
+						console.log(`SUCCESS app exportBlockchain, time: ${Date('CET')}`);
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app exportBlockchain, time: ${Date('CET')}, ${error}`);
 						result = {"error":error.toString()}
 					}
 				}

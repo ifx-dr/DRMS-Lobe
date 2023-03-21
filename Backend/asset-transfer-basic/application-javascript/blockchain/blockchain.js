@@ -198,5 +198,6 @@ module.exports = {
     printBlockToConsole,
     printChainToConsole,
     exportChainOnlyToExcel,
+    exportChainToWord,
     resetChain,
 }
