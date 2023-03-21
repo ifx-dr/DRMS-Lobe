@@ -693,7 +693,7 @@ class DRChaincode extends Contract {
             let pos = members.indexOf(member);
             member.Tokens -= numTokens;
             if (member.Tokens < voteDeposit) member.Tokens = voteDeposit;
-            member.LastParticipation = Date();
+            member.LastParticipation = Date('CET');
             members[pos] = member;
             await this.UpdateMembers(ctx, members);
             result = 1;
@@ -725,7 +725,7 @@ class DRChaincode extends Contract {
         //Check whether within 24 Hours min since proposal is ongoing
         let startTime = await ctx.stub.getState('time');
         startTime = new Date(startTime);
-        let currentT = new Date().getTime();
+        let currentT = new Date('CET').getTime();
         if( (currentT - startTime) > 86400000) {
             console.log('Out of time' + (currentT - startTime));
             return 'TimeOut';
@@ -734,7 +734,7 @@ class DRChaincode extends Contract {
     }
 
     async CheckTimeOut(ctx, startTimeString, maxHours){
-        let endTime = new Date();
+        let endTime = new Date('CET');
         let startTime = new Date(startTimeString);
         let diff = (startTime.getTime() - endTime.getTime())/(1000*3600);
         if(diff > maxHours)
@@ -765,7 +765,7 @@ class DRChaincode extends Contract {
             proposal = JSON.parse(proposal);
             let EndDate = proposal.EndDate;
             EndDate = new Date(EndDate);
-            const currentT = new Date().getTime();
+            const currentT = new Date('CET').getTime();
             return (currentT - EndDate.getTime()) >= 2592000000;
         } catch (e) {
             console.log('Error when getting the creation date of the proposal'+ originalID + e);
@@ -826,7 +826,7 @@ class DRChaincode extends Contract {
             Valid: valid.toString(),
             AuthorID: author_id,
             Proposal_Message: message,
-            Creation_Date: Date(),
+            Creation_Date: Date('CET'),
             State: 'ongoing',
             Type: type,
             OriginalID: originalID,
@@ -1066,7 +1066,7 @@ class DRChaincode extends Contract {
         // await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(parseInt(ongoingprop) + 1)));
 
         // Update the start time for ongoing proposal
-        await ctx.stub.putState('time', Buffer.from(Date()));
+        await ctx.stub.putState('time', Buffer.from(Date('CET')));
 
         let proposal = await this.GetProposal(ctx, proposalID);
 
@@ -1077,7 +1077,7 @@ class DRChaincode extends Contract {
             // console.log(blockchain);
             let latestBlock = await this.GetLatestBlock(ctx);
             let index = latestBlock.index+1;
-            let timestamp = Date();
+            let timestamp = Date('CET');
             let data = null;
             if(proposal.Type==='vetoProposal'){
                 data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
@@ -1122,7 +1122,7 @@ class DRChaincode extends Contract {
         const closedProposal = {
             ID: closedProposalID,
             State: result,
-            EndDate: Date(),
+            EndDate: Date('CET'),
             Veto: false
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
@@ -1216,7 +1216,7 @@ class DRChaincode extends Contract {
     }
 
     async CalculateMonthDifference (member) {
-        let currentDate = new Date();
+        let currentDate = new Date('CET');
         let lastParticipation = new Date(member.LastParticipation);
         
         // let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
@@ -1298,7 +1298,7 @@ class DRChaincode extends Contract {
         let lastingTime = 300000;
         let ongoingtime = await ctx.stub.getState('time');
         ongoingtime = new Date(ongoingtime);
-        let currentT = new Date().getTime();
+        let currentT = new Date('CET').getTime();
         let time = ongoingtime.getTime() + lastingTime- currentT;
         console.log(time);
         if(time <= 0) {

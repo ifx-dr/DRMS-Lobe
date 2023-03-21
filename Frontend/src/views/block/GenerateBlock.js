@@ -155,7 +155,7 @@ export default class GenerateBlock extends Component {
   }
   getTimeStamp = async (t) => {
     let d = new Date(t);
-    let date, month, year;
+    let date, month, year, hh, mm;
     if(d.getDate()<10)
       date = '0' + d.getDate();
     else
@@ -165,7 +165,18 @@ export default class GenerateBlock extends Component {
     else
       month = d.getMonth()+1;
     year = d.getFullYear();
-    const timestamp = date + '.' + month + '.' + year;
+    if(d.getHours()<10)
+      hh = '0' + d.getHours();
+    else
+      hh = d.getHours();
+    if(d.getMinutes()<10)
+      mm = '0' + d.getMinutes();
+    else
+      mm = d.getMinutes();
+    const timestamp = `${date}.${month}.${year} ${hh}:${mm} (CET)`;
+    this.setState({
+      timestamp:timestamp
+    }, console.log('timestamp: '+timestamp));
     this.setState({
       nextTimestamp:timestamp
     }, console.log('timestamp: '+timestamp));
