@@ -71,5 +71,7 @@ NewBlockRequest:
   author: n/a
   lobeOwner: n/a
   supervisor: n/a
-LatestDR: ''
-FileHash: ''
+LatestDR: >-
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/69c451ed3cc43181ccf7143ba7e6ada345d38d6f
+FileHash: >-
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/raw/69c451ed3cc43181ccf7143ba7e6ada345d38d6f/PMV.owl?inline=false

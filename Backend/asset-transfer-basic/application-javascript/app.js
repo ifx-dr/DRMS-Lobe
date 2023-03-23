@@ -72,8 +72,8 @@ var defaultBranch = '';
 var fileName = '';
 var outFileName = '';
 // specify the config file to change project
-// var ledgerFile = 'ledger_sub_OrderManagement.yaml';
-var ledgerFile = 'ledger_sub_PMV.yaml';
+var ledgerFile = 'ledger_sub_OrderManagement.yaml';
+// var ledgerFile = 'ledger_sub_PMV.yaml';
 var platform = '';
 var newBlockRequest = null;
 var latestDR = '';
@@ -180,8 +180,7 @@ async function main() {
 					try {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-						if(latestDR.length===0)
-							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName);
+						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName, latestDR.length===0);
 						let res = `ledger initialized from file, time: ${Date('CET')}`;
 						console.log(`SUCCESS app initiate: ${res}`)
 						result = {"success":res};
@@ -240,7 +239,7 @@ async function main() {
 			app.get("/saveBlockchain", async (req, res) => {
 				console.log("app saveBlockchain");
 				let timestamp = getTimestamp(); // YYYYMMDD_hhmm
-				let outFileName = `./blockchain/blockchain_hist_${timestamp}.xlsx`;
+				let outFileName = `./blockchain/blockchain_hist_${ontologyName.split('.')[0]}_${timestamp}.xlsx`;
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
@@ -260,7 +259,7 @@ async function main() {
 			app.get("/exportBlockchain", async (req, res) => {
 				console.log("app exportBlockchain");
 				let timestamp = getTimestamp(); // YYYYMMDD_hhmm
-				let outFileName = `./blockchain/blockchain_hist_${timestamp}.docx`;
+				let outFileName = `./blockchain/blockchain_hist_${ontologyName.split('.')[0]}_${timestamp}.docx`;
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
@@ -423,7 +422,7 @@ async function main() {
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());
 							await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()), platform, ontologyName);
+							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()), platform, ontologyName, true);
 							await contract.submitTransaction('CloseNewBlockRequest');
 							res = 'Successfully generated a new block!'
 							console.log(`SUCCESS app generateBlock: ${res}`)

@@ -182,6 +182,7 @@ class DRChaincode extends Contract {
         
 
         const latestDR = ledgerTXT['LatestDR'];
+        console.log(`cc latestDR: ${latestDR}`);
         // const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         // download link of the ongoing proposal
@@ -216,35 +217,38 @@ class DRChaincode extends Contract {
         blockchain = JSON.parse(blockchain);
         await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
     }
-    async WriteLatestBlock(ctx, latestBlock, platform, ontologyName){
+    async WriteLatestBlock(ctx, latestBlock, platform, ontologyName, flag){
         console.log('cc: write latest block')
         console.log(latestBlock);
         // latestBlock = JSON.parse(latestBlock);
         // ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
         await ctx.stub.putState('latestBlock', Buffer.from(latestBlock));
-        latestBlock = JSON.parse(latestBlock);
-        let latestDR = 'New project: please upload ontology file';
-        let fileHash = 'New project: please upload ontology file';
-        if(latestBlock.data!=='Genesis Block'){
-            latestDR = latestBlock.data;
-            if(platform==='GitHub'){
-                // https://github.com/ifx-dr/Update-Test-DR-Sub-Onto/commit/ac9aef219f062221dc147d65b4fdfc5e5930804d
-                let latestDRSplit = latestDR.split('/');
-                let hash = latestDRSplit.pop();
-                latestDRSplit.pop();
-                let repoName = latestDRSplit.pop();
-                let repoAuthor = latestDRSplit.pop();
-                let repo = repoAuthor + '/' + repoName;
-                fileHash = `https://github.com/${repo}/archive/${hash}.zip`;
+        if(flag){
+            // when flag is true, update latestDR and fileHash with latestBlock
+            latestBlock = JSON.parse(latestBlock);
+            let latestDR = 'New project: please upload ontology file';
+            let fileHash = 'New project: please upload ontology file';
+            if(latestBlock.data!=='Genesis Block'){
+                latestDR = latestBlock.data;
+                if(platform==='GitHub'){
+                    // https://github.com/ifx-dr/Update-Test-DR-Sub-Onto/commit/ac9aef219f062221dc147d65b4fdfc5e5930804d
+                    let latestDRSplit = latestDR.split('/');
+                    let hash = latestDRSplit.pop();
+                    latestDRSplit.pop();
+                    let repoName = latestDRSplit.pop();
+                    let repoAuthor = latestDRSplit.pop();
+                    let repo = repoAuthor + '/' + repoName;
+                    fileHash = `https://github.com/${repo}/archive/${hash}.zip`;
+                }
+                else{
+                    // https://gitlab.intra.infineon.com/digital-reference/order_management/-/commit/802222735fe9a7fa2b0feb3ad198dbbb30342ac9
+                    // https://gitlab.intra.infineon.com/digital-reference/Order_Management/-/raw/802222735fe9a7fa2b0feb3ad198dbbb30342ac9/OrderManagement.owl?inline=false
+                    fileHash = `${latestDR.split('/commit/')[0]}/raw/${latestDR.split('/commit/')[1]}/${ontologyName}?inline=false`;
+                }
             }
-            else{
-                // https://gitlab.intra.infineon.com/digital-reference/order_management/-/commit/802222735fe9a7fa2b0feb3ad198dbbb30342ac9
-                // https://gitlab.intra.infineon.com/digital-reference/Order_Management/-/raw/802222735fe9a7fa2b0feb3ad198dbbb30342ac9/OrderManagement.owl?inline=false
-                fileHash = `${latestDR.split('/commit/')[0]}/raw/${latestDR.split('/commit/')[1]}/${ontologyName}?inline=false`;
-            }
+            await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
+            await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
         }
-        await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
-        await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
     }
 
     // async Init_Ledger(ctx) {
