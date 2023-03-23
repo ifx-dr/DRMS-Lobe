@@ -76,6 +76,8 @@ var outFileName = '';
 var ledgerFile = 'ledger_sub_PMV.yaml';
 var platform = '';
 var newBlockRequest = null;
+var latestDR = '';
+var fileHash = '';
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -162,6 +164,8 @@ async function main() {
 				outFileName = ledger['BlockchainInfo']['OutFileName'];
 				platform = ledger['OntologyInfo']['Platform'];
 				newBlockRequest = ledger['NewBlockRequest'];
+				latestDR = ledger['LatestDR'];
+				fileHash = ledger['FileHash'];
 				if(platform==='GitLab')
 					accessToken = ledger['OntologyInfo']['AccessToken'];
 				if(!fs.existsSync(fileName)){
@@ -176,7 +180,8 @@ async function main() {
 					try {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName);
+						if(latestDR.length===0)
+							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName);
 						let res = `ledger initialized from file, time: ${Date('CET')}`;
 						console.log(`SUCCESS app initiate: ${res}`)
 						result = {"success":res};
@@ -212,6 +217,8 @@ async function main() {
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
 						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
 						ledger['NewBlockRequest'] = JSON.parse(await contract.evaluateTransaction("GetNewBlockRequest"));
+						ledger['LatestDR'] = (await contract.evaluateTransaction('CheckLatestDR')).toString();
+						ledger['FileHash'] = (await contract.evaluateTransaction('CheckDRHash')).toString();
 						if(platform==='GitLab')
 							ledger['OntologyInfo']['AccessToken'] = accessToken;
 						let yamlStr = yaml.dump(ledger);

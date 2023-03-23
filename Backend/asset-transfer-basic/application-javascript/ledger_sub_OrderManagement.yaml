@@ -63,11 +63,13 @@ ClosedProposalInfo:
     Veto: false
   - ID: proposal1
     State: accept
-    EndDate: Invalid Date (CET)
+    EndDate: 23.03.2023 10:09 (CET)
     Veto: false
 NewBlockRequest:
-  newBlockWaiting: 'true'
-  proposalID: proposal1
-  author: member4
-  lobeOwner: member1
+  newBlockWaiting: 'false'
+  proposalID: n/a
+  author: n/a
+  lobeOwner: n/a
   supervisor: n/a
+LatestDR: ''
+FileHash: ''

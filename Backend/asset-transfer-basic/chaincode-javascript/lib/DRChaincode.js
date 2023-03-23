@@ -153,10 +153,10 @@ class DRChaincode extends Contract {
 
         if(closedProposals!=null){
             for(let closedProposal of closedProposals){
-                let date_part = closedProposal.EndDate.split('.');
-                if(date_part.length==3){
-                    closedProposal.EndDate = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
-                }
+                // let date_part = closedProposal.EndDate.split('.');
+                // if(date_part.length==3){
+                //     closedProposal.EndDate = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+                // }
                 // closedProposal.docType = 'closedProposal';
                 await ctx.stub.putState(closedProposal.ID, Buffer.from(JSON.stringify(closedProposal)));
                 console.info(`ClosedProposal ${closedProposal.ID} initialized`);
@@ -181,13 +181,13 @@ class DRChaincode extends Contract {
             await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify('none')));
         
 
-        const latestDR = '';
+        const latestDR = ledgerTXT['LatestDR'];
         // const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         // download link of the ongoing proposal
         // const fileHash = 'https://ipfs.io/ipfs/QmSWDa85q8FQzB8qAnuoxZ4LDoXoWKmD6t4sPszdq5FiW2?filename=test.owl';
         // const fileHash = 'https://github.com/tibonto/dr/archive/50d0834deba2ce791772be7932055cf1a7bb9545.zip'
-        const fileHash = '';
+        const fileHash = ledgerTXT['FileHash'];
         await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
 
         ////////////////////
@@ -771,7 +771,7 @@ class DRChaincode extends Contract {
             const proposalID = 'closedproposal' + originalID.substring(8);
             let proposal = await ctx.stub.getState(proposalID);
             proposal = JSON.parse(proposal);
-            let EndDate = proposal.EndDate;
+            let EndDate = proposal.EndDate_Internal;
             EndDate = new Date(EndDate);
             const currentT = new Date().getTime();
             return (currentT - EndDate.getTime()) >= 2592000000;
@@ -947,6 +947,7 @@ class DRChaincode extends Contract {
                 }
                 result.Message = 'Lobe Owner Successfully Vote for proposal!';
                 result.Finished = true;
+                result.Result = 'accept by lobe owner';
                 return JSON.stringify(result);
             }
         }
@@ -1085,25 +1086,26 @@ class DRChaincode extends Contract {
 
         ////////////////////
         // if approved, update the blockchain and latest block
-        if(result==='accept'){
-            let blockchain = await this.GetBlockchain(ctx);
-            // console.log(blockchain);
-            let latestBlock = await this.GetLatestBlock(ctx);
-            let index = latestBlock.index+1;
-            let timestamp = Date();
-            let data = null;
-            if(proposal.Type==='vetoProposal'){
-                data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
-            }
-            else
-                data = `commemt: ${proposal.Proposal_Message}, file hash: ${proposal.Hash}`; // Hash or URI? Hash is unique give a specific file
-            // let previousHash = latestBlock.hash;
-            // latestBlock = new BC.Block(index, timestamp, data, previousHash);
-            // console.log(blockchain);
-            // console.log(latestBlock);
-            // blockchain.push(latestBlock);
-            // await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
-            // await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
+        // if(result==='accept'||result==='accept by lobe owner'){
+        if(result.includes('accept')){
+            // // let blockchain = await this.GetBlockchain(ctx);
+            // // console.log(blockchain);
+            // let latestBlock = await this.GetLatestBlock(ctx);
+            // let index = latestBlock.index+1;
+            // let timestamp = Date();
+            // let data = null;
+            // if(proposal.Type==='vetoProposal'){
+            //     data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
+            // }
+            // else
+            //     data = `commemt: ${proposal.Proposal_Message}, file hash: ${proposal.Hash}`; // Hash or URI? Hash is unique give a specific file
+            // // let previousHash = latestBlock.hash;
+            // // latestBlock = new BC.Block(index, timestamp, data, previousHash);
+            // // console.log(blockchain);
+            // // console.log(latestBlock);
+            // // blockchain.push(latestBlock);
+            // // await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
+            // // await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
             let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
             let newBlockRequest = {
                 newBlockWaiting: 'true',
@@ -1135,7 +1137,9 @@ class DRChaincode extends Contract {
         const closedProposal = {
             ID: closedProposalID,
             State: result,
+            StartDate: proposal.Creation_Date,
             EndDate: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+            EndDate_Internal: Date(),
             Veto: false
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));

@@ -66,8 +66,10 @@ ClosedProposalInfo:
     EndDate: 22.3.2023, 16:42:16 (CET)
     Veto: false
 NewBlockRequest:
-  newBlockWaiting: 'true'
-  proposalID: proposal1
-  author: member4
-  lobeOwner: member3
+  newBlockWaiting: 'false'
+  proposalID: n/a
+  author: n/a
+  lobeOwner: n/a
   supervisor: n/a
+LatestDR: ''
+FileHash: ''
