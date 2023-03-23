@@ -2,7 +2,7 @@ OntologyInfo:
   Name: PMV.owl
   Domains:
     - Process
-  Repo: digital-reference/process_model_version
+  Repo: semantic-web-projects/digital-reference/process_model_version
   Default: main
   Platform: GitLab
   AccessToken: glpat-tbi7Q9X_rsrZZg8zC9Cw
@@ -17,7 +17,8 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 24.2.2023, 16:05:22 (CET)
+    LastParticipation_Internal: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
   - ID: member2
@@ -27,17 +28,19 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 23.1.2023, 01:00:00 (CET)
+    LastParticipation_Internal: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
   - ID: member3
     Name: Marta
     Password: '333'
     Email: 333@gmail.com
-    Tokens: 1030
+    Tokens: 1040
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Thu Mar 16 2023 08:16:48 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 22.3.2023, 16:42:14 (CET)
+    LastParticipation_Internal: Wed Mar 22 2023 15:42:14 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Process
     Expert: []
@@ -45,10 +48,11 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 990
-    Total_Proposal: 0
+    Tokens: 1020
+    Total_Proposal: 1
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Mar 15 2023 14:32:41 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 15.3.2023, 15:32:41 (CET)
+    LastParticipation_Internal: Wed Mar 15 2023 14:32:41 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -57,9 +61,13 @@ ClosedProposalInfo:
     State: accept
     EndDate: Thu Mar 16 2023 08:16:50 GMT+0000 (Coordinated Universal Time)
     Veto: false
+  - ID: proposal1
+    State: accept
+    EndDate: 22.3.2023, 16:42:16 (CET)
+    Veto: false
 NewBlockRequest:
-  newBlockWaiting: 'false'
-  proposalID: n/a
-  author: n/a
-  lobeOwner: n/a
+  newBlockWaiting: 'true'
+  proposalID: proposal1
+  author: member4
+  lobeOwner: member3
   supervisor: n/a

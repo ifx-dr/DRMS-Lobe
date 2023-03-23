@@ -103,9 +103,9 @@ class DRChaincode extends Contract {
         // }
         
         for(let member of members){
-            let date_part = member.LastParticipation.split('.');
+            let date_part = member.LastParticipation_Internal.split('.');
             if(date_part.length==3){
-                member.LastParticipation = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString();
+                member.LastParticipation_Internal = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
             }
             for(let domain of member["LobeOwner"]){
                 console.log("Finding lobe owner: "+domain)
@@ -134,9 +134,9 @@ class DRChaincode extends Contract {
         let closedProposalQueue = [];
         if(ongoingProposals!=null){
             for(let ongoingProposal of ongoingProposals){
-                let date_part = ongoingProposal.Creation_Date.split('.');
+                let date_part = ongoingProposal.Creation_Date_Internal.split('.');
                 if(date_part.length==3){
-                    ongoingProposal.Creation_Date = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString();
+                    ongoingProposal.Creation_Date_Internal = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
                 }
                 // ongoingProposal.docType = 'proposal';
                 ongoingProposalQueue.push(ongoingProposal.ID);
@@ -155,7 +155,7 @@ class DRChaincode extends Contract {
             for(let closedProposal of closedProposals){
                 let date_part = closedProposal.EndDate.split('.');
                 if(date_part.length==3){
-                    closedProposal.EndDate = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString();
+                    closedProposal.EndDate = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
                 }
                 // closedProposal.docType = 'closedProposal';
                 await ctx.stub.putState(closedProposal.ID, Buffer.from(JSON.stringify(closedProposal)));
@@ -688,16 +688,24 @@ class DRChaincode extends Contract {
         let members = await this.GetMembers(ctx);
 
         let member = members.find(member => member.ID == member_id);
-        console.log('member is: '+member);
-        if (member != undefined){
-            let pos = members.indexOf(member);
-            member.Tokens -= numTokens;
-            if (member.Tokens < voteDeposit) member.Tokens = voteDeposit;
-            member.LastParticipation = Date('CET');
-            members[pos] = member;
-            await this.UpdateMembers(ctx, members);
-            result = 1;
-        }
+        console.log('member is: '+JSON.stringify(member));
+        let pos = members.indexOf(member);
+        
+        member.Tokens = parseInt(member.Tokens) - numTokens;
+
+        if (member.Tokens < voteDeposit) 
+            member.Tokens = voteDeposit;
+        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+        member.LastParticipation_Internal = Date();
+        console.log(`member info to update: ${JSON.stringify(member)}`)
+        members[pos] = member;
+
+        console.log(`pos: ${pos}`)
+        console.log(`members: ${JSON.stringify(members)}`)
+
+        this.UpdateMembers(ctx, members);
+
+        result = 1;
 
         return result;
     }
@@ -725,7 +733,7 @@ class DRChaincode extends Contract {
         //Check whether within 24 Hours min since proposal is ongoing
         let startTime = await ctx.stub.getState('time');
         startTime = new Date(startTime);
-        let currentT = new Date('CET').getTime();
+        let currentT = new Date().getTime();
         if( (currentT - startTime) > 86400000) {
             console.log('Out of time' + (currentT - startTime));
             return 'TimeOut';
@@ -734,7 +742,7 @@ class DRChaincode extends Contract {
     }
 
     async CheckTimeOut(ctx, startTimeString, maxHours){
-        let endTime = new Date('CET');
+        let endTime = new Date();
         let startTime = new Date(startTimeString);
         let diff = (startTime.getTime() - endTime.getTime())/(1000*3600);
         if(diff > maxHours)
@@ -765,7 +773,7 @@ class DRChaincode extends Contract {
             proposal = JSON.parse(proposal);
             let EndDate = proposal.EndDate;
             EndDate = new Date(EndDate);
-            const currentT = new Date('CET').getTime();
+            const currentT = new Date().getTime();
             return (currentT - EndDate.getTime()) >= 2592000000;
         } catch (e) {
             console.log('Error when getting the creation date of the proposal'+ originalID + e);
@@ -784,13 +792,14 @@ class DRChaincode extends Contract {
         let members = await this.GetMembers(ctx);
         let member = members.find(member => member.ID == author_id);
         //get the amount of tokens this author, and charge 20 tokens as deposit of the proposal
-        let tokens = member.Tokens;
-        tokens = parseInt(tokens) -20;
-        if (tokens < 0) {
+        if (member.Tokens < 20) {
             return ('Sorry you do not have enough tokens!');
-        } else {
-            await this.RemoveTokens(ctx, author_id, 20);
-        }
+        } 
+        const CreateProposalDeposit = 20;
+        // console.log(`cc RemoveTokens: ${res}`);
+
+        // let members2 = await this.GetMembers(ctx);
+        // console.log(`cc members after removetokens: ${JSON.stringify(members2)}`)
         //Check whether this proposal is a veto proposal
         if(type !== 'newProposal'){
             //Check whether the author is able to create a veto proposal
@@ -826,7 +835,8 @@ class DRChaincode extends Contract {
             Valid: valid.toString(),
             AuthorID: author_id,
             Proposal_Message: message,
-            Creation_Date: Date('CET'),
+            Creation_Date: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+            Creation_Date_Internal: Date(),
             State: 'ongoing',
             Type: type,
             OriginalID: originalID,
@@ -841,6 +851,9 @@ class DRChaincode extends Contract {
         members = await this.GetMembers(ctx);
         member = members.find(member => member.ID == author_id);
         member.Total_Proposal = parseInt(member.Total_Proposal)+1;
+        member.Tokens = member.Tokens - CreateProposalDeposit;
+        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+        member.LastParticipation_Internal = Date(),
         await this.UpdateMembers(ctx, members);
         //add new proposal to the world state
 
@@ -912,7 +925,7 @@ class DRChaincode extends Contract {
         // 2. lobe owner, not time out: lobe owner permission
         // 3. expert, time out: expert voting
         // 4. expert, not time out: wait for lobe owner voting
-        let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date, 24);
+        let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date_Internal, 24);
         if(voter_id===lobeOwner){
             if(isTimeOut){
                 result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
@@ -1066,7 +1079,7 @@ class DRChaincode extends Contract {
         // await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(parseInt(ongoingprop) + 1)));
 
         // Update the start time for ongoing proposal
-        await ctx.stub.putState('time', Buffer.from(Date('CET')));
+        await ctx.stub.putState('time', Buffer.from(Date().toString()));
 
         let proposal = await this.GetProposal(ctx, proposalID);
 
@@ -1077,7 +1090,7 @@ class DRChaincode extends Contract {
             // console.log(blockchain);
             let latestBlock = await this.GetLatestBlock(ctx);
             let index = latestBlock.index+1;
-            let timestamp = Date('CET');
+            let timestamp = Date();
             let data = null;
             if(proposal.Type==='vetoProposal'){
                 data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
@@ -1122,7 +1135,7 @@ class DRChaincode extends Contract {
         const closedProposal = {
             ID: closedProposalID,
             State: result,
-            EndDate: Date('CET'),
+            EndDate: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
             Veto: false
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
@@ -1216,12 +1229,15 @@ class DRChaincode extends Contract {
     }
 
     async CalculateMonthDifference (member) {
-        let currentDate = new Date('CET');
-        let lastParticipation = new Date(member.LastParticipation);
+        let currentDate = new Date();
+        let lastParticipation = new Date(member.LastParticipation_Internal);
         
         // let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
         // 1 month = 4 weeks
         let difference = (currentDate.getTime()-lastParticipation.getTime())/(1000*86400*28);
+        console.log(`currentDate: ${currentDate.toString()}`);
+        console.log(`lastParticipation: ${lastParticipation.toString()}`);
+        console.log(`difference: ${difference}`);
         return Math.floor(difference);
     }
 
@@ -1298,7 +1314,7 @@ class DRChaincode extends Contract {
         let lastingTime = 300000;
         let ongoingtime = await ctx.stub.getState('time');
         ongoingtime = new Date(ongoingtime);
-        let currentT = new Date('CET').getTime();
+        let currentT = new Date().getTime();
         let time = ongoingtime.getTime() + lastingTime- currentT;
         console.log(time);
         if(time <= 0) {
@@ -1403,6 +1419,20 @@ class DRChaincode extends Contract {
             }
         console.log(allClosedProposal);
         return allClosedProposal;
+    }
+    async ParseTimestamp(timestamp){
+        let timestamp_split = timestamp.split(' ');
+        let year, month, date, hh, mm;
+        if(timestamp_split.length===1){
+            // dd.mm.yyyy
+        }
+        else if(timestamp_split.length===2){
+            // dd.mm.yyyy, hh:mm:ss
+        }
+        else if(timestamp_split.length===3){
+            // dd.mm.yyyy, hh:mm:ss (CET)
+        }
+        return 1;
     }
 }
 

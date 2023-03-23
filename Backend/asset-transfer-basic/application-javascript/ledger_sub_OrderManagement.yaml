@@ -2,7 +2,7 @@ OntologyInfo:
   Name: OrderManagement.owl
   Domains:
     - Supply Chain
-  Repo: digital-reference/order_management
+  Repo: semantic-web-projects/digital-reference/order_management
   Default: main
   Platform: GitLab
   AccessToken: glpat-tbi7Q9X_rsrZZg8zC9Cw
@@ -14,10 +14,11 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1010
+    Tokens: 1020
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Thu Mar 16 2023 15:38:25 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 22.3.2023, 15:50:52 (CET)
+    LastParticipation_Internal: Wed Mar 22 2023 14:50:52 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Supply Chain
     Expert: []
@@ -28,7 +29,8 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 23.1.2023, 01:00:00 (CET)
+    LastParticipation_Internal: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
   - ID: member3
@@ -38,17 +40,19 @@ UserInfo:
     Tokens: 1020
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 9.3.2023, 11:02:02 (CET)
+    LastParticipation_Internal: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
   - ID: member4
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 990
-    Total_Proposal: 0
+    Tokens: 1020
+    Total_Proposal: 2
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Mar 15 2023 14:37:10 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 15.3.2023, 15:37:10 (CET)
+    LastParticipation_Internal: Wed Mar 15 2023 14:37:10 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -57,9 +61,13 @@ ClosedProposalInfo:
     State: accept
     EndDate: Thu Mar 16 2023 14:38:27 GMT+0000 (Coordinated Universal Time)
     Veto: false
+  - ID: proposal1
+    State: accept
+    EndDate: Invalid Date (CET)
+    Veto: false
 NewBlockRequest:
-  newBlockWaiting: 'false'
-  proposalID: n/a
-  author: n/a
-  lobeOwner: n/a
+  newBlockWaiting: 'true'
+  proposalID: proposal1
+  author: member4
+  lobeOwner: member1
   supervisor: n/a

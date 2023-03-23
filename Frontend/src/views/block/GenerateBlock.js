@@ -109,7 +109,11 @@ export default class GenerateBlock extends Component {
       }
       else{
         // '/' in author/repo needs to be replaced with %2F
-        let rp = this.state.Repo.RepoName.split('/')[0] + '%2F' + this.state.Repo.RepoName.split('/')[1];
+        let reponame_split = this.state.Repo.RepoName.split('/');
+        let rp = reponame_split[0];
+        for(let i=1;i<reponame_split.length;i++)
+          rp += '%2F' + reponame_split[i]
+        
         link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${this.state.Repo.DefaultBranch}`;
         // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
         prefix = `https://gitlab.intra.infineon.com/${this.state.Repo.RepoName}/-/commit/`
