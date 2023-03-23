@@ -217,6 +217,8 @@ async function main() {
 						// 	FileName: blockchainInfo['FileName'],
 						// 	OutFileName: blockchainInfo['OutFileName']
 						// };
+						ledger['OntologyInfo'] = ontologyInfo;
+						ledger["BlockchainInfo"] = blockchainInfo;
 						ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
 						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
@@ -225,8 +227,7 @@ async function main() {
 						ledger['FileHash'] = (await contract.evaluateTransaction('CheckDRHash')).toString();
 						// if(ontologyInfo['Platform']==='GitLab')
 						// 	ledger['OntologyInfo']['AccessToken'] = accessToken;
-						ledger['OntologyInfo'] = ontologyInfo;
-						ledger["BlockchainInfo"] = blockchainInfo;
+
 						let yamlStr = yaml.dump(ledger);
 						fs.writeFileSync(ledgerFile, yamlStr, 'utf8');
 
