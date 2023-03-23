@@ -71,5 +71,7 @@ NewBlockRequest:
   author: n/a
   lobeOwner: n/a
   supervisor: n/a
-LatestDR: ''
-FileHash: ''
+LatestDR: >-
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/4f24e65057a7257c057b4ab9241d4c02154082ae
+FileHash: >-
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/raw/4f24e65057a7257c057b4ab9241d4c02154082ae/OrderManagement.owl?inline=false

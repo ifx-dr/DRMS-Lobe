@@ -64,17 +64,19 @@ const retry_cnt = 3;
 var NewProposalLock = true;
 var VaidateProposalLock = true;
 var NewBlockLock = true;
-var allDomains = [];
-var ontologyName = '';
-var repo = '';
-var accessToken = '';
-var defaultBranch = '';
-var fileName = '';
-var outFileName = '';
+// var allDomains = [];
+// var ontologyName = '';
+// var repo = '';
+// var accessToken = '';
+// var defaultBranch = '';
+// var fileName = '';
+// var outFileName = '';
 // specify the config file to change project
 var ledgerFile = 'ledger_sub_OrderManagement.yaml';
 // var ledgerFile = 'ledger_sub_PMV.yaml';
-var platform = '';
+// var platform = '';
+var ontologyInfo = null;
+var blockchainInfo = null;
 var newBlockRequest = null;
 var latestDR = '';
 var fileHash = '';
@@ -156,22 +158,25 @@ async function main() {
 				console.log('*****read ledger file*****')
 				let fileContents = fs.readFileSync(ledgerFile, 'utf8');
 				let ledger = yaml.load(fileContents);
-				allDomains = ledger['OntologyInfo']['Domains'];
-				ontologyName = ledger['OntologyInfo']['Name'];
-				repo = ledger['OntologyInfo']['Repo'];
-				defaultBranch = ledger['OntologyInfo']['Default'];
-				fileName = ledger['BlockchainInfo']['FileName'];
-				outFileName = ledger['BlockchainInfo']['OutFileName'];
-				platform = ledger['OntologyInfo']['Platform'];
+				ontologyInfo = ledger['OntologyInfo'];
+				blockchainInfo = ledger['BlockchainInfo'];
+
+				// allDomains = ledger['OntologyInfo']['Domains'];
+				// ontologyName = ledger['OntologyInfo']['Name'];
+				// repo = ledger['OntologyInfo']['Repo'];
+				// defaultBranch = ledger['OntologyInfo']['Default'];
+				// fileName = ledger['BlockchainInfo']['FileName'];
+				// outFileName = ledger['BlockchainInfo']['OutFileName'];
+				// platform = ledger['OntologyInfo']['Platform'];
 				newBlockRequest = ledger['NewBlockRequest'];
 				latestDR = ledger['LatestDR'];
 				fileHash = ledger['FileHash'];
-				if(platform==='GitLab')
-					accessToken = ledger['OntologyInfo']['AccessToken'];
-				if(!fs.existsSync(fileName)){
-					fs.writeFileSync(fileName, '', 'utf8');
+				// if(ontologyInfo['Platform']==='GitLab')
+				// 	accessToken = ledger['OntologyInfo']['AccessToken'];
+				if(!fs.existsSync(blockchainInfo['FileName'])){
+					fs.writeFileSync(blockchainInfo['FileName'], '', 'utf8');
 				}
-				let blockchain = BC.loadChainFromExcel(fileName);
+				let blockchain = BC.loadChainFromExcel(blockchainInfo['FileName']);
 				// console.log(blockchain);
 				let latestBlock = blockchain.getLatestBlock();
 				let flag = false;
@@ -180,7 +185,7 @@ async function main() {
 					try {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), platform, ontologyName, latestDR.length===0);
+						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), ontologyInfo['Platform'], ontologyInfo['Name'], latestDR.length===0);
 						let res = `ledger initialized from file, time: ${Date('CET')}`;
 						console.log(`SUCCESS app initiate: ${res}`)
 						result = {"success":res};
@@ -201,30 +206,32 @@ async function main() {
 				for(let i=0;i<retry_cnt;i++){
 					try {
 						let ledger = {};
-						ledger["OntologyInfo"] = {
-							Name: ontologyName,
-							Domains: allDomains,
-							Repo: repo,
-							Default: defaultBranch,
-							Platform: platform,
-						}
-						ledger["BlockchainInfo"] = {
-							FileName: fileName,
-							OutFileName: outFileName
-						};
+						// ledger["OntologyInfo"] = {
+						// 	Name: ontologyInfo['Name'],
+						// 	Domains: ontologyInfo['Domains'],
+						// 	Repo: ontologyInfo['Repo'],
+						// 	Default: ontologyInfo['Default'],
+						// 	Platform: ontologyInfo['Platform'],
+						// }
+						// ledger["BlockchainInfo"] = {
+						// 	FileName: blockchainInfo['FileName'],
+						// 	OutFileName: blockchainInfo['OutFileName']
+						// };
 						ledger["UserInfo"] = JSON.parse(await contract.evaluateTransaction('GetMembers'));
 						ledger["OngoingProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
 						ledger["ClosedProposalInfo"] = JSON.parse(await contract.evaluateTransaction("GetAllClosedProposal"));
 						ledger['NewBlockRequest'] = JSON.parse(await contract.evaluateTransaction("GetNewBlockRequest"));
 						ledger['LatestDR'] = (await contract.evaluateTransaction('CheckLatestDR')).toString();
 						ledger['FileHash'] = (await contract.evaluateTransaction('CheckDRHash')).toString();
-						if(platform==='GitLab')
-							ledger['OntologyInfo']['AccessToken'] = accessToken;
+						// if(ontologyInfo['Platform']==='GitLab')
+						// 	ledger['OntologyInfo']['AccessToken'] = accessToken;
+						ledger['OntologyInfo'] = ontologyInfo;
+						ledger["BlockchainInfo"] = blockchainInfo;
 						let yamlStr = yaml.dump(ledger);
 						fs.writeFileSync(ledgerFile, yamlStr, 'utf8');
 
 						let chain = JSON.parse(await contract.evaluateTransaction("GetBlockchain"))
-						BC.exportChainOnlyToExcel(chain, outFileName);
+						BC.exportChainOnlyToExcel(chain, blockchainInfo['OutFileName']);
 						// let latestBlock = JSON.parse(await contract.evaluateTransaction("GetLatestBlock"))
 						result = {"success":"ledger saved"};
 						console.log(`SUCCESS app saveStatus, time: ${Date('CET')}`);
@@ -239,7 +246,7 @@ async function main() {
 			app.get("/saveBlockchain", async (req, res) => {
 				console.log("app saveBlockchain");
 				let timestamp = getTimestamp(); // YYYYMMDD_hhmm
-				let outFileName = `./blockchain/blockchain_hist_${ontologyName.split('.')[0]}_${timestamp}.xlsx`;
+				let outFileName = `./blockchain/blockchain_hist_${ontologyInfo['Name'].split('.')[0]}_${timestamp}.xlsx`;
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
@@ -259,7 +266,7 @@ async function main() {
 			app.get("/exportBlockchain", async (req, res) => {
 				console.log("app exportBlockchain");
 				let timestamp = getTimestamp(); // YYYYMMDD_hhmm
-				let outFileName = `./blockchain/blockchain_hist_${ontologyName.split('.')[0]}_${timestamp}.docx`;
+				let outFileName = `./blockchain/blockchain_hist_${ontologyInfo['Name'].split('.')[0]}_${timestamp}.docx`;
 				let result;
 				for(let i=0;i<retry_cnt;i++){
 					try {
@@ -335,10 +342,10 @@ async function main() {
 			});
 			app.get("/Repo", async (req, res) => {
 				let result = {"success":{
-					Platform: platform,
-					RepoName: repo,
-					DefaultBranch: defaultBranch,
-					AccessToken: accessToken
+					Platform: ontologyInfo['Platform'],
+					RepoName: ontologyInfo['Repo'],
+					DefaultBranch: ontologyInfo['Default'],
+					AccessToken: ontologyInfo['AccessToken']
 				}};
 				res.json(result);
 			});
@@ -422,7 +429,7 @@ async function main() {
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());
 							await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
-							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()), platform, ontologyName, true);
+							await contract.submitTransaction('WriteLatestBlock', JSON.stringify(blockchain.getLatestBlock()), ontologyInfo['Platform'], ontologyInfo['Name'], true);
 							await contract.submitTransaction('CloseNewBlockRequest');
 							res = 'Successfully generated a new block!'
 							console.log(`SUCCESS app generateBlock: ${res}`)
@@ -666,13 +673,13 @@ async function main() {
 				// let fileContents = fs.readFileSync('../../../Frontend/src/config.json', 'utf8');
 				// console.log(fileContents);
 				// let allDomains =JSON.parse(fileContents)["allDomains"];
-				console.log(allDomains);
-				res.json(JSON.stringify(allDomains));
+				console.log(ontologyInfo['Domains']);
+				res.json(JSON.stringify(ontologyInfo['Domains']));
 			})
 			app.post("/saveDomainsInFrontend", async (req, res) => {
 				console.log("app save domain");
 				// fs.writeFileSync('../../../Frontend/src/config.json', JSON.stringify(req.body), 'utf8');
-				allDomains = req.body["allDomains"];
+				ontologyInfo['Domains'] = req.body["allDomains"];
 				res.json('done');
 			})
 			async function parseFile(req) {
@@ -770,8 +777,8 @@ async function main() {
 				console.log("app ontologyInfo");
 				// multiple layers can be added
 				let result = {
-					Name: ontologyName,
-					Domains: allDomains
+					Name: ontologyInfo['Name'],
+					Domains: ontologyInfo['Domains']
 				};
 				res.json(JSON.stringify(result));
 			})
