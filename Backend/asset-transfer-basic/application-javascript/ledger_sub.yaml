@@ -11,7 +11,7 @@ BlockchainInfo:
   OutFileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
 LayerInfo:
   - ID: L1
-    LayerName: Top-level Layer
+    LayerName: 'L1: Top-level Layer'
     Comment: domain independent knowledge
     OntologyInfo:
       - Name: time.owl
@@ -25,7 +25,7 @@ LayerInfo:
           FileName: ./blockchain/blockchain_hist_sub_Time.xlsx
           OutFileName: ./blockchain/blockchain_hist_sub_Time.xlsx
   - ID: L2
-    LayerName: Domain-specific Layer
+    LayerName: 'L2: Domain-specific Layer'
     Comment: Semiconductor Supply Chain
     OntologyInfo:
       - Name: PMV.owl
@@ -49,11 +49,11 @@ LayerInfo:
           FileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
           OutFileName: ./blockchain/blockchain_hist_sub_OrderManagement.xlsx
   - ID: L3
-    LayerName: General Application Layer
+    LayerName: 'L3: General Application Layer'
     Comment: ''
     OntologyInfo: []
   - ID: L4
-    LayerName: Specific Application Layer
+    LayerName: 'L4: Specific Application Layer'
     Comment: ontologies at semiconductor companies
     OntologyInfo: []
 UserInfo:
