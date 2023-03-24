@@ -218,12 +218,14 @@ class DRChaincode extends Contract {
         await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
     }
     async WriteLatestBlock(ctx, latestBlock, platform, ontologyName, flag){
+        console.log(`cc flag: ${flag}, type: ${typeof flag}`)
         console.log('cc: write latest block')
         console.log(latestBlock);
+        
         // latestBlock = JSON.parse(latestBlock);
         // ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
         await ctx.stub.putState('latestBlock', Buffer.from(latestBlock));
-        if(flag){
+        if(flag==='true'){
             // when flag is true, update latestDR and fileHash with latestBlock
             latestBlock = JSON.parse(latestBlock);
             let latestDR = 'New project: please upload ontology file';

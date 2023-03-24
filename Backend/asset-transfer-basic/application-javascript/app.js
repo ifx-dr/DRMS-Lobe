@@ -170,6 +170,7 @@ async function main() {
 				// platform = ledger['OntologyInfo']['Platform'];
 				newBlockRequest = ledger['NewBlockRequest'];
 				latestDR = ledger['LatestDR'];
+				console.log(`app latestDR: ${latestDR}`)
 				fileHash = ledger['FileHash'];
 				// if(ontologyInfo['Platform']==='GitLab')
 				// 	accessToken = ledger['OntologyInfo']['AccessToken'];
@@ -185,7 +186,10 @@ async function main() {
 					try {
 						await contract.submitTransaction('InitLedgerFromFile', JSON.stringify(ledger));
 						await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
+						// if(latestDR.length===0)
 						await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), ontologyInfo['Platform'], ontologyInfo['Name'], latestDR.length===0);
+						// else
+						// 	await contract.submitTransaction('WriteLatestBlock', JSON.stringify(latestBlock), ontologyInfo['Platform'], ontologyInfo['Name'], 0);
 						let res = `ledger initialized from file, time: ${Date('CET')}`;
 						console.log(`SUCCESS app initiate: ${res}`)
 						result = {"success":res};
