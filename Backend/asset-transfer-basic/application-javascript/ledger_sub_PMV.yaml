@@ -36,11 +36,11 @@ UserInfo:
     Name: Marta
     Password: '333'
     Email: 333@gmail.com
-    Tokens: 1030
+    Tokens: 1020
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: 24.3.2023, 16:16:46 (CET)
-    LastParticipation_Internal: Fri Mar 24 2023 15:16:46 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 31.3.2023, 12:42:40 (CET)
+    LastParticipation_Internal: Fri Mar 31 2023 10:42:40 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Process
     Expert: []
@@ -48,11 +48,11 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 1000
-    Total_Proposal: 2
+    Tokens: 980
+    Total_Proposal: 3
     Total_Accepted_Proposal: 0
-    LastParticipation: 24.3.2023, 15:52:09 (CET)
-    LastParticipation_Internal: Fri Mar 24 2023 14:52:09 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 31.3.2023, 11:39:31 (CET)
+    LastParticipation_Internal: Fri Mar 31 2023 09:39:31 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -71,6 +71,12 @@ ClosedProposalInfo:
     EndDate: 24.3.2023, 16:16:48 (CET)
     EndDate_Internal: Fri Mar 24 2023 15:16:48 GMT+0000 (Coordinated Universal Time)
     Veto: false
+  - ID: proposal3
+    State: accept by lobe owner
+    StartDate: 31.3.2023, 11:39:31 (CET)
+    EndDate: 31.3.2023, 12:42:42 (CET)
+    EndDate_Internal: Fri Mar 31 2023 10:42:42 GMT+0000 (Coordinated Universal Time)
+    Veto: false
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a
@@ -78,6 +84,6 @@ NewBlockRequest:
   lobeOwner: n/a
   supervisor: n/a
 LatestDR: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/7d95b41a9b432c782ac3bd45ad803e677399ab28
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/b7ffbf458b88d4980e1c5ee0f583ccc127d4f792
 FileHash: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/raw/7d95b41a9b432c782ac3bd45ad803e677399ab28/PMV.owl?inline=false
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/raw/b7ffbf458b88d4980e1c5ee0f583ccc127d4f792/PMV.owl?inline=false

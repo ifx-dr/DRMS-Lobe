@@ -14,11 +14,11 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1010
+    Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: 24.3.2023, 15:31:04 (CET)
-    LastParticipation_Internal: Fri Mar 24 2023 14:31:04 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 31.3.2023, 12:01:32 (CET)
+    LastParticipation_Internal: Fri Mar 31 2023 10:01:32 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Supply Chain
     Expert: []
@@ -48,11 +48,11 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 1000
-    Total_Proposal: 3
+    Tokens: 980
+    Total_Proposal: 4
     Total_Accepted_Proposal: 0
-    LastParticipation: 24.3.2023, 14:54:33 (CET)
-    LastParticipation_Internal: Fri Mar 24 2023 13:54:33 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 31.3.2023, 11:25:18 (CET)
+    LastParticipation_Internal: Fri Mar 31 2023 09:25:18 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -71,6 +71,12 @@ ClosedProposalInfo:
     EndDate: 24.3.2023, 15:31:06 (CET)
     EndDate_Internal: Fri Mar 24 2023 14:31:06 GMT+0000 (Coordinated Universal Time)
     Veto: false
+  - ID: proposal3
+    State: accept by lobe owner
+    StartDate: 31.3.2023, 11:25:18 (CET)
+    EndDate: 31.3.2023, 12:01:34 (CET)
+    EndDate_Internal: Fri Mar 31 2023 10:01:34 GMT+0000 (Coordinated Universal Time)
+    Veto: false
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a
@@ -78,6 +84,6 @@ NewBlockRequest:
   lobeOwner: n/a
   supervisor: n/a
 LatestDR: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/fb965955f5d3cc29931426bf15edfcd279305895
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/e62a015a27d3885eca648a019cb9616469209ed4
 FileHash: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/raw/fb965955f5d3cc29931426bf15edfcd279305895/OrderManagement.owl?inline=false
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/raw/e62a015a27d3885eca648a019cb9616469209ed4/OrderManagement.owl?inline=false
