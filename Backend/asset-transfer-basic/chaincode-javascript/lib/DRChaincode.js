@@ -885,13 +885,17 @@ class DRChaincode extends Contract {
         let members = await this.GetMembers(ctx);
         let member = members.find(member => member.ID == author_id);
         //get the amount of tokens this author, and charge 20 tokens as deposit of the proposal
-        let tokens = member.Tokens;
-        tokens = parseInt(tokens) -20;
-        if (tokens < 0) {
+        // let tokens = member.Tokens;
+        // tokens = parseInt(tokens) -20;
+        // if (tokens < 0) {
+        //     return ('Sorry you do not have enough tokens!');
+        // } else {
+        //     await this.RemoveTokens(ctx, author_id, 20);
+        // }
+        if (member.Tokens < 20) {
             return ('Sorry you do not have enough tokens!');
-        } else {
-            await this.RemoveTokens(ctx, author_id, 20);
-        }
+        } 
+        const CreateProposalDeposit = 20;
         //Check whether this proposal is a veto proposal
         if(type !== 'newProposal'){
             //Check whether the author is able to create a veto proposal
@@ -939,14 +943,16 @@ class DRChaincode extends Contract {
             AcceptedVotes: [],
             RejectedVotes: [],
             Hash:download,
+            LobeOwner: allLobeOwners[domain]
         };
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(parseInt(total_proposals) + 1)));
         //the author's total proposals should increase by 1
         members = await this.GetMembers(ctx);
         member = members.find(member => member.ID == author_id);
         member.Total_Proposal = parseInt(member.Total_Proposal)+1;
-        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
-        member.LastParticipation_Internal = Date(),
+        member.Tokens = member.Tokens - CreateProposalDeposit;
+        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+        member.LastParticipation_Internal = Date();
         await this.UpdateMembers(ctx, members);
         //add new proposal to the world state
 
@@ -1243,8 +1249,16 @@ class DRChaincode extends Contract {
             Layer: proposal.Layer,
             Ontology: proposal.Ontology, 
             State: result,
-            EndDate: Date('CET'),
-            Veto: false
+            StartDate: proposal.Creation_Date,
+            StartDate_Internal: proposal.Creation_Date_Internal,
+            EndDate: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+            EndDate_Internal: Date(),
+            Veto: false,
+            URI: proposal.URI,
+            Message: proposal.Proposal_Message,
+            Author: proposal.AuthorID,
+            Domain: proposal.Domain,
+            LobeOwner: lobeOwner
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
         let closedProposalQueue = await ctx.stub.getState("closedProposalQueue");
@@ -1419,7 +1433,7 @@ class DRChaincode extends Contract {
         let lastingTime = 300000;
         let ongoingtime = await ctx.stub.getState('time');
         ongoingtime = new Date(ongoingtime);
-        let currentT = new Date('CET').getTime();
+        let currentT = new Date().getTime();
         let time = ongoingtime.getTime() + lastingTime- currentT;
         console.log(time);
         if(time <= 0) {

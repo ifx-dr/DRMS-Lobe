@@ -61,6 +61,7 @@ var latestBlockInfo = [];
 
 var layerInfoShort = {};
 let allRepos = {};
+var blockDataPreview = null;
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -473,6 +474,32 @@ async function main() {
 				}
 				res.json(result);
 			});
+			app.post("/getBlockDataPreview", async (req, res) => {
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						console.log(`req.body.proposalID:${req.body.proposalID}`)
+						let proposal = JSON.parse(await contract.evaluateTransaction('GetProposal', req.body.proposalID));
+						console.log('here')
+						blockDataPreview = {
+							ProposedVersion: proposal.URI,
+							UpdatedVersion: req.body.data,
+							Message: proposal.Proposal_Message,
+							Author: proposal.AuthorID,
+							Domain: proposal.Domain,
+							LobeOwner: proposal.LobeOwner,
+							Result: proposal.State
+						};
+						console.log(`SUCCESS app getBlockDataPreview: ${JSON.stringify(blockDataPreview)}`);
+						result = {"success":blockDataPreview};
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app getBlockDataPreview: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
+			})
 			app.post("/generateBlock", async (req, res) => {
 				if(!NewBlockLock){
 					res.json({"success":"please wait"});
@@ -486,6 +513,7 @@ async function main() {
 							let blockchain = new BC.Blockchain();
 							blockchain.chain = JSON.parse(res);
 							let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
+							// let newBlock = new BC.Block(req.body.index, req.body.timestamp, blockDataPreview);
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());
 							await contract.submitTransaction('WriteBlockchainByKey', JSON.stringify(blockchain), req.body.ontologyKey);

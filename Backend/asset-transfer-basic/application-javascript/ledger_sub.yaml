@@ -116,5 +116,10 @@ ClosedProposalInfo:
     State: accept
     EndDate: Mon Mar 20 2023 14:32:32 GMT+0000 (Coordinated Universal Time)
     Veto: false
+    URI: https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/c11b4973490bf509db3fffb1900263646ad716f0
+    Message: Names of data properties adjusted
+    Author: member4
+    Domain: Process
+    LobeOwner: member2
 AllNewBlockRequests: {}
 NewBlockRequest: {}
