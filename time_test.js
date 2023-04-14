@@ -1,16 +1,6 @@
-let a = Date()
-let b = 'Wed Mar 01 2023 23:01:39 GMT+0000 (Coordinated Universal Time)'
-startTime = new Date(b);
-endTime = new Date(b);
-console.log(endTime.getHours())
-let mm = endTime.getMinutes()
-if(mm<10)
-    mm = '0' + mm
-console.log(mm)
-// let currentT = new Date().getTime();
-// console.log((endTime.getTime()-startTime.getTime())/1000/60)
-
-// let a = ['[L1]a','[L2]b']
-// let b = JSON.stringify(a)
-// console.log(b)
-// console.log(JSON.parse(b)[0])
+date = 'Wed Mar 08 2023 14:02:39 GMT+0000 (Coordinated Universal Time)'
+// date_part = date.split(' ')
+// console.log(date_part.length)
+// console.log(new Date(Date.UTC(2023,3,22,11,34)))
+nDate = new Date(date).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)'
+console.log(nDate)

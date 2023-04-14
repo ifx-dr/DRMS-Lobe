@@ -51,7 +51,7 @@ class BlockInfo extends Component {
       
     }
     else{
-      alert('No new block waiting!');
+      // alert('No new block waiting!');
       this.setState({
         Redirect:'Dashboard'
       })

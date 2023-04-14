@@ -35,10 +35,11 @@ export default class CreateNewProp extends Component {
       allDomains: [],
       newBlockReq:'',
       layerInfo: null,
+      allNewBlockReq: null,
     }
   }
   componentDidMount(){
-    this.getNewBlockRequest();
+    this.getAllNewBlockRequests();
     this.loadDomains();
     this.getLayerInfo();
   }
@@ -103,6 +104,31 @@ export default class CreateNewProp extends Component {
       }
       return;
     }
+  };
+  getAllNewBlockRequests = async () => {
+    let token = sessionStorage.getItem('token');
+    if(token==null){
+      this.setState({
+        Redirect:'Login'
+      })
+      alert('Please login in!');
+      return;
+    }
+    token = JSON.parse(token);
+    let allNewBlockReq = await fetch('http://localhost:3001/checkAllNewBlockRequests').then((response) => response.json());
+    // newBlockReq = JSON.parse(newBlockReq);
+    if(allNewBlockReq.error){
+      alert(allNewBlockReq.error);
+      this.setState({
+        Redirect:'Dashboard'
+      })
+      return;
+    }
+    // alert(JSON.stringify(newBlockReq));
+    allNewBlockReq = allNewBlockReq.success;
+    this.setState({
+      allNewBlockReq:allNewBlockReq
+    })
   };
   getLayerInfo = async () => {
     let token = sessionStorage.getItem('token');
@@ -218,6 +244,11 @@ export default class CreateNewProp extends Component {
     // console.log("author: "+token.ID);
     event.preventDefault();
 
+    let ontologyKey = `[${this.state.Layer}] ${this.state.Ontology}`
+    if(ontologyKey in this.state.allNewBlockReq){
+      alert(`A new block is to be generated for ${ontologyKey}: waiting for lobe owner operation\nPlease choose another ontology`);
+      return;
+    }
     let domain;
     if(this.state.NewDomain!==''){
       // this.setState({
@@ -252,7 +283,7 @@ export default class CreateNewProp extends Component {
       download: this.state.Download,
       originalID: ''
     }
-    alert(data);
+    // alert(data);
     // check if input is valid
     if(data.domain.length===0){
       alert('Please choose a domain!');

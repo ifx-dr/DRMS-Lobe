@@ -32,15 +32,16 @@ export default class GenerateBlock extends Component {
       allNewBlocks: {},
       ontologyKey: '',
       timestamp:'',
+      blockDataPreview: null,
     }
   }
 
   componentDidMount() {
-    this.getNewBlockRequest();
+    // this.getNewBlockRequest();
     this.getAllNewBlockRequests();
-    this.getCommitInfo();
+    // this.getCommitInfo();
     // if(sessionStorage.getItem('latestBlock')===null)
-    this.getLatestBlock();
+    // this.getLatestBlock();
     // this.getTimeStamp();
     this.getAllLatestBlocks();
     this.getAllCommitInfo();
@@ -170,7 +171,11 @@ export default class GenerateBlock extends Component {
         }
         else{
           // '/' in author/repo needs to be replaced with %2F
-          let rp = RepoName.split('/')[0] + '%2F' + RepoName.split('/')[1];
+          let rp_part = RepoName.split('/');
+          let rp = rp_part[0];
+          for(let i=1;i<rp_part.length;i++){
+            rp += '%2F' + rp_part[i];
+          }
           link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${DefaultBranch}`;
           // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
           prefix = `https://gitlab.intra.infineon.com/${RepoName}/-/commit/`
@@ -252,7 +257,11 @@ export default class GenerateBlock extends Component {
       }
       else{
         // '/' in author/repo needs to be replaced with %2F
-        let rp = this.state.Repo.RepoName.split('/')[0] + '%2F' + this.state.Repo.RepoName.split('/')[1];
+        let rp_part = this.state.Repo.RepoName.split('/');
+        let rp = rp_part[0];
+        for(let i=1;i<rp_part.length;i++){
+          rp += '%2F' + rp_part[i];
+        }
         link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${this.state.Repo.DefaultBranch}`;
         // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
         prefix = `https://gitlab.intra.infineon.com/${this.state.Repo.RepoName}/-/commit/`
@@ -325,6 +334,8 @@ export default class GenerateBlock extends Component {
   handleChangeB = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
     let ontologyKey = value[0];
+    if(ontologyKey.length===0)
+      return;
     // alert(`ontologyKey: ${ontologyKey}`)
     let latestBlock = this.state.allLatestBlocks[ontologyKey];
     let newBlock = this.state.allNewBlocks[ontologyKey]
@@ -549,28 +560,28 @@ export default class GenerateBlock extends Component {
                     gutterBottom
                     variant="h6"
                   >
-                    index: {this.state.nextIndex}
+                    index: {this.state.ontologyKey.length>0?this.state.nextIndex:-1}
                 </Typography>
                 <Typography
                     color="textPrimary"
                     gutterBottom
                     variant="h6"
                   >
-                    timestamp: {this.state.nextTimestamp}
+                    timestamp: {this.state.ontologyKey.length>0?this.state.nextTimestamp:'n/a'}
                 </Typography>
                 <Typography
                     color="textPrimary"
                     gutterBottom
                     variant="h6"
                   >
-                    data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
+                    data: {this.state.ontologyKey.length>0?this.state.nextCommitHash:'n/a'} <button><a href={this.state.ontologyKey.length>0?this.state.nextCommitHash:'n/a'} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
                 </Typography>
                 <Typography
                     color="textSecondary"
                     gutterBottom
                     variant="h6"
                   >
-                    commitMessage: {this.state.commitMessage}
+                    commitMessage: {this.state.ontologyKey.length>0?this.state.commitMessage:'n/a'}
                 </Typography>
             </CardContent>
             <Divider />

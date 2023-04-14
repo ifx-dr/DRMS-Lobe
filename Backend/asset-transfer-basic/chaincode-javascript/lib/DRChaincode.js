@@ -116,9 +116,9 @@ class DRChaincode extends Contract {
         // }
         
         for(let member of members){
-            let date_part = member.LastParticipation.split('.');
+            let date_part = member.LastParticipation_Internal.split('.');
             if(date_part.length==3){
-                member.LastParticipation = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString();
+                member.LastParticipation_Internal = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
             }
             for(let domain of member["LobeOwner"]){
                 console.log("Finding lobe owner: "+domain)
@@ -793,7 +793,8 @@ class DRChaincode extends Contract {
             let pos = members.indexOf(member);
             member.Tokens -= numTokens;
             if (member.Tokens < voteDeposit) member.Tokens = voteDeposit;
-            member.LastParticipation = Date('CET');
+            member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+            member.LastParticipation_Internal = Date();
             members[pos] = member;
             await this.UpdateMembers(ctx, members);
             result = 1;
@@ -928,7 +929,8 @@ class DRChaincode extends Contract {
             Valid: valid.toString(),
             AuthorID: author_id,
             Proposal_Message: message,
-            Creation_Date: Date('CET'),
+            Creation_Date: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+            Creation_Date_Internal: Date(),
             State: 'ongoing',
             Type: type,
             OriginalID: originalID,
@@ -943,6 +945,8 @@ class DRChaincode extends Contract {
         members = await this.GetMembers(ctx);
         member = members.find(member => member.ID == author_id);
         member.Total_Proposal = parseInt(member.Total_Proposal)+1;
+        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+        member.LastParticipation_Internal = Date(),
         await this.UpdateMembers(ctx, members);
         //add new proposal to the world state
 
@@ -1333,8 +1337,8 @@ class DRChaincode extends Contract {
     }
 
     async CalculateMonthDifference (member) {
-        let currentDate = new Date('CET');
-        let lastParticipation = new Date(member.LastParticipation);
+        let currentDate = new Date();
+        let lastParticipation = new Date(member.LastParticipation_Internal);
         
         // let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
         // 1 month = 4 weeks
