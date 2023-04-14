@@ -32,6 +32,7 @@ export default class GenerateBlock extends Component {
       allNewBlocks: {},
       ontologyKey: '',
       timestamp:'',
+      BlockDataPreview:null,
     }
   }
 
@@ -43,7 +44,7 @@ export default class GenerateBlock extends Component {
     this.getLatestBlock();
     // this.getTimeStamp();
     this.getAllLatestBlocks();
-    this.getAllCommitInfo();
+    // this.getAllCommitInfo();
   }
   getNewBlockRequest = async () => {
     let token = sessionStorage.getItem('token');
@@ -111,7 +112,7 @@ export default class GenerateBlock extends Component {
       this.setState({
         allNewBlockReq:allNewBlockReq
       })
-      
+      this.getAllCommitInfo();
     }
     else{
       alert('No new block waiting!');
@@ -230,7 +231,26 @@ export default class GenerateBlock extends Component {
                   commitMessage: body.message
                 })
               }  
-        })
+        }).then(()=>{
+          let data = {
+            proposalID: this.state.allNewBlockReq[ontologyKey].proposalID,
+            data: this.state.nextCommitHash,
+            message: this.state.commitMessage
+          };
+          // alert(JSON.stringify(data))
+          fetch('http://localhost:3001/getBlockDataPreview',{
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+              }).then((response) => response.json())
+              .then((body)=>{
+                this.setState({
+                  BlockDataPreview: body.success
+                })
+              });  
+        });
       }
     }
     else{
@@ -246,6 +266,8 @@ export default class GenerateBlock extends Component {
       // using GitHub api to get commit info
       var link = '';
       var prefix = '';
+      if(this.state.Repo===null)
+        return;
       if(this.state.Repo.Platform==='GitHub'){
         link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
         prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
@@ -495,12 +517,20 @@ export default class GenerateBlock extends Component {
                   >
                     timestamp: {this.state.latestBlock?this.state.latestBlock.timestamp:'n/a'}
                 </Typography>
-                <Typography
+                {/* <Typography
                     color="textPrimary"
                     gutterBottom
                     variant="h6"
                   >
                     data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
+                </Typography> */}
+                <Typography
+                    color="textPrimary"
+                    gutterBottom
+                    variant="h6"
+                  >
+                    {/* data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} target={"_blank"} rel={"noopener noreferrer"}>check</a></button> */}
+                    data: {JSON.stringify(this.state.latestBlock?this.state.latestBlock.data:'n/a')}
                 </Typography>
                 <Typography
                     color="textPrimary"
@@ -558,12 +588,20 @@ export default class GenerateBlock extends Component {
                   >
                     timestamp: {this.state.nextTimestamp}
                 </Typography>
-                <Typography
+                {/* <Typography
                     color="textPrimary"
                     gutterBottom
                     variant="h6"
                   >
                     data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
+                </Typography> */}
+                <Typography
+                    color="textPrimary"
+                    gutterBottom
+                    variant="h6"
+                  >
+                    {/* data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"} rel={"noopener noreferrer"}>check</a></button> */}
+                    data: {JSON.stringify(this.state.BlockDataPreview)}
                 </Typography>
                 <Typography
                     color="textSecondary"

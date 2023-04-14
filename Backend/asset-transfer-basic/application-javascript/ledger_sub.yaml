@@ -64,7 +64,8 @@ UserInfo:
     Tokens: 1060
     Total_Proposal: 1
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Mar 20 2023 14:32:30 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 20.3.2023, 15:32:30 (CET)
+    LastParticipation_Internal: Mon Mar 20 2023 14:32:30 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Supply Chain
     Expert: []
@@ -75,7 +76,8 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Feb 27 2023 08:31:53 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 27.2.2023, 09:31:53 (CET)
+    LastParticipation_Internal: Mon Feb 27 2023 08:31:53 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Time
     Expert: []
@@ -86,7 +88,8 @@ UserInfo:
     Tokens: 980
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Mar 01 2023 16:01:11 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 1.3.2023, 17:01:11 (CET)
+    LastParticipation_Internal: Wed Mar 01 2023 16:01:11 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Process
     Expert: []
@@ -97,7 +100,8 @@ UserInfo:
     Tokens: 970
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Wed Mar 08 2023 14:02:39 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 8.3.2023, 15:02:39 (CET)
+    LastParticipation_Internal: Wed Mar 08 2023 14:02:39 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -112,5 +116,10 @@ ClosedProposalInfo:
     State: accept
     EndDate: Mon Mar 20 2023 14:32:32 GMT+0000 (Coordinated Universal Time)
     Veto: false
+    URI: https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/c11b4973490bf509db3fffb1900263646ad716f0
+    Message: Names of data properties adjusted
+    Author: member4
+    Domain: Process
+    LobeOwner: member2
 AllNewBlockRequests: {}
 NewBlockRequest: {}
