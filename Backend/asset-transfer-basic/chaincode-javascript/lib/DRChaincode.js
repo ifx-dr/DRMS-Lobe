@@ -272,8 +272,20 @@ class DRChaincode extends Contract {
             console.log(`cc WriteAllLatestBlocks repo: ${JSON.stringify(allRepos[ontologyKey])}`)
             allLatestDRs[ontologyKey] = 'New project: please upload ontology file';
             allFileHashes[ontologyKey] = 'New project: please upload ontology file';
+            console.log(`cc allLatestBlocks ${ontologyKey}: ${JSON.stringify(allLatestBlocks[ontologyKey])}`)
             if(allLatestBlocks[ontologyKey].data!=='Genesis Block'){
-                allLatestDRs[ontologyKey] = allLatestBlocks[ontologyKey].data;
+                if(allLatestBlocks[ontologyKey].data.includes('UpdatedVersion')){
+                    console.log(`cc improved`)
+                    let data = JSON.parse(allLatestBlocks[ontologyKey].data)
+                    allLatestDRs[ontologyKey] = data.UpdatedVersion;
+                }    
+                else{
+                    console.log(`cc origin`)
+                    allLatestDRs[ontologyKey] = allLatestBlocks[ontologyKey].data;
+                }
+                    
+
+                console.log(`cc allLatestDRs: ${JSON.stringify(allLatestDRs)}`)
                 if(allRepos[ontologyKey].Platform==='GitHub'){
                     let latestDRSplit = allLatestDRs[ontologyKey].split('/');
                     let hash = latestDRSplit.pop();
@@ -1046,6 +1058,7 @@ class DRChaincode extends Contract {
                 }
                 result.Message = 'Lobe Owner Successfully Vote for proposal!';
                 result.Finished = true;
+                result.Result = 'accept by lobe owner';
                 return JSON.stringify(result);
             }
         }
@@ -1184,18 +1197,18 @@ class DRChaincode extends Contract {
 
         ////////////////////
         // if approved, update the blockchain and latest block
-        if(result==='accept'){
-            let blockchain = await this.GetBlockchain(ctx);
+        if(result.includes('accept')){
+            // let blockchain = await this.GetBlockchain(ctx);
             // console.log(blockchain);
-            let latestBlock = await this.GetLatestBlock(ctx);
-            let index = latestBlock.index+1;
-            let timestamp = Date('CET');
-            let data = null;
-            if(proposal.Type==='vetoProposal'){
-                data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
-            }
-            else
-                data = `commemt: ${proposal.Proposal_Message}, file hash: ${proposal.Hash}`; // Hash or URI? Hash is unique give a specific file
+            // let latestBlock = await this.GetLatestBlock(ctx);
+            // let index = latestBlock.index+1;
+            // let timestamp = Date('CET');
+            // let data = null;
+            // if(proposal.Type==='vetoProposal'){
+            //     data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
+            // }
+            // else
+            //     data = `commemt: ${proposal.Proposal_Message}, file hash: ${proposal.Hash}`; // Hash or URI? Hash is unique give a specific file
             // let previousHash = latestBlock.hash;
             // latestBlock = new BC.Block(index, timestamp, data, previousHash);
             // console.log(blockchain);
@@ -1223,6 +1236,7 @@ class DRChaincode extends Contract {
             }
             let allNewBlockRequests = JSON.parse(await ctx.stub.getState('allNewBlockRequests'));
             allNewBlockRequests[`[${NBReq.Layer}] ${NBReq.Ontology}`] = NBReq;
+            console.log(`cc update allNewBlockRequests: ${JSON.stringify(allNewBlockRequests)}`);
             await ctx.stub.putState('allNewBlockRequests', Buffer.from(JSON.stringify(allNewBlockRequests)));
 
 
@@ -1258,7 +1272,7 @@ class DRChaincode extends Contract {
             Message: proposal.Proposal_Message,
             Author: proposal.AuthorID,
             Domain: proposal.Domain,
-            LobeOwner: lobeOwner
+            LobeOwner: proposal.LobeOwner,
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
         let closedProposalQueue = await ctx.stub.getState("closedProposalQueue");
@@ -1287,7 +1301,7 @@ class DRChaincode extends Contract {
         let member;
         let pos;
         
-        if (result === 'accept') {
+        if (result.includes('accept')) {
             votes = proposal.AcceptedVotes;
         } else {
             votes = proposal.RejectedVotes;
@@ -1303,7 +1317,7 @@ class DRChaincode extends Contract {
         }
 
         // Reward proposal author
-        if (result === 'accept') {
+        if (result.includes('accept')) {
             member = members.find(expert => expert.ID == proposal.AuthorID);
             if (member != undefined) {
                 pos = members.indexOf(member);

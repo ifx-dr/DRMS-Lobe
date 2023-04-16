@@ -10,6 +10,7 @@ class BlockInfo extends Component {
         allLatestBlocks: {},
         blockInfoSorted: {},
         allNewBlockReq: {},
+        SelectedBlock: null,
     };
   }
 
@@ -71,10 +72,15 @@ class BlockInfo extends Component {
     
   };
   getAllLatestBlocks = async () => {
-    const allLatestBlocks = await fetch('http://localhost:3001/checkAllLatestBlocks').then((response) => response.json());
+    let allLatestBlocks = await fetch('http://localhost:3001/checkAllLatestBlocks').then((response) => response.json());
     if(!allLatestBlocks.error){
+      allLatestBlocks = JSON.parse(allLatestBlocks.success);
+      for(let ontoKey in allLatestBlocks){
+        if(allLatestBlocks[ontoKey].data.includes('UpdatedVersion'))
+          allLatestBlocks[ontoKey].data = JSON.parse(allLatestBlocks[ontoKey].data)
+      }
       this.setState({
-        allLatestBlocks: JSON.parse(allLatestBlocks.success),
+        allLatestBlocks: allLatestBlocks,
       }, console.log(allLatestBlocks));
       let blockInfoSorted = {};
       for(let ontologyKey in this.state.allLatestBlocks){
@@ -212,6 +218,13 @@ class BlockInfo extends Component {
                         
                         {
                           Object.keys(this.state.blockInfoSorted[layerName]).map(ontologyName => {
+                            
+                            let SelectedBlock = this.state.blockInfoSorted[layerName][ontologyName];
+                            // if(SelectedBlock.data instanceof String)
+                            //   alert('string')
+                            // else
+                            //   alert('not string')
+                            // alert(JSON.stringify(this.state.SelectedBlock))
                             return (
                               <Grid>
                               <Typography
@@ -224,31 +237,47 @@ class BlockInfo extends Component {
                                 color="textPrimary"
                                 variant="h6"
                               >
-                                index: {this.state.blockInfoSorted[layerName][ontologyName].index}
+                                index: {SelectedBlock?.index}
                               </Typography>
                                 <Typography
                                 color="textPrimary"
                                 variant="h6"
                               >
-                                timestamp: {this.state.blockInfoSorted[layerName][ontologyName].timestamp}
+                                timestamp: {SelectedBlock?.timestamp}
                                 </Typography>
                                 <Typography
                                 color="textPrimary"
                                 variant="h6"
                               >
-                                data: {this.state.blockInfoSorted[layerName][ontologyName].data}
+                                {/* data: {this.state.blockInfoSorted[layerName][ontologyName].data} */}
+
+
+                                data: {(SelectedBlock)&&!(SelectedBlock.data.ProposedVersion)&&!(SelectedBlock.data.UpdatedVersion)?<button><a href={SelectedBlock.data} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check data</a></button>:''}
+                                {(SelectedBlock)&&(SelectedBlock.data.ProposedVersion)?<button><a href={SelectedBlock.data.ProposedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check ProposedVersion</a></button>:''}
+                                {(SelectedBlock)&&(SelectedBlock.data.UpdatedVersion)?<button><a href={SelectedBlock.data.UpdatedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check UpdatedVersion</a></button>:''}
+                                <p>{SelectedBlock?(
+                                  (!(SelectedBlock.data.ProposedVersion)&&!(SelectedBlock.data.UpdatedVersion))?
+                                  (SelectedBlock.data):
+                                  (
+                                    Object.keys(SelectedBlock.data).map((keyName, i) => (
+                                      <p key={i}>
+                                        {keyName}: {SelectedBlock.data[keyName]}
+                                      </p>
+                                  ))
+                                  )
+                                ):'n/a'}</p>
                                 </Typography>
                                 <Typography
                                 color="textPrimary"
                                 variant="h6"
                               >
-                                previousHash: {this.state.blockInfoSorted[layerName][ontologyName].previousHash}
+                                previousHash: {SelectedBlock?.previousHash}
                                 </Typography>
                                 <Typography
                                 color="textPrimary"
                                 variant="h6"
                               >
-                                hash: {this.state.blockInfoSorted[layerName][ontologyName].hash}
+                                hash: {SelectedBlock?.hash}
                                 </Typography>
                               <Divider/>
                               </Grid>

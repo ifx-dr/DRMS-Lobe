@@ -32,7 +32,8 @@ export default class GenerateBlock extends Component {
       allNewBlocks: {},
       ontologyKey: '',
       timestamp:'',
-      blockDataPreview: null,
+      BlockDataPreview: null,
+      allBlockDataPreviews: {},
     }
   }
 
@@ -109,10 +110,12 @@ export default class GenerateBlock extends Component {
     // alert(JSON.stringify(newBlockReq))
     // alert(newBlockReq.newBlockWaiting)
     if(Object.keys(allNewBlockReq).length>0){
+      // alert(JSON.stringify(allNewBlockReq))
       this.setState({
         allNewBlockReq:allNewBlockReq
+      }, function(){
+        this.getAllCommitInfo();
       })
-      this.getAllCommitInfo();
     }
     else{
       alert('No new block waiting!');
@@ -138,10 +141,15 @@ export default class GenerateBlock extends Component {
     })
   };
   getAllLatestBlocks = async () => {
-    const allLatestBlocks = await fetch('http://localhost:3001/checkAllLatestBlocks').then((response) => response.json());
+    let allLatestBlocks = await fetch('http://localhost:3001/checkAllLatestBlocks').then((response) => response.json());
     if(!allLatestBlocks.error){
+      allLatestBlocks = JSON.parse(allLatestBlocks.success);
+      for(let ontoKey in allLatestBlocks){
+        if(allLatestBlocks[ontoKey].data.includes('UpdatedVersion'))
+          allLatestBlocks[ontoKey].data = JSON.parse(allLatestBlocks[ontoKey].data)
+      }
       this.setState({
-        allLatestBlocks: JSON.parse(allLatestBlocks.success),
+        allLatestBlocks: allLatestBlocks,
       }, console.log(allLatestBlocks));
     }
     else{
@@ -236,24 +244,29 @@ export default class GenerateBlock extends Component {
                 })
               }  
         }).then(()=>{
-          let data = {
-            proposalID: this.state.allNewBlockReq[ontologyKey].proposalID,
-            data: this.state.nextCommitHash,
-            message: this.state.commitMessage
-          };
-          // alert(JSON.stringify(data))
-          fetch('http://localhost:3001/getBlockDataPreview',{
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-              }).then((response) => response.json())
-              .then((body)=>{
-                this.setState({
-                  BlockDataPreview: body.success
-                })
-              });  
+          if(ontologyKey in this.state.allNewBlockReq){
+            alert(JSON.stringify(this.state.allNewBlockReq[ontologyKey]))
+            let data = {
+              proposalID: this.state.allNewBlockReq[ontologyKey].proposalID,
+              data: this.state.nextCommitHash,
+              message: this.state.commitMessage
+            };
+            // alert(JSON.stringify(data))
+            fetch('http://localhost:3001/getBlockDataPreview',{
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                }).then((response) => response.json())
+                .then((body)=>{
+                  let allBlockDataPreviews = this.state.allBlockDataPreviews;
+                  allBlockDataPreviews[ontologyKey] = body.success;
+                  this.setState({
+                    allBlockDataPreviews: allBlockDataPreviews
+                  })
+                });  
+          }
         });
       }
     }
@@ -367,6 +380,7 @@ export default class GenerateBlock extends Component {
       nextIndex: latestBlock.index+1,
       nextTimestamp: newBlock.timestamp,
       nextCommitHash: newBlock.data,
+      BlockDataPreview: this.state.allBlockDataPreviews[ontologyKey],
     });
   };
   handleSubmit = async(event) => {
@@ -540,7 +554,20 @@ export default class GenerateBlock extends Component {
                     variant="h6"
                   >
                     {/* data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} target={"_blank"} rel={"noopener noreferrer"}>check</a></button> */}
-                    data: {JSON.stringify(this.state.latestBlock?this.state.latestBlock.data:'n/a')}
+                    data: {(this.state.latestBlock)&&!(this.state.latestBlock.data.ProposedVersion)&&!(this.state.latestBlock.data.UpdatedVersion)?<button><a href={this.state.latestBlock.data} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check data</a></button>:''}
+                {(this.state.latestBlock)&&(this.state.latestBlock.data.ProposedVersion)?<button><a href={this.state.latestBlock.data.ProposedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check ProposedVersion</a></button>:''}
+                {(this.state.latestBlock)&&(this.state.latestBlock.data.UpdatedVersion)?<button><a href={this.state.latestBlock.data.UpdatedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check UpdatedVersion</a></button>:''}
+                <p>{this.state.latestBlock?(
+                  (!(this.state.latestBlock.data.ProposedVersion)&&!(this.state.latestBlock.data.UpdatedVersion))?
+                  (this.state.latestBlock.data):
+                  (
+                    Object.keys(this.state.latestBlock.data).map((keyName, i) => (
+                      <p key={i}>
+                        {keyName}: {this.state.latestBlock.data[keyName]}
+                      </p>
+                  ))
+                  )
+                ):'n/a'}</p>
                 </Typography>
                 <Typography
                     color="textPrimary"
@@ -611,7 +638,20 @@ export default class GenerateBlock extends Component {
                     variant="h6"
                   >
                     {/* data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"} rel={"noopener noreferrer"}>check</a></button> */}
-                    data: {JSON.stringify(this.state.BlockDataPreview)}
+                    data: {(this.state.BlockDataPreview)&&!(this.state.BlockDataPreview.ProposedVersion)&&!(this.state.BlockDataPreview.UpdatedVersion)?<button><a href={this.state.BlockDataPreview} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check data</a></button>:''}
+                {(this.state.BlockDataPreview)&&(this.state.BlockDataPreview.ProposedVersion)?<button><a href={this.state.BlockDataPreview.ProposedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check ProposedVersion</a></button>:''}
+                {(this.state.BlockDataPreview)&&(this.state.BlockDataPreview.UpdatedVersion)?<button><a href={this.state.BlockDataPreview.UpdatedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check UpdatedVersion</a></button>:''}
+                <p>{this.state.BlockDataPreview?(
+                  (!(this.state.BlockDataPreview.ProposedVersion)&&!(this.state.BlockDataPreview.UpdatedVersion))?
+                  (this.state.BlockDataPreview):
+                  (
+                    Object.keys(this.state.BlockDataPreview).map((keyName, i) => (
+                      <p key={i}>
+                        {keyName}: {this.state.BlockDataPreview[keyName]}
+                      </p>
+                  ))
+                  )
+                ):'n/a'}</p>
                 </Typography>
                 <Typography
                     color="textSecondary"

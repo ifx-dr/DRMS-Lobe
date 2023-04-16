@@ -464,11 +464,11 @@ async function main() {
 				for(let i=0;i<retry_cnt;i++){
 					try {
 						let res = await contract.evaluateTransaction('GetAllNewBlockRequests');
-						console.log(`SUCCESS app GetAllNewBlockRequests: ${res}`);
+						console.log(`SUCCESS app checkAllNewBlockRequests: ${res}`);
 						result = {"success":JSON.parse(res)};
 						break;
 					} catch (error) {
-						console.log(`FAILED ${i} app GetAllNewBlockRequests: ${error}`);
+						console.log(`FAILED ${i} app checkAllNewBlockRequests: ${error}`);
 						result = {"error":error.toString()};
 					}
 				}
@@ -512,8 +512,8 @@ async function main() {
 							let res = await contract.evaluateTransaction('GetBlockchainByKey', req.body.ontologyKey);
 							let blockchain = new BC.Blockchain();
 							blockchain.chain = JSON.parse(res);
-							let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
-							// let newBlock = new BC.Block(req.body.index, req.body.timestamp, blockDataPreview);
+							// let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
+							let newBlock = new BC.Block(req.body.index, req.body.timestamp, JSON.stringify(blockDataPreview));
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());
 							await contract.submitTransaction('WriteBlockchainByKey', JSON.stringify(blockchain), req.body.ontologyKey);

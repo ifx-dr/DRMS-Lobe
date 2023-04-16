@@ -17,7 +17,7 @@ this.hash = this.calculateHash();
 
     calculateHash(){
         // console.log("mytest: "+ this.previousHash+'\n')
-return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data)).toString();
+return SHA256(this.index + this.previousHash + this.timestamp + this.data);
     }
 }
 
