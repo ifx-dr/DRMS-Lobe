@@ -2,9 +2,9 @@ OntologyInfo:
   Name: time.owl
   Domains:
     - Time
-  Platform: GitLab
-  Repo: digital-reference/Time
+  Repo: semantic-web-projects/digital-reference/Time
   Default: main
+  Platform: GitLab
   AccessToken: glpat-tbi7Q9X_rsrZZg8zC9Cw
 BlockchainInfo:
   FileName: ./blockchain/blockchain_hist_sub_Time.xlsx
@@ -17,9 +17,9 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
-    LobeOwner:
-      - Time
+    LastParticipation: 24.2.2023, 16:05:22 (CET)
+    LastParticipation_Internal: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
+    LobeOwner: []
     Expert: []
   - ID: member2
     Name: Philipp
@@ -28,8 +28,10 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
-    LobeOwner: []
+    LastParticipation: 23.1.2023, 01:00:00 (CET)
+    LastParticipation_Internal: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LobeOwner: 
+      - Time
     Expert: []
   - ID: member3
     Name: Marta
@@ -38,7 +40,8 @@ UserInfo:
     Tokens: 1020
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 9.3.2023, 11:02:02 (CET)
+    LastParticipation_Internal: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
   - ID: member4
@@ -48,7 +51,8 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 23.1.2023, 01:00:00 (CET)
+    LastParticipation_Internal: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []

@@ -80,6 +80,7 @@ var blockchainInfo = null;
 var newBlockRequest = null;
 var latestDR = '';
 var fileHash = '';
+var blockDataPreview = null;
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -418,6 +419,33 @@ async function main() {
 				}
 				res.json(result);
 			});
+			app.post("/getBlockDataPreview", async (req, res) => {
+				// console.log('calling')
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						console.log(`req.body.proposalID:${req.body.proposalID}`)
+						let proposal = JSON.parse(await contract.evaluateTransaction('GetProposal', req.body.proposalID));
+						console.log('here')
+						blockDataPreview = {
+							ProposedVersion: proposal.URI,
+							UpdatedVersion: req.body.data,
+							Message: proposal.Proposal_Message,
+							Author: proposal.AuthorID,
+							Domain: proposal.Domain,
+							LobeOwner: proposal.LobeOwner,
+							Result: proposal.State
+						};
+						console.log(`SUCCESS app getBlockDataPreview: ${JSON.stringify(blockDataPreview)}`);
+						result = {"success":blockDataPreview};
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app getBlockDataPreview: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
+			});
 			app.post("/generateBlock", async (req, res) => {
 				if(!NewBlockLock){
 					res.json({"success":"please wait"});
@@ -430,7 +458,10 @@ async function main() {
 							let res = await contract.evaluateTransaction('GetBlockchain');
 							let blockchain = new BC.Blockchain();
 							blockchain.chain = JSON.parse(res);
-							let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
+							let data = blockDataPreview;
+							console.log(`app data: ${data}`);
+							let newBlock = new BC.Block(req.body.index, req.body.timestamp, blockDataPreview);
+							// let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());
 							await contract.submitTransaction('WriteBlockchain', JSON.stringify(blockchain));
@@ -490,7 +521,11 @@ async function main() {
 								message = 'Penalization for inactivity: ' + penalization.toString() + ' tokens removed.\n';
 								console.log(message);
 							}
-
+							let allOngoing = JSON.parse(await contract.evaluateTransaction("GetAllOngoingProposal"));
+							if(allOngoing.length>=1){
+								result = {"success":'Cannot create new proposal: a proposal is ongoing'};
+								break;
+							}
 							let res = await contract.submitTransaction('CreateProposal', req.body.domain, req.body.uri, req.body.author, req.body.message, req.body.type, req.body.originalID, req.body.download);
 							console.log('******The creation result is:' + res);
 							if (message != '') res += message + '\n';

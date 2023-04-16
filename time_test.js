@@ -9,7 +9,7 @@
 // a = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString()
 // console.log(a)
 // const nDate = new Date('Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)').toLocaleString('de-DE', { timeZone: 'CET' })
-date = 'Wed Mar 15 2023 14:32:41 GMT+0000 (Coordinated Universal Time)'
+date = 'Wed Mar 08 2023 14:02:39 GMT+0000 (Coordinated Universal Time)'
 // date_part = date.split(' ')
 // console.log(date_part.length)
 // console.log(new Date(Date.UTC(2023,3,22,11,34)))

@@ -150,6 +150,7 @@ class LatestDR extends Component {
                 gutterBottom
                 variant="h6"
               >
+                <p>For visualization, please check:<a href={'https://service.tib.eu/sc3/'} target="_blank" rel={"noopener noreferrer"}>https://service.tib.eu/sc3/</a></p>
                 Here is the latest DR: <button><a href={this.state.DR} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> {/* <button onClick={this.updateDR}>update</button> */}
               </Typography>
               <Typography

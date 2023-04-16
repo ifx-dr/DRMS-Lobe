@@ -683,7 +683,7 @@ class DRChaincode extends Contract {
             proposal.RejectedVotes.push(vote);
             proposal.NumRejectedVotes = proposal.RejectedVotes.length;
         }
-
+        console.log(`cc AddVoter updated proposal: ${JSON.stringify(proposal)}`)
         return proposal;
     }
 
@@ -851,6 +851,7 @@ class DRChaincode extends Contract {
             AcceptedVotes: [],
             RejectedVotes: [],
             Hash:download,
+            LobeOwner: allLobeOwners[domain]
         };
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(parseInt(total_proposals) + 1)));
         //the author's total proposals should increase by 1
@@ -858,8 +859,8 @@ class DRChaincode extends Contract {
         member = members.find(member => member.ID == author_id);
         member.Total_Proposal = parseInt(member.Total_Proposal)+1;
         member.Tokens = member.Tokens - CreateProposalDeposit;
-        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
-        member.LastParticipation_Internal = Date(),
+        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+        member.LastParticipation_Internal = Date();
         await this.UpdateMembers(ctx, members);
         //add new proposal to the world state
 
@@ -1125,6 +1126,11 @@ class DRChaincode extends Contract {
             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));
 
+            // let members = await this.GetMembers(ctx);
+            // let member = members.find(member => member.ID == proposal.AuthorID);
+            // member.Total_Accepted_Proposal = parseInt(member.Total_Accepted_Proposal)+1;
+            // await this.UpdateMembers(ctx, members);
+
             let members = await this.GetMembers(ctx);
             let member = members.find(member => member.ID == proposal.AuthorID);
             member.Total_Accepted_Proposal = parseInt(member.Total_Accepted_Proposal)+1;
@@ -1144,9 +1150,15 @@ class DRChaincode extends Contract {
             ID: closedProposalID,
             State: result,
             StartDate: proposal.Creation_Date,
+            StartDate_Internal: proposal.Creation_Date_Internal,
             EndDate: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
             EndDate_Internal: Date(),
-            Veto: false
+            Veto: false,
+            URI: proposal.URI,
+            Message: proposal.Proposal_Message,
+            Author: proposal.AuthorID,
+            Domain: proposal.Domain,
+            LobeOwner: proposal.LobeOwner,
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
         let closedProposalQueue = await ctx.stub.getState("closedProposalQueue");
@@ -1175,11 +1187,13 @@ class DRChaincode extends Contract {
         let member;
         let pos;
         
-        if (result === 'accept') {
+        if (result.includes('accept')) {
             votes = proposal.AcceptedVotes;
         } else {
             votes = proposal.RejectedVotes;
         }
+        console.log(`cc RewardVoters proposal: ${JSON.stringify(proposal)}`)
+        console.log(`cc RewardVoters votes: ${votes}`)
 
         // Reward voters
         for (let vote of votes) {
@@ -1191,14 +1205,14 @@ class DRChaincode extends Contract {
         }
 
         // Reward proposal author
-        if (result === 'accept') {
+        if (result.includes('accept')) {
             member = members.find(expert => expert.ID == proposal.AuthorID);
             if (member != undefined) {
                 pos = members.indexOf(member);
                 members[pos].Tokens += (proposalDeposit + reward);
             }
         }
-
+        console.log(`cc RewardVoters members to update: ${JSON.stringify(members)}`)
         await this.UpdateMembers(ctx, members);
     }
 

@@ -146,8 +146,8 @@ export default class Vote extends Component {
             >
               <Grid
                 item
-                md={4}
-                sm={8}
+                md={9}
+                sm={9}
                 xs={12}
               >
                 <p>
@@ -165,13 +165,13 @@ export default class Vote extends Component {
                 <p>
                   RejectedVotes: {this.state.prop.NumRejectedVotes}
                 </p>
-              </Grid>
+              {/* </Grid>
 
               <Grid
                 item
                 md={4}
                 sm={8}
-                xs={12}>
+                xs={12}> */}
                 <p>
                 Proposal ID: {this.state.prop.ID}
                 </p>
@@ -184,6 +184,9 @@ export default class Vote extends Component {
                 </p>
                 <p>
                   URI: {this.state.prop.URI} <button><a href={this.state.prop.URI} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
+                </p>
+                <p>
+                LobeOwner: {this.state.prop.LobeOwner}
                 </p>
               </Grid>
             </Grid>

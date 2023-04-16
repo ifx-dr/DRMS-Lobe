@@ -221,7 +221,7 @@ const Dashboard = () => {
           >
             <UploadDR />
           </Grid> */}
-          <Grid
+          {/* <Grid
             item
             // lg={8}
             // md={12}
@@ -233,7 +233,7 @@ const Dashboard = () => {
             xs={12}
           >
             <WebVowl />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </Page>

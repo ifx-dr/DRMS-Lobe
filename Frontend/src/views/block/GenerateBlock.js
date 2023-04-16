@@ -26,13 +26,14 @@ export default class GenerateBlock extends Component {
       commitMessage: '', 
       Redirect: '',
       newBlockReq: '',
-      Repo: null
+      Repo: null,
+      BlockDataPreview: null
     }
   }
 
   componentDidMount() {
     this.getNewBlockRequest();
-    this.getCommitInfo();
+    // this.getCommitInfo();
     // if(sessionStorage.getItem('latestBlock')===null)
     this.getLatestBlock();
     // this.getTimeStamp();
@@ -69,6 +70,7 @@ export default class GenerateBlock extends Component {
         this.setState({
           newBlockReq:newBlockReq
         })
+        this.getCommitInfo();
       }
     }
     else{
@@ -103,6 +105,8 @@ export default class GenerateBlock extends Component {
       // using GitHub api to get commit info
       var link = '';
       var prefix = '';
+      if(this.state.Repo===null)
+        return;
       if(this.state.Repo.Platform==='GitHub'){
         link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
         prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
@@ -150,8 +154,27 @@ export default class GenerateBlock extends Component {
                 // nextTimestamp:',',
                 commitMessage: body.message
               })
-            }  
-      })
+            }
+      }).then(()=>{
+        let data = {
+          proposalID: this.state.newBlockReq.proposalID,
+          data: this.state.nextCommitHash,
+          message: this.state.commitMessage
+        };
+        // alert(JSON.stringify(data))
+        fetch('http://localhost:3001/getBlockDataPreview',{
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+            }).then((response) => response.json())
+            .then((body)=>{
+              this.setState({
+                BlockDataPreview: body.success
+              })
+            });  
+      });
     }
     else{
       alert(Repo.error);
@@ -219,11 +242,20 @@ export default class GenerateBlock extends Component {
     const data = {
       index: this.state.nextIndex,
       timestamp: this.state.nextTimestamp,
-      data: this.state.nextCommitHash
+      data: this.state.nextCommitHash,
+      proposalID: newBlockReq.proposalID
     }
-    if(data.data===this.state.latestBlock.data){
-      alert('New branch is to be merged before block generation!');
-      return;
+    if(this.state.latestBlock.data.UpdatedVersion){
+      if(data.data===this.state.latestBlock.data.UpdatedVersion){
+        alert('New branch is to be merged before block generation!');
+        return;
+      }
+    }
+    else{
+      if(data.data===this.state.latestBlock.data){
+        alert('New branch is to be merged before block generation!');
+        return;
+      }
     }
     // const link = 'https://api.github.com/repos/tibonto/dr/commits/master';
     // const prefix = 'https://github.com/tibonto/dr/commit/';
@@ -303,9 +335,9 @@ export default class GenerateBlock extends Component {
       if(this.state.Redirect==='Login'){
         return <Navigate to='/app/login' state={this.state}></Navigate>
       }
-      if(this.state.Redirect==='Dashboard'){
-        return <Navigate to='/app/dashboard' state={this.state}></Navigate>
-      }
+      // if(this.state.Redirect==='Dashboard'){
+      //   return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+      // }
       return (
         <form onSubmit={this.handleSubmit} >
           <Card>
@@ -333,7 +365,23 @@ export default class GenerateBlock extends Component {
                     gutterBottom
                     variant="h6"
                   >
-                    data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
+                    {/* data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} target={"_blank"} rel={"noopener noreferrer"}>check</a></button> */}
+                    {/* data: {JSON.stringify(this.state.latestBlock?this.state.latestBlock.data:'n/a')} */}
+                    {/* data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> */}
+                    data: {(this.state.latestBlock)&&!(this.state.latestBlock.data.ProposedVersion)&&!(this.state.latestBlock.data.UpdatedVersion)?<button><a href={this.state.latestBlock.data} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check data</a></button>:''}
+                {(this.state.latestBlock)&&(this.state.latestBlock.data.ProposedVersion)?<button><a href={this.state.latestBlock.data.ProposedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check ProposedVersion</a></button>:''}
+                {(this.state.latestBlock)&&(this.state.latestBlock.data.UpdatedVersion)?<button><a href={this.state.latestBlock.data.UpdatedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check UpdatedVersion</a></button>:''}
+                <p>{this.state.latestBlock?(
+                  (!(this.state.latestBlock.data.ProposedVersion)&&!(this.state.latestBlock.data.UpdatedVersion))?
+                  (this.state.latestBlock.data):
+                  (
+                    Object.keys(this.state.latestBlock.data).map((keyName, i) => (
+                      <p key={i}>
+                        {keyName}: {this.state.latestBlock.data[keyName]}
+                      </p>
+                  ))
+                  )
+                ):'n/a'}</p>
                 </Typography>
                 <Typography
                     color="textPrimary"
@@ -396,7 +444,23 @@ export default class GenerateBlock extends Component {
                     gutterBottom
                     variant="h6"
                   >
-                    data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"} rel={"noopener noreferrer"}>check</a></button>
+                    {/* data: {this.state.nextCommitHash} <button><a href={this.state.nextCommitHash} target={"_blank"} rel={"noopener noreferrer"}>check</a></button> */}
+                    {/* data: {JSON.stringify(this.state.BlockDataPreview)} */}
+                    {/* data: {this.state.latestBlock?this.state.latestBlock.data:'n/a'} <button><a href={this.state.latestBlock?this.state.latestBlock.data:'n/a'} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button> */}
+                data: {(this.state.BlockDataPreview)&&!(this.state.BlockDataPreview.ProposedVersion)&&!(this.state.BlockDataPreview.UpdatedVersion)?<button><a href={this.state.BlockDataPreview} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check data</a></button>:''}
+                {(this.state.BlockDataPreview)&&(this.state.BlockDataPreview.ProposedVersion)?<button><a href={this.state.BlockDataPreview.ProposedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check ProposedVersion</a></button>:''}
+                {(this.state.BlockDataPreview)&&(this.state.BlockDataPreview.UpdatedVersion)?<button><a href={this.state.BlockDataPreview.UpdatedVersion} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check UpdatedVersion</a></button>:''}
+                <p>{this.state.BlockDataPreview?(
+                  (!(this.state.BlockDataPreview.ProposedVersion)&&!(this.state.BlockDataPreview.UpdatedVersion))?
+                  (this.state.BlockDataPreview):
+                  (
+                    Object.keys(this.state.BlockDataPreview).map((keyName, i) => (
+                      <p key={i}>
+                        {keyName}: {this.state.BlockDataPreview[keyName]}
+                      </p>
+                  ))
+                  )
+                ):'n/a'}</p>
                 </Typography>
                 <Typography
                     color="textSecondary"

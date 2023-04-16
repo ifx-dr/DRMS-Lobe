@@ -270,7 +270,7 @@ export default class CreateNewProp extends Component {
                   </select>
                 </Grid>
               </Grid>
-                <TextField
+                {/* <TextField
                   fullWidth
                   onChange={this.handleNewDomain}
                   label="New domain? Input the domain name"
@@ -279,7 +279,7 @@ export default class CreateNewProp extends Component {
                   type="NewDomain"
                   value={this.state.NewDomain}
                   variant="outlined"
-                />
+                /> */}
                 <TextField
                   fullWidth
                   onChange={this.handleChangeU}

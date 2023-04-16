@@ -61,22 +61,42 @@ ClosedProposalInfo:
     State: accept
     EndDate: Thu Mar 16 2023 14:38:27 GMT+0000 (Coordinated Universal Time)
     Veto: false
+    URI: 'n/a'
+    Message: 'n/a'
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
   - ID: proposal1
     State: accept
     EndDate: 23.03.2023 10:09 (CET)
     Veto: false
+    URI: 'n/a'
+    Message: 'n/a'
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
   - ID: proposal2
     State: accept by lobe owner
     StartDate: 24.3.2023, 14:54:33 (CET)
     EndDate: 24.3.2023, 15:31:06 (CET)
     EndDate_Internal: Fri Mar 24 2023 14:31:06 GMT+0000 (Coordinated Universal Time)
     Veto: false
+    URI: 'n/a'
+    Message: 'n/a'
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
   - ID: proposal3
     State: accept by lobe owner
     StartDate: 31.3.2023, 11:25:18 (CET)
     EndDate: 31.3.2023, 12:01:34 (CET)
     EndDate_Internal: Fri Mar 31 2023 10:01:34 GMT+0000 (Coordinated Universal Time)
     Veto: false
+    URI: https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/1895c45b96efa33a413581a68a5748007b6fb6ac,
+    Message: Names of data properties adjusted
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a
