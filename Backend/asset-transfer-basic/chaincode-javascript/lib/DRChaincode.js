@@ -224,7 +224,7 @@ class DRChaincode extends Contract {
 
         let allNewBlockRequests = {};
         if(ledgerTXT['AllNewBlockRequests']!==null){
-            newBlockRequest = ledgerTXT['AllNewBlockRequest'];
+            allNewBlockRequests = ledgerTXT['AllNewBlockRequests'];
         }
         await ctx.stub.putState('allNewBlockRequests', Buffer.from(JSON.stringify(allNewBlockRequests)));
 

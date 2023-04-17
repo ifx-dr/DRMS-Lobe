@@ -214,7 +214,7 @@ ClosedProposalInfo:
     State: accept by lobe owner
     StartDate: 17.4.2023, 10:29:19 (CET)
     StartDate_Internal: Mon Apr 17 2023 08:29:19 GMT+0000 (Coordinated Universal Time)
-    EndDate: 17.4.2023, 10:31:54 (CET)
+    EndDate: Invalid Date
     EndDate_Internal: Mon Apr 17 2023 08:31:54 GMT+0000 (Coordinated Universal Time)
     Veto: false
     URI: >-
@@ -229,7 +229,7 @@ ClosedProposalInfo:
     State: accept by lobe owner
     StartDate: 17.4.2023, 10:29:56 (CET)
     StartDate_Internal: Mon Apr 17 2023 08:29:56 GMT+0000 (Coordinated Universal Time)
-    EndDate: 17.4.2023, 10:32:29 (CET)
+    EndDate: Invalid Date
     EndDate_Internal: Mon Apr 17 2023 08:32:29 GMT+0000 (Coordinated Universal Time)
     Veto: false
     URI: >-
@@ -238,17 +238,5 @@ ClosedProposalInfo:
     Author: member4
     Domain: Process
     LobeOwner: member3
-AllNewBlockRequests:
-  '[L2: Domain-specific Layer] OrderManagement.owl':
-    proposalID: proposal8
-    Layer: 'L2: Domain-specific Layer'
-    Ontology: OrderManagement.owl
-    lobeOwner: member1
-    supervisor: n/a
-  '[L2: Domain-specific Layer] PMV.owl':
-    proposalID: proposal9
-    Layer: 'L2: Domain-specific Layer'
-    Ontology: PMV.owl
-    lobeOwner: member3
-    supervisor: n/a
+AllNewBlockRequests: {}
 NewBlockRequest: {}
