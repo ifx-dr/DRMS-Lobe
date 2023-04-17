@@ -107,125 +107,104 @@ UserInfo:
 OngoingProposalInfo: []
 ClosedProposalInfo:
   - ID: proposal0
-    State: accept
-    EndDate: Wed Mar 08 2023 14:16:46 GMT+0000 (Coordinated Universal Time)
-    Veto: false
-  - ID: proposal1
     Layer: Domain-specific Layer
     Ontology: OrderManagement.owl
-    State: accept
-    EndDate: Mon Mar 20 2023 14:32:32 GMT+0000 (Coordinated Universal Time)
+    State: accept by lobe owner
+    EndDate: 16.3.2023, 15:38:27 (CET)
+    EndDate_Internal: Thu Mar 16 2023 14:38:27 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/c11b4973490bf509db3fffb1900263646ad716f0
-    Message: Names of data properties adjusted
+    URI: 'n/a'
+    Message: 'n/a'
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
+  - ID: proposal1
+    Layer: 'L2: Domain-specific Layer'
+    Ontology: PMV.owl
+    State: accept by lobe owner
+    EndDate: 16.3.2023, 09:16:50 (CET)
+    EndDate_Internal: Thu Mar 16 2023 08:16:50 GMT+0000 (Coordinated Universal Time)
+    Veto: false
+    URI: 'n/a'
+    Message: 'n/a'
     Author: member4
     Domain: Process
-    LobeOwner: member2
+    LobeOwner: member3
   - ID: proposal2
     Layer: 'L2: Domain-specific Layer'
     Ontology: PMV.owl
     State: accept by lobe owner
-    StartDate: 16.4.2023, 20:01:22 (CET)
-    StartDate_Internal: Sun Apr 16 2023 18:01:22 GMT+0000 (Coordinated Universal Time)
-    EndDate: Invalid Date
-    EndDate_Internal: Sun Apr 16 2023 18:01:57 GMT+0000 (Coordinated Universal Time)
+    EndDate: 22.3.2023, 16:42:16 (CET)
+    EndDate_Internal: Wed Mar 22 2023 15:42:16 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
-    Message: 'update test 12: PMV.owl, Missing labels added for classes'
+    URI: 'n/a'
+    Message: 'n/a'
     Author: member4
     Domain: Process
     LobeOwner: member3
   - ID: proposal3
-    Layer: 'L2: Domain-specific Layer'
-    Ontology: PMV.owl
+    Layer: Domain-specific Layer
+    Ontology: OrderManagement.owl
     State: accept by lobe owner
-    StartDate: 16.4.2023, 20:13:08 (CET)
-    StartDate_Internal: Sun Apr 16 2023 18:13:08 GMT+0000 (Coordinated Universal Time)
-    EndDate: Invalid Date
-    EndDate_Internal: Sun Apr 16 2023 18:13:26 GMT+0000 (Coordinated Universal Time)
+    EndDate: 23.03.2023 10:09 (CET)
+    EndDate_Internal: Thu Mar 23 2023 09:09:00 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
-    Message: ''
-    Author: member3
-    Domain: Process
-    LobeOwner: member3
+    URI: 'n/a'
+    Message: 'n/a'
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
   - ID: proposal4
-    Layer: 'L2: Domain-specific Layer'
-    Ontology: PMV.owl
+    Layer: Domain-specific Layer
+    Ontology: OrderManagement.owl
     State: accept by lobe owner
-    StartDate: 16.4.2023, 20:17:50 (CET)
-    StartDate_Internal: Sun Apr 16 2023 18:17:50 GMT+0000 (Coordinated Universal Time)
-    EndDate: Invalid Date
-    EndDate_Internal: Sun Apr 16 2023 18:18:20 GMT+0000 (Coordinated Universal Time)
+    StartDate: 24.3.2023, 14:54:33 (CET)
+    EndDate: 24.3.2023, 15:31:06 (CET)
+    EndDate_Internal: Fri Mar 24 2023 14:31:06 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
-    Message: ''
-    Author: member3
-    Domain: Process
-    LobeOwner: member3
+    URI: 'n/a'
+    Message: 'n/a'
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1 
   - ID: proposal5
     Layer: 'L2: Domain-specific Layer'
     Ontology: PMV.owl
     State: accept by lobe owner
-    StartDate: 16.4.2023, 20:30:34 (CET)
-    StartDate_Internal: Sun Apr 16 2023 18:30:34 GMT+0000 (Coordinated Universal Time)
-    EndDate: Invalid Date
-    EndDate_Internal: Sun Apr 16 2023 18:31:15 GMT+0000 (Coordinated Universal Time)
+    StartDate: 24.3.2023, 15:52:09 (CET)
+    EndDate: 24.3.2023, 16:16:48 (CET)
+    EndDate_Internal: Fri Mar 24 2023 15:16:48 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
-    Message: ''
-    Author: member3
+    URI: 'n/a'
+    Message: 'n/a'
+    Author: member4
     Domain: Process
     LobeOwner: member3
   - ID: proposal6
-    Layer: 'L2: Domain-specific Layer'
-    Ontology: PMV.owl
+    Layer: Domain-specific Layer
+    Ontology: OrderManagement.owl
     State: accept by lobe owner
-    StartDate: 16.4.2023, 20:38:03 (CET)
-    StartDate_Internal: Sun Apr 16 2023 18:38:03 GMT+0000 (Coordinated Universal Time)
-    EndDate: Invalid Date
-    EndDate_Internal: Sun Apr 16 2023 18:38:26 GMT+0000 (Coordinated Universal Time)
+    StartDate: 31.3.2023, 11:25:18 (CET)
+    EndDate: 31.3.2023, 12:01:34 (CET)
+    EndDate_Internal: Fri Mar 31 2023 10:01:34 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
-    Message: ''
-    Author: member3
-    Domain: Process
-    LobeOwner: member3
+    URI: https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/1895c45b96efa33a413581a68a5748007b6fb6ac,
+    Message: Names of data properties adjusted
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
   - ID: proposal7
     Layer: 'L2: Domain-specific Layer'
     Ontology: PMV.owl
     State: accept by lobe owner
-    StartDate: 16.4.2023, 20:46:44 (CET)
-    StartDate_Internal: Sun Apr 16 2023 18:46:44 GMT+0000 (Coordinated Universal Time)
-    EndDate: Invalid Date
-    EndDate_Internal: Sun Apr 16 2023 18:47:03 GMT+0000 (Coordinated Universal Time)
+    StartDate: 31.3.2023, 11:39:31 (CET)
+    EndDate: 31.3.2023, 12:42:42 (CET)
+    EndDate_Internal: Fri Mar 31 2023 10:42:42 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
-    Message: ''
-    Author: member3
+    URI: https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/c11b4973490bf509db3fffb1900263646ad716f0
+    Message: Names of data properties adjusted
+    Author: member4
     Domain: Process
-    LobeOwner: member3
-  - ID: proposal8
-    Layer: 'L2: Domain-specific Layer'
-    Ontology: PMV.owl
-    State: accept by lobe owner
-    StartDate: 16.4.2023, 21:22:03 (CET)
-    StartDate_Internal: Sun Apr 16 2023 19:22:03 GMT+0000 (Coordinated Universal Time)
-    EndDate: 16.4.2023, 21:22:25 (CET)
-    EndDate_Internal: Sun Apr 16 2023 19:22:25 GMT+0000 (Coordinated Universal Time)
-    Veto: false
-    URI: >-
-      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
-    Message: ''
-    Author: member3
-    Domain: Process
-    LobeOwner: member3
+    LobeOwner: member3  
 AllNewBlockRequests: {}
 NewBlockRequest: {}
