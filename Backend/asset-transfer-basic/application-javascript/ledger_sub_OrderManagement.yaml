@@ -14,11 +14,11 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 100
+    Tokens: 110
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: 31.3.2023, 12:01:32 (CET)
-    LastParticipation_Internal: Fri Mar 31 2023 10:01:32 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 17.4.2023, 11:16:45 (CET)
+    LastParticipation_Internal: Mon Apr 17 2023 09:16:45 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Supply Chain
     Expert: []
@@ -48,11 +48,11 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 100
-    Total_Proposal: 4
+    Tokens: 110
+    Total_Proposal: 5
     Total_Accepted_Proposal: 0
-    LastParticipation: 31.3.2023, 11:25:18 (CET)
-    LastParticipation_Internal: Fri Mar 31 2023 09:25:18 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 17.4.2023, 11:03:02 (CET)
+    LastParticipation_Internal: Mon Apr 17 2023 09:03:02 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -61,8 +61,8 @@ ClosedProposalInfo:
     State: accept
     EndDate: Thu Mar 16 2023 14:38:27 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: 'n/a'
-    Message: 'n/a'
+    URI: n/a
+    Message: n/a
     Author: member4
     Domain: Supply Chain
     LobeOwner: member1
@@ -70,8 +70,8 @@ ClosedProposalInfo:
     State: accept
     EndDate: 23.03.2023 10:09 (CET)
     Veto: false
-    URI: 'n/a'
-    Message: 'n/a'
+    URI: n/a
+    Message: n/a
     Author: member4
     Domain: Supply Chain
     LobeOwner: member1
@@ -81,8 +81,8 @@ ClosedProposalInfo:
     EndDate: 24.3.2023, 15:31:06 (CET)
     EndDate_Internal: Fri Mar 24 2023 14:31:06 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: 'n/a'
-    Message: 'n/a'
+    URI: n/a
+    Message: n/a
     Author: member4
     Domain: Supply Chain
     LobeOwner: member1
@@ -92,8 +92,22 @@ ClosedProposalInfo:
     EndDate: 31.3.2023, 12:01:34 (CET)
     EndDate_Internal: Fri Mar 31 2023 10:01:34 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/1895c45b96efa33a413581a68a5748007b6fb6ac,
+    URI: >-
+      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/1895c45b96efa33a413581a68a5748007b6fb6ac,
     Message: Names of data properties adjusted
+    Author: member4
+    Domain: Supply Chain
+    LobeOwner: member1
+  - ID: proposal4
+    State: accept by lobe owner
+    StartDate: 17.4.2023, 11:03:02 (CET)
+    StartDate_Internal: Mon Apr 17 2023 09:03:02 GMT+0000 (Coordinated Universal Time)
+    EndDate: 17.4.2023, 11:16:47 (CET)
+    EndDate_Internal: Mon Apr 17 2023 09:16:47 GMT+0000 (Coordinated Universal Time)
+    Veto: false
+    URI: >-
+      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/50873a28b7e97ba8d65492c7a7938f0fc336ac02
+    Message: 'update test 11: OrderManagement.owl, Labels added for classes'
     Author: member4
     Domain: Supply Chain
     LobeOwner: member1
@@ -104,6 +118,6 @@ NewBlockRequest:
   lobeOwner: n/a
   supervisor: n/a
 LatestDR: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/e62a015a27d3885eca648a019cb9616469209ed4
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/commit/90c783a6e4ff122dbc160ccf0a2745e78a024c73
 FileHash: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/raw/e62a015a27d3885eca648a019cb9616469209ed4/OrderManagement.owl?inline=false
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/order_management/-/raw/90c783a6e4ff122dbc160ccf0a2745e78a024c73/OrderManagement.owl?inline=false

@@ -36,11 +36,11 @@ UserInfo:
     Name: Marta
     Password: '333'
     Email: 333@gmail.com
-    Tokens: 100
+    Tokens: 110
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: 31.3.2023, 12:42:40 (CET)
-    LastParticipation_Internal: Fri Mar 31 2023 10:42:40 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 17.4.2023, 12:35:01 (CET)
+    LastParticipation_Internal: Mon Apr 17 2023 10:35:01 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Process
     Expert: []
@@ -48,11 +48,11 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 100
-    Total_Proposal: 3
+    Tokens: 110
+    Total_Proposal: 4
     Total_Accepted_Proposal: 0
-    LastParticipation: 31.3.2023, 11:39:31 (CET)
-    LastParticipation_Internal: Fri Mar 31 2023 09:39:31 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 17.4.2023, 11:06:54 (CET)
+    LastParticipation_Internal: Mon Apr 17 2023 09:06:54 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -61,8 +61,8 @@ ClosedProposalInfo:
     State: accept
     EndDate: Thu Mar 16 2023 08:16:50 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: 'n/a'
-    Message: 'n/a'
+    URI: n/a
+    Message: n/a
     Author: member4
     Domain: Process
     LobeOwner: member3
@@ -70,8 +70,8 @@ ClosedProposalInfo:
     State: accept
     EndDate: 22.3.2023, 16:42:16 (CET)
     Veto: false
-    URI: 'n/a'
-    Message: 'n/a'
+    URI: n/a
+    Message: n/a
     Author: member4
     Domain: Process
     LobeOwner: member3
@@ -81,8 +81,8 @@ ClosedProposalInfo:
     EndDate: 24.3.2023, 16:16:48 (CET)
     EndDate_Internal: Fri Mar 24 2023 15:16:48 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: 'n/a'
-    Message: 'n/a'
+    URI: n/a
+    Message: n/a
     Author: member4
     Domain: Process
     LobeOwner: member3
@@ -92,8 +92,22 @@ ClosedProposalInfo:
     EndDate: 31.3.2023, 12:42:42 (CET)
     EndDate_Internal: Fri Mar 31 2023 10:42:42 GMT+0000 (Coordinated Universal Time)
     Veto: false
-    URI: https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/c11b4973490bf509db3fffb1900263646ad716f0
+    URI: >-
+      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/c11b4973490bf509db3fffb1900263646ad716f0
     Message: Names of data properties adjusted
+    Author: member4
+    Domain: Process
+    LobeOwner: member3
+  - ID: proposal4
+    State: accept by lobe owner
+    StartDate: 17.4.2023, 11:06:54 (CET)
+    StartDate_Internal: Mon Apr 17 2023 09:06:54 GMT+0000 (Coordinated Universal Time)
+    EndDate: 17.4.2023, 12:35:03 (CET)
+    EndDate_Internal: Mon Apr 17 2023 10:35:03 GMT+0000 (Coordinated Universal Time)
+    Veto: false
+    URI: >-
+      https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/4ed84f92a361098006df6448cc6932c63b60c9fc
+    Message: 'update test 12: PMV.owl, Missing labels added for classes'
     Author: member4
     Domain: Process
     LobeOwner: member3
@@ -104,6 +118,6 @@ NewBlockRequest:
   lobeOwner: n/a
   supervisor: n/a
 LatestDR: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/b7ffbf458b88d4980e1c5ee0f583ccc127d4f792
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/commit/8c89276d5970a8c6cdbdf7ced361b6cdaa31cc08
 FileHash: >-
-  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/raw/b7ffbf458b88d4980e1c5ee0f583ccc127d4f792/PMV.owl?inline=false
+  https://gitlab.intra.infineon.com/semantic-web-projects/digital-reference/process_model_version/-/raw/8c89276d5970a8c6cdbdf7ced361b6cdaa31cc08/PMV.owl?inline=false
