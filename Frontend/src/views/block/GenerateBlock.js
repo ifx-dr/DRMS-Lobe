@@ -89,6 +89,8 @@ export default class GenerateBlock extends Component {
       return;
     }
     latestBlock = JSON.parse(latestBlock.success);
+    if(latestBlock.data.includes('UpdatedVersion'))
+      latestBlock.data = JSON.parse(latestBlock.data);
     this.setState({
       latestBlock: latestBlock,
     }, console.log(latestBlock.index));

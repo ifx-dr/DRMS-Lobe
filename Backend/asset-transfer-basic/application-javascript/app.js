@@ -460,7 +460,7 @@ async function main() {
 							blockchain.chain = JSON.parse(res);
 							let data = blockDataPreview;
 							console.log(`app data: ${data}`);
-							let newBlock = new BC.Block(req.body.index, req.body.timestamp, blockDataPreview);
+							let newBlock = new BC.Block(req.body.index, req.body.timestamp, JSON.stringify(blockDataPreview));
 							// let newBlock = new BC.Block(req.body.index, req.body.timestamp, req.body.data);
 							blockchain.addBlock(newBlock)
 							// console.log("view blockchain:\n"+res.toString());

@@ -30,10 +30,13 @@ class BlockInfo extends Component {
     
   };
   getLatestBlock = async () => {
-    const latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
+    let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
     if(!latestBlock.error){
+      latestBlock = JSON.parse(latestBlock.success);
+      if(latestBlock.data.includes('UpdatedVersion'))
+        latestBlock.data = JSON.parse(latestBlock.data);
       this.setState({
-        latestBlock: JSON.parse(latestBlock.success),
+        latestBlock: latestBlock,
       }, console.log(latestBlock));
     }
     else{

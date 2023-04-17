@@ -14,7 +14,7 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1000
+    Tokens: 100
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: 31.3.2023, 12:01:32 (CET)
@@ -26,7 +26,7 @@ UserInfo:
     Name: Philipp
     Password: '222'
     Email: 222@gmail.com
-    Tokens: 1000
+    Tokens: 100
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: 23.1.2023, 01:00:00 (CET)
@@ -37,7 +37,7 @@ UserInfo:
     Name: Marta
     Password: '333'
     Email: 333@gmail.com
-    Tokens: 1020
+    Tokens: 100
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: 9.3.2023, 11:02:02 (CET)
@@ -48,7 +48,7 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 980
+    Tokens: 100
     Total_Proposal: 4
     Total_Accepted_Proposal: 0
     LastParticipation: 31.3.2023, 11:25:18 (CET)

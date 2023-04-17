@@ -231,7 +231,16 @@ class DRChaincode extends Contract {
             let latestDR = 'New project: please upload ontology file';
             let fileHash = 'New project: please upload ontology file';
             if(latestBlock.data!=='Genesis Block'){
-                latestDR = latestBlock.data;
+                // latestDR = latestBlock.data;
+                if(latestBlock.data.includes('UpdatedVersion')){
+                    console.log(`cc improved`)
+                    let data = JSON.parse(latestBlock.data)
+                    latestDR = data.UpdatedVersion;
+                }    
+                else{
+                    console.log(`cc origin`)
+                    latestDR = latestBlock.data;
+                }
                 if(platform==='GitHub'){
                     // https://github.com/ifx-dr/Update-Test-DR-Sub-Onto/commit/ac9aef219f062221dc147d65b4fdfc5e5930804d
                     let latestDRSplit = latestDR.split('/');

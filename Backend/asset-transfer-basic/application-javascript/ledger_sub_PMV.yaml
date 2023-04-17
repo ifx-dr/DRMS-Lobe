@@ -14,7 +14,7 @@ UserInfo:
     Name: Hans
     Password: '111'
     Email: 111@gmail.com
-    Tokens: 1000
+    Tokens: 100
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: 24.2.2023, 16:05:22 (CET)
@@ -25,7 +25,7 @@ UserInfo:
     Name: Philipp
     Password: '222'
     Email: 222@gmail.com
-    Tokens: 1000
+    Tokens: 100
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: 23.1.2023, 01:00:00 (CET)
@@ -36,7 +36,7 @@ UserInfo:
     Name: Marta
     Password: '333'
     Email: 333@gmail.com
-    Tokens: 1020
+    Tokens: 100
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
     LastParticipation: 31.3.2023, 12:42:40 (CET)
@@ -48,7 +48,7 @@ UserInfo:
     Name: Yipeng
     Password: '444'
     Email: 444@gmail.com
-    Tokens: 980
+    Tokens: 100
     Total_Proposal: 3
     Total_Accepted_Proposal: 0
     LastParticipation: 31.3.2023, 11:39:31 (CET)
@@ -65,7 +65,7 @@ ClosedProposalInfo:
     Message: 'n/a'
     Author: member4
     Domain: Process
-    LobeOwner: member2
+    LobeOwner: member3
   - ID: proposal1
     State: accept
     EndDate: 22.3.2023, 16:42:16 (CET)
@@ -74,7 +74,7 @@ ClosedProposalInfo:
     Message: 'n/a'
     Author: member4
     Domain: Process
-    LobeOwner: member2
+    LobeOwner: member3
   - ID: proposal2
     State: accept by lobe owner
     StartDate: 24.3.2023, 15:52:09 (CET)
@@ -85,7 +85,7 @@ ClosedProposalInfo:
     Message: 'n/a'
     Author: member4
     Domain: Process
-    LobeOwner: member2
+    LobeOwner: member3
   - ID: proposal3
     State: accept by lobe owner
     StartDate: 31.3.2023, 11:39:31 (CET)
@@ -96,7 +96,7 @@ ClosedProposalInfo:
     Message: Names of data properties adjusted
     Author: member4
     Domain: Process
-    LobeOwner: member2
+    LobeOwner: member3
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a
