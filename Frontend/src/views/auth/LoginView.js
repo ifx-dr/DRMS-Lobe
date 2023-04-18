@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import { withRouter, useNavigate, Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import {
   Button,
   TextField,
   Card, CardHeader, Divider, CardContent, Input
 } from '@material-ui/core';
-import useToken from 'src/useToken';
-import Tokens from '../reports/DashboardView/Tokens';
 
 class LoginViews extends Component {
   constructor(props) {
@@ -30,62 +28,17 @@ class LoginViews extends Component {
       PWD: value
     })
   }
-  getMemberInfo = async () => {
-    
-    // const data = await fetch('http://localhost:3001/memberInfo').then((response) =>response.json());
-    // this.setState({
-    //   members: data
-    // })
-    // const navigate = useNavigate();
-    let data = {
-      memberID: this.state.ID
-    };
-    // let flag = 1;
-    let result = await fetch('http://localhost:3001/memberInfo', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        }).then(function(response){
-          return response.json();
-        }).then(function(body){
-          console.log(body);
-          if(!body.error){
-            window.userID = body.ID;
-            window.userName = body.Name;
-            window.userRole = body.Role;
-            alert(`
-                   ID:   ${window.userID}\n
-                   Name: ${window.userName}\n
-                   Role: ${window.userRole}\n
-                   login success`);
-            // this.props.history.push('/app/dashboard')
-            // flag = 0;
-            // return 0;
-            // window.location = "/app/dashboard";
-            // navigate('/app/dashboard');
-          }
-          else{
-            alert(body.error);
-            // return 1;
-          }
-        })
-    // if(window.userName){
-      
-    //   navigate('/app/dashboard');
-    // }
-  };
   async handleSubmit(event)  {
     // let navigate = useNavigate();
     // const {token, setToken} = useToken();
     event.preventDefault();
     let data = {
-      memberID: this.state.ID
+      memberID: this.state.ID,
+      password: this.state.PWD,
     };
     console.log("get memberInfo: "+data.memberID);
     // let flag = 1;
-    let result = await fetch('http://localhost:3001/memberInfo', {
+    let result = await fetch('http://localhost:3001/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -97,43 +50,27 @@ class LoginViews extends Component {
           console.log(body);
           // re-login: update token
           // setToken(body);
-          sessionStorage.setItem('token',JSON.stringify(body.success));
           if(!body.error){
-            window.userID = body.success.ID;
-            window.userName = body.success.Name;
             // window.userRole = body.Role;
+            body = body.success;
+            if(body.Fail){
+              alert(body.Fail)
+              return;
+            }
+            sessionStorage.setItem('token',JSON.stringify(body));
             alert(`
-                   ID:   ${window.userID}\n
-                   Name: ${window.userName}\n
+                   ID:   ${body.ID}\n
+                   Name: ${body.Name}\n
                    login success`);
             this.setState({
               flag: true,
             })
-            // alert(`
-            //        ID:   ${window.userID}\n
-            //        Name: ${window.userName}\n
-            //        Role: ${window.userRole}\n
-            //        login success`);
-            // this.props.history.push('/app/dashboard')
-            // flag = 0;
-            // return 0;
-            // window.location = "/app/dashboard";
-            
-            // navigate('http://localhost:3006/app/dashboard/');
           }
           else{
             alert(body.error);
             // return 1;
           }
         })
-
-    // window.userID =this.state.ID
-    
-    // this.getMemberInfo().then(()=>{
-    //   console.log(window.userID);
-    //   // navigate('../dashboard');
-    //   // window.location.href = "/app/dashboard";
-    // });
   }
   updateEmployeeDetails = (event) => {
     this.setState({ data:{Id:event.target.value} });

@@ -656,7 +656,41 @@ async function main() {
 				}
 				res.json(result);
 			});
-
+			app.post("/login", async (req, res) => {
+				//Get the amount of members in the system
+				console.log(JSON.stringify(req.body));
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let res = await contract.evaluateTransaction('GetMemberById', req.body.memberID);
+						console.log(`SUCCESS app login: ${res}`);
+						res = JSON.parse(res);
+						let data = {};
+						console.log(`req.body.password = ${req.body.pwd}, ${typeof(req.body.pwd)}`);
+						console.log(`res.Password = ${res.Password}, ${typeof(res.Password)}`);
+						// save the pwd in other vars otherwise wont work, dont know why
+						let a = req.body.pwd;
+						let b = res.Password;
+						if(a==b){
+							data = {
+								ID: res.ID,
+								Name: res.Name,
+							}
+						}
+						else{
+							data = {
+								Fail: `invalid password of ${req.body.memberID}`,
+							}
+						}
+						result = {"success":data};
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app login: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
+			});
 			// check blockchain
 			app.get("/checkBlockchain", async (req, res) => {
 				let result;
