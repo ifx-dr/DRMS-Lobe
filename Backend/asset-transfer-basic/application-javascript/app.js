@@ -659,8 +659,19 @@ async function main() {
 
 			// check blockchain
 			app.get("/checkBlockchain", async (req, res) => {
-				let result = await contract.evaluateTransaction('GetBlockchain');
-				res.json(result.toString());
+				let result;
+				for(let i=0;i<retry_cnt;i++){
+					try {
+						let res = await contract.evaluateTransaction('GetBlockchain');
+						console.log(`SUCCESS app checkBlockchain: ${res}`);
+						result = {"success":res.toString()}
+						break;
+					} catch (error) {
+						console.log(`FAILED ${i} app checkBlockchain: ${error}`);
+						result = {"error":error.toString()};
+					}
+				}
+				res.json(result);
 				// console.log("view blockchain:\n"+result.toString());
 			});
 			app.get("/checkLatestBlock", async (req, res) => {

@@ -9,7 +9,7 @@ import RegisterView from 'src/views/auth/RegisterView';
 import CreateProposalView from 'src/views/settings/CreateProposalView';
 import VetoProposalView from 'src/views/vetoproposal/VetoProposalView';
 import ValidateProposal from 'src/views/vote/ValidateProposalView';
-import TestPageView from 'src/views/test';
+import BlockchainView from 'src/views/blockchain';
 import GenerateBlockView from 'src/views/block';
 const routes = [
   {
@@ -22,7 +22,7 @@ const routes = [
       { path: 'vetoProposal', element: <VetoProposalView />},
       { path: 'validateProposal', element: <ValidateProposal />},
       { path: 'generateBlock', element: <GenerateBlockView />},
-      { path: 'testPage', element: <TestPageView />},
+      { path: 'blockchain', element: <BlockchainView />},
       { path: '*', element: <Navigate to="/404" /> }
     ]
   },

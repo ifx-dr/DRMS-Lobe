@@ -84,6 +84,11 @@ const items = [
     icon: UserCheck,
     title: 'Generate New Block'
   },
+  {
+    href: '/app/blockchain',
+    icon: BarChartIcon,
+    title: 'View Blockchain'
+  },
   // {
   //   href: '/app/testPage',
   //   icon: UserCheck,

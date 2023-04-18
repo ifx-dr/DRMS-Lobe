@@ -5,7 +5,7 @@ import {
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
-import TestPage from './TestPage';
+import Blockchain from './BlockchainView';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,18 +16,18 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const TestPageView = () => {
+const BlockchainView = () => {
   const classes = useStyles();
   return (
     <Page
       className={classes.root}
-      title="test page"
+      title="View Blockchain"
     >
       <Container maxWidth="lg">
-        <TestPage />
+        <Blockchain />
       </Container>
     </Page>
   );
 };
 
-export default TestPageView;
+export default BlockchainView;
