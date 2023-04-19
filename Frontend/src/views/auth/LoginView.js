@@ -38,39 +38,42 @@ class LoginViews extends Component {
     };
     console.log("get memberInfo: "+data.memberID);
     // let flag = 1;
-    let result = await fetch('http://localhost:3001/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        }).then((response)=>{
-          return response.json();
-        }).then((body)=>{
-          console.log(body);
-          // re-login: update token
-          // setToken(body);
-          if(!body.error){
-            // window.userRole = body.Role;
-            body = body.success;
-            if(body.Fail){
-              alert(body.Fail)
-              return;
-            }
-            sessionStorage.setItem('token',JSON.stringify(body));
-            alert(`
-                   ID:   ${body.ID}\n
-                   Name: ${body.Name}\n
-                   login success`);
-            this.setState({
-              flag: true,
-            })
+    try{
+      await fetch('http://localhost:3001/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then((response)=>{
+        return response.json();
+      }).then((body)=>{
+        console.log(body);
+        // re-login: update token
+        // setToken(body);
+        if(!body.error){
+          // window.userRole = body.Role;
+          body = body.success;
+          if(body.Fail){
+            alert(body.Fail)
+            return;
           }
-          else{
-            alert(body.error);
-            // return 1;
-          }
-        })
+          sessionStorage.setItem('token',JSON.stringify(body));
+          alert(`
+                  ID:   ${body.ID}\n
+                  Name: ${body.Name}\n
+                  login success`);
+          this.setState({
+            flag: true,
+          })
+        }
+        else{
+          alert(body.error);
+          // return 1;
+        }
+      })
+    }
+    catch(error){alert(error)}
   }
   updateEmployeeDetails = (event) => {
     this.setState({ data:{Id:event.target.value} });

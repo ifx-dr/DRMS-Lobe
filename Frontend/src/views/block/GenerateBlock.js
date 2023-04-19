@@ -6,14 +6,10 @@ import {
   Divider,
   Grid,
   Typography,
-  TextField,
   Input,
   Button
 } from '@material-ui/core';
-import useToken from 'src/useToken';
 import { Navigate } from 'react-router';
-import NavItem from 'src/layouts/DashboardLayout/NavBar/NavItem';
-import { times } from 'lodash';
 
 export default class GenerateBlock extends Component {
   constructor() {
@@ -33,154 +29,160 @@ export default class GenerateBlock extends Component {
 
   componentDidMount() {
     this.getNewBlockRequest();
-    // this.getCommitInfo();
-    // if(sessionStorage.getItem('latestBlock')===null)
     this.getLatestBlock();
-    // this.getTimeStamp();
   }
   getNewBlockRequest = async () => {
-    let token = sessionStorage.getItem('token');
-    if(token===null){
-      this.setState({
-        Redirect:'Login'
-      })
-      alert('Please login in!');
-      return;
-    }
-    token = JSON.parse(token);
-    let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
-    // newBlockReq = JSON.parse(newBlockReq);
-    if(newBlockReq.error){
-      alert(newBlockReq.error)
-      return;
-    }
-    
-    newBlockReq = newBlockReq.success;
-    // alert(JSON.stringify(newBlockReq))
-    // alert(newBlockReq.newBlockWaiting)
-    if(newBlockReq.newBlockWaiting==='true'){
-      if(newBlockReq.author!==token.ID&&newBlockReq.lobeOwner!==token.ID){
-        alert('A new block is to be generated: waiting for lobe owner operation!');
+    try{
+      let token = sessionStorage.getItem('token');
+      if(token===null){
+        this.setState({
+          Redirect:'Login'
+        })
+        alert('Please login in!');
+        return;
+      }
+      token = JSON.parse(token);
+      let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
+      // newBlockReq = JSON.parse(newBlockReq);
+      if(newBlockReq.error){
+        alert(newBlockReq.error)
+        return;
+      }
+      
+      newBlockReq = newBlockReq.success;
+      // alert(JSON.stringify(newBlockReq))
+      // alert(newBlockReq.newBlockWaiting)
+      if(newBlockReq.newBlockWaiting==='true'){
+        if(newBlockReq.author!==token.ID&&newBlockReq.lobeOwner!==token.ID){
+          alert('A new block is to be generated: waiting for lobe owner operation!');
+          this.setState({
+            Redirect:'Dashboard'
+          })
+          return;
+        }
+        else{
+          this.setState({
+            newBlockReq:newBlockReq
+          })
+          this.getCommitInfo();
+        }
+      }
+      else{
+        alert('No new block waiting!');
         this.setState({
           Redirect:'Dashboard'
         })
         return;
       }
-      else{
-        this.setState({
-          newBlockReq:newBlockReq
-        })
-        this.getCommitInfo();
-      }
     }
-    else{
-      alert('No new block waiting!');
-      this.setState({
-        Redirect:'Dashboard'
-      })
-      return;
-    }
+    catch{}
   };
   getLatestBlock = async () => {
-    let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
-    // latestBlock = JSON.parse(latestBlock)
-    if(latestBlock.error){
-      alert(latestBlock.error)
-      return;
+    try{
+      let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
+      // latestBlock = JSON.parse(latestBlock)
+      if(latestBlock.error){
+        alert(latestBlock.error)
+        return;
+      }
+      latestBlock = JSON.parse(latestBlock.success);
+      if(latestBlock.data.includes('UpdatedVersion'))
+        latestBlock.data = JSON.parse(latestBlock.data);
+      this.setState({
+        latestBlock: latestBlock,
+      }, console.log(latestBlock.index));
+      this.setState({
+        nextIndex:latestBlock.index+1
+      })
     }
-    latestBlock = JSON.parse(latestBlock.success);
-    if(latestBlock.data.includes('UpdatedVersion'))
-      latestBlock.data = JSON.parse(latestBlock.data);
-    this.setState({
-      latestBlock: latestBlock,
-    }, console.log(latestBlock.index));
-    this.setState({
-      nextIndex:latestBlock.index+1
-    })
+    catch{}
   };
   getCommitInfo = async() => {
-    const Repo = await fetch('http://localhost:3001/Repo').then((response) => response.json());
-    if(!Repo.error){
-      this.setState({
-        Repo: Repo.success,
-      }, console.log(Repo));
-      // using GitHub api to get commit info
-      var link = '';
-      var prefix = '';
-      if(this.state.Repo===null)
-        return;
-      if(this.state.Repo.Platform==='GitHub'){
-        link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
-        prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
+    try{
+      const Repo = await fetch('http://localhost:3001/Repo').then((response) => response.json());
+      if(!Repo.error){
+        this.setState({
+          Repo: Repo.success,
+        }, console.log(Repo));
+        // using GitHub api to get commit info
+        var link = '';
+        var prefix = '';
+        if(this.state.Repo===null)
+          return;
+        if(this.state.Repo.Platform==='GitHub'){
+          link = `https://api.github.com/repos/${this.state.Repo.RepoName}/commits/${this.state.Repo.DefaultBranch}`;
+          prefix = `https://github.com/${this.state.Repo.RepoName}/commit/`;
+        }
+        else{
+          // '/' in author/repo needs to be replaced with %2F
+          let reponame_split = this.state.Repo.RepoName.split('/');
+          let rp = reponame_split[0];
+          for(let i=1;i<reponame_split.length;i++)
+            rp += '%2F' + reponame_split[i]
+          
+          link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${this.state.Repo.DefaultBranch}`;
+          // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
+          prefix = `https://gitlab.intra.infineon.com/${this.state.Repo.RepoName}/-/commit/`
+        }
+        fetch(link, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                "PRIVATE-TOKEN":this.state.Repo.AccessToken,
+              },
+            //   body: JSON.stringify(data)
+            }).then(function(resp){
+                // console.log(resp.json());
+                return resp.json();
+            }).then((body)=>{
+              if(this.state.Repo.Platform==='GitHub'){
+                console.log(body.sha)
+                console.log(body.commit.message)
+                console.log(body.commit.author.date)
+                this.getTimeStamp(body.commit.author.date);
+                this.setState({
+                  nextCommitHash: prefix+body.sha,
+                  // nextTimestamp:'',
+                  commitMessage: body.commit.message
+                })
+              }
+              else{
+                console.log(body.id)
+                console.log(body.message)
+                console.log(body.committed_date)
+                this.getTimeStamp(body.committed_date);
+                this.setState({
+                  nextCommitHash: prefix+body.id,
+                  // nextTimestamp:',',
+                  commitMessage: body.message
+                })
+              }
+        }).then(()=>{
+          let data = {
+            proposalID: this.state.newBlockReq.proposalID,
+            data: this.state.nextCommitHash,
+            message: this.state.commitMessage
+          };
+          // alert(JSON.stringify(data))
+          fetch('http://localhost:3001/getBlockDataPreview',{
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+              }).then((response) => response.json())
+              .then((body)=>{
+                this.setState({
+                  BlockDataPreview: body.success
+                })
+              });  
+        });
       }
       else{
-        // '/' in author/repo needs to be replaced with %2F
-        let reponame_split = this.state.Repo.RepoName.split('/');
-        let rp = reponame_split[0];
-        for(let i=1;i<reponame_split.length;i++)
-          rp += '%2F' + reponame_split[i]
-        
-        link = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/${this.state.Repo.DefaultBranch}`;
-        // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
-        prefix = `https://gitlab.intra.infineon.com/${this.state.Repo.RepoName}/-/commit/`
+        alert(Repo.error);
       }
-      fetch(link, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              "PRIVATE-TOKEN":this.state.Repo.AccessToken,
-            },
-          //   body: JSON.stringify(data)
-          }).then(function(resp){
-              // console.log(resp.json());
-              return resp.json();
-          }).then((body)=>{
-            if(this.state.Repo.Platform==='GitHub'){
-              console.log(body.sha)
-              console.log(body.commit.message)
-              console.log(body.commit.author.date)
-              this.getTimeStamp(body.commit.author.date);
-              this.setState({
-                nextCommitHash: prefix+body.sha,
-                // nextTimestamp:'',
-                commitMessage: body.commit.message
-              })
-            }
-            else{
-              console.log(body.id)
-              console.log(body.message)
-              console.log(body.committed_date)
-              this.getTimeStamp(body.committed_date);
-              this.setState({
-                nextCommitHash: prefix+body.id,
-                // nextTimestamp:',',
-                commitMessage: body.message
-              })
-            }
-      }).then(()=>{
-        let data = {
-          proposalID: this.state.newBlockReq.proposalID,
-          data: this.state.nextCommitHash,
-          message: this.state.commitMessage
-        };
-        // alert(JSON.stringify(data))
-        fetch('http://localhost:3001/getBlockDataPreview',{
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(data)
-            }).then((response) => response.json())
-            .then((body)=>{
-              this.setState({
-                BlockDataPreview: body.success
-              })
-            });  
-      });
     }
-    else{
-      alert(Repo.error);
-    }
+    catch{}
   }
   getTimeStamp = async (t) => {
     let d = new Date(t);
@@ -265,72 +267,75 @@ export default class GenerateBlock extends Component {
 
     console.log('****Generate new block invokes generateBlock api*********');
     const retry_cnt = 3;
-    for(let i=0;i<retry_cnt;i++){
-      let result = await fetch('http://localhost:3001/generateBlock', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        }).then((response) =>response.json());
-      // alert(JSON.stringify(result));
-      if(!result.error){
-        alert(result.success);
-        if(result.success!=='please wait'){
-          this.setState({
-            Redirect: "Dashboard"
-          })
-        }
-        return;
-      }
-      else{
-        // if error, check if the block is "somehow" added
-        // alert(result.error)
-        alert("checking & retrying ...")
-        let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
-        // latestBlock = JSON.parse(latestBlock)
-        if(latestBlock.error){
-          alert(latestBlock.error)
+    try{
+      for(let i=0;i<retry_cnt;i++){
+        let result = await fetch('http://localhost:3001/generateBlock', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          }).then((response) =>response.json());
+        // alert(JSON.stringify(result));
+        if(!result.error){
+          alert(result.success);
+          if(result.success!=='please wait'){
+            this.setState({
+              Redirect: "Dashboard"
+            })
+          }
           return;
         }
-        latestBlock = JSON.parse(latestBlock.success);
-        if(data.index===latestBlock.index){
-          alert('New block added');
-          this.setState({
-            Redirect: "Dashboard"
-          })
-          return;
+        else{
+          // if error, check if the block is "somehow" added
+          // alert(result.error)
+          alert("checking & retrying ...")
+          let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
+          // latestBlock = JSON.parse(latestBlock)
+          if(latestBlock.error){
+            alert(latestBlock.error)
+            return;
+          }
+          latestBlock = JSON.parse(latestBlock.success);
+          if(data.index===latestBlock.index){
+            alert('New block added');
+            this.setState({
+              Redirect: "Dashboard"
+            })
+            return;
+          }
         }
+        // await fetch('http://localhost:3001/generateBlock', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify(data)
+        // }).then(function(response){
+        //   // alert(response);
+        //   // let body = response.json();
+        //   // alert(body);
+        //   // return body;
+        //   return response.json();
+        // }).then((body)=>{
+        //   if(body.error){
+        //     alert(body.error)
+        //     this.setState({
+        //       Redirect:'Dashboard'
+        //     });
+        //   }
+        //   else{
+        //     alert(body.success)
+        //     console.log(body);
+        //     if(body!=='please wait')
+        //       this.setState({
+        //         Redirect:'Dashboard'
+        //       });
+        //   }
+        // });
       }
-      // await fetch('http://localhost:3001/generateBlock', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify(data)
-      // }).then(function(response){
-      //   // alert(response);
-      //   // let body = response.json();
-      //   // alert(body);
-      //   // return body;
-      //   return response.json();
-      // }).then((body)=>{
-      //   if(body.error){
-      //     alert(body.error)
-      //     this.setState({
-      //       Redirect:'Dashboard'
-      //     });
-      //   }
-      //   else{
-      //     alert(body.success)
-      //     console.log(body);
-      //     if(body!=='please wait')
-      //       this.setState({
-      //         Redirect:'Dashboard'
-      //       });
-      //   }
-      // });
     }
+    catch(error){alert(error)}
   }
   render()
     {

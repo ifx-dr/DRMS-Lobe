@@ -5,12 +5,8 @@ import {
   CardHeader,
   Divider,
   Grid,
-  Typography,
-  TextField,
-  Input,
-  Button
+  Typography
 } from '@material-ui/core';
-import configJS from 'src/config.json'
 
 class Blockchain extends Component {
   constructor(props) {
@@ -23,23 +19,26 @@ class Blockchain extends Component {
     this.getBlockchain();
   }
   getBlockchain = async () => {
-    let blockchain = await fetch('http://localhost:3001/checkBlockchain').then((response) => response.json());
-    if(!blockchain.error){
-      // alert(blockchain.success)
-      // a list of blocks
-      blockchain = JSON.parse(blockchain.success);
-      for(let i=0;i<blockchain.length;i++){
-        // blockchain[i] = JSON.parse(blockchain[i]);
-        if(blockchain[i].data.includes('UpdatedVersion'))
-          blockchain[i].data = JSON.parse(blockchain[i].data);
+    try{
+      let blockchain = await fetch('http://localhost:3001/checkBlockchain').then((response) => response.json());
+      if(!blockchain.error){
+        // alert(blockchain.success)
+        // a list of blocks
+        blockchain = JSON.parse(blockchain.success);
+        for(let i=0;i<blockchain.length;i++){
+          // blockchain[i] = JSON.parse(blockchain[i]);
+          if(blockchain[i].data.includes('UpdatedVersion'))
+            blockchain[i].data = JSON.parse(blockchain[i].data);
+        }
+        this.setState({
+          Blockchain: blockchain,
+        });
       }
-      this.setState({
-        Blockchain: blockchain,
-      });
+      else{
+        alert(blockchain.error)
+      }
     }
-    else{
-      alert(blockchain.error)
-    }
+    catch{}
   };
   render(){
     return (

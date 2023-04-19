@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Avatar, Box, Button, Card, CardContent, Grid, Typography } from '@material-ui/core';
-import PeopleIcon from '@material-ui/icons/PeopleOutlined';
-import { DropzoneDialog, DropzoneDialogBase } from 'material-ui-dropzone';
-import {DropzoneArea} from 'material-ui-dropzone';
+import { Card, CardContent, Grid, Typography } from '@material-ui/core';
+// import { Avatar, Box, Button, Card, CardContent, Grid, Typography } from '@material-ui/core';
+// import PeopleIcon from '@material-ui/icons/PeopleOutlined';
+// import { DropzoneDialog, DropzoneDialogBase } from 'material-ui-dropzone';
+// import {DropzoneArea} from 'material-ui-dropzone';
 
-import $ from 'jquery';
-import * as axios from 'ajax';
-import { Form } from 'formik';
+// import $ from 'jquery';
+// import * as axios from 'ajax';
+// import { Form } from 'formik';
 class DRHash extends Component {
   constructor(props) {
     super(props);
@@ -17,29 +18,22 @@ class DRHash extends Component {
   }
 
   componentDidMount() {
-    // this.getDRHash(); // .then(((response) => console.log(response)));
     this.getOngoingDR()
   }
   getOngoingDR = async () => {
-    const OngoingDR = await fetch('http://localhost:3001/OngoingDR').then((response) => response.json());
-    if(!OngoingDR.error){
-      this.setState({
-        OngoingDR: OngoingDR.success,
-      }, console.log(OngoingDR));
+    try{
+      const OngoingDR = await fetch('http://localhost:3001/OngoingDR').then((response) => response.json());
+      if(!OngoingDR.error){
+        this.setState({
+          OngoingDR: OngoingDR.success,
+        }, console.log(OngoingDR));
+      }
+      else{
+        alert(OngoingDR.error);
+      }
     }
-    else{
-      alert(OngoingDR.error);
-    }
-  };
-  getDRHash = async () => {
-    const DRHash = await fetch('http://localhost:3001/DRHash').then((response) => response.json());
-    if(!DRHash.error){
-      this.setState({
-        Hash: DRHash.success,
-      }, console.log(DRHash));
-    }
-    else{
-      alert(DRHash.error)
+    catch (error) {
+      // alert(error);
     }
   };
   handleClose = async() => {
@@ -49,7 +43,6 @@ class DRHash extends Component {
   };
 
   render() {
-    let download = this.state.Hash;
     return (
       <Card>
         <CardContent>

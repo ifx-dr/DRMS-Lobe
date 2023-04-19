@@ -666,10 +666,10 @@ async function main() {
 						console.log(`SUCCESS app login: ${res}`);
 						res = JSON.parse(res);
 						let data = {};
-						console.log(`req.body.password = ${req.body.pwd}, ${typeof(req.body.pwd)}`);
+						console.log(`req.body.password = ${req.body.password}, ${typeof(req.body.password)}`);
 						console.log(`res.Password = ${res.Password}, ${typeof(res.Password)}`);
 						// save the pwd in other vars otherwise wont work, dont know why
-						let a = req.body.pwd;
+						let a = req.body.password;
 						let b = res.Password;
 						if(a==b){
 							data = {

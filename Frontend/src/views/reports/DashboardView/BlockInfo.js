@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Avatar, Box, Button, Card, CardContent, Grid, Typography, Divider } from '@material-ui/core';
+import { Card, CardContent, Grid, Typography, Divider } from '@material-ui/core';
 
 class BlockInfo extends Component {
   constructor(props) {
@@ -16,33 +16,41 @@ class BlockInfo extends Component {
 }
 
   getNewBlockRequest = async () => {
-    let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
-    // if(newBlockReq==='true')
-    //     newBlockReq = '456';
-    if(!newBlockReq.error){
-      this.setState({
-        newBlockReq: newBlockReq.success,
-      }, console.log(newBlockReq));
+    try{
+      let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
+      // if(newBlockReq==='true')
+      //     newBlockReq = '456';
+      if(!newBlockReq.error){
+        this.setState({
+          newBlockReq: newBlockReq.success,
+        }, console.log(newBlockReq));
+      }
+      else{
+        alert(newBlockReq.error);
+      }
     }
-    else{
-      alert(newBlockReq.error);
-    }
-    
+    catch(error){
+      // alert(error);
+    } 
   };
   getLatestBlock = async () => {
-    let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
-    if(!latestBlock.error){
-      latestBlock = JSON.parse(latestBlock.success);
-      if(latestBlock.data.includes('UpdatedVersion'))
-        latestBlock.data = JSON.parse(latestBlock.data);
-      this.setState({
-        latestBlock: latestBlock,
-      }, console.log(latestBlock));
+    try{
+      let latestBlock = await fetch('http://localhost:3001/checkLatestBlock').then((response) => response.json());
+      if(!latestBlock.error){
+        latestBlock = JSON.parse(latestBlock.success);
+        if(latestBlock.data.includes('UpdatedVersion'))
+          latestBlock.data = JSON.parse(latestBlock.data);
+        this.setState({
+          latestBlock: latestBlock,
+        }, console.log(latestBlock));
+      }
+      else{
+        alert(latestBlock.error);
+      }
     }
-    else{
-      alert(latestBlock.error);
-    }
-    
+    catch(error){
+      // alert(error);
+    } 
   };
 
   render() {

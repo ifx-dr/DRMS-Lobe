@@ -8,7 +8,6 @@ import {
   Typography,
   TextField, Input, Button
 } from '@material-ui/core';
-import useToken from 'src/useToken';
 import { Navigate } from 'react-router';
 
 export default class Vote extends Component {
@@ -33,29 +32,32 @@ export default class Vote extends Component {
     //alert("Every 30 seconds!");
   }
   getOnGoingProp = async () => {
-    const data = await fetch('http://localhost:3001/ongoingProp').then((response) => response.json());
-    if(data.error){
-      alert(data.error);
-      this.setState({
-        Redirect:'Dashboard'
-      })
-    }
-    else{
-      if(!data.success.error){
-        this.setState({
-          prop: data.success,
-          prop_ID: data.success.ID,
-          // eslint-disable-next-line react/destructuring-assignment
-        });
-        console.log(this.state.prop + this.state.prop_ID);
-      }
-      else{
-        alert('No ongoing proposal now!');
+    try{
+      const data = await fetch('http://localhost:3001/ongoingProp').then((response) => response.json());
+      if(data.error){
+        alert(data.error);
         this.setState({
           Redirect:'Dashboard'
         })
       }
+      else{
+        if(!data.success.error){
+          this.setState({
+            prop: data.success,
+            prop_ID: data.success.ID,
+            // eslint-disable-next-line react/destructuring-assignment
+          });
+          console.log(this.state.prop + this.state.prop_ID);
+        }
+        else{
+          alert('No ongoing proposal now!');
+          this.setState({
+            Redirect:'Dashboard'
+          })
+        }
+      }
     }
+    catch{}
   };
 
   handleChangeV = async (event) => {
@@ -95,33 +97,36 @@ export default class Vote extends Component {
       return;
     }
     console.log('Submit*******'+ JSON.stringify(data));
-    fetch('http://localhost:3001/validateProposal', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }).then(function(response){
-      return response.json();
-    }).then((body)=>{
-      // body = JSON.parse(body.success)
-      // alert(JSON.stringify(body));
-      if(body.error){
-        alert(body.error);
-        return;
-      }
-      else{
-        if(body.success==='please wait')
-          alert(body.success)
-        else{
-          alert(body.success.Message);
-          console.log(body);
-          this.setState({
-            Redirect:'Dashboard'
-          })
+    try{
+      await fetch('http://localhost:3001/validateProposal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(function(response){
+        return response.json();
+      }).then((body)=>{
+        // body = JSON.parse(body.success)
+        // alert(JSON.stringify(body));
+        if(body.error){
+          alert(body.error);
+          return;
         }
-      }
-    });
+        else{
+          if(body.success==='please wait')
+            alert(body.success)
+          else{
+            alert(body.success.Message);
+            console.log(body);
+            this.setState({
+              Redirect:'Dashboard'
+            })
+          }
+        }
+      });
+    }
+    catch(error){alert(error)}
   }
   render()
   {

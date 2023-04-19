@@ -10,7 +10,6 @@ import {
   Input,
   Button
 } from '@material-ui/core';
-import useToken from 'src/useToken';
 import { Navigate } from 'react-router';
 
 export default class CreateNewProp extends Component {
@@ -37,20 +36,23 @@ export default class CreateNewProp extends Component {
     this.loadDomains();
   }
   loadDomains = async () => {
-    await fetch('http://localhost:3001/loadDomainsInFrontend', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    }).then(function(response){
-      return response.json()
-    }).then((body)=>{
-      // alert(body);
-      console.log(body);
-      this.setState({
-        allDomains: JSON.parse(body)
-      })
-    });
+    try{
+      await fetch('http://localhost:3001/loadDomainsInFrontend', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }).then(function(response){
+        return response.json()
+      }).then((body)=>{
+        // alert(body);
+        console.log(body);
+        this.setState({
+          allDomains: JSON.parse(body)
+        })
+      });
+    }
+    catch{}
   };
   saveDomains = async (newConfig) => {
     await fetch('http://localhost:3001/saveDomainsInFrontend', {
@@ -62,41 +64,44 @@ export default class CreateNewProp extends Component {
     })
   }
   getNewBlockRequest = async () => {
-    let token = sessionStorage.getItem('token');
-    if(token==null){
-      this.setState({
-        Redirect:'Login'
-      })
-      alert('Please login in!');
-      return;
-    }
-    token = JSON.parse(token);
-    let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
-    // newBlockReq = JSON.parse(newBlockReq);
-    if(newBlockReq.error){
-      alert(newBlockReq.error);
-      this.setState({
-        Redirect:'Dashboard'
-      })
-      return;
-    }
-    // alert(JSON.stringify(newBlockReq));
-    newBlockReq = newBlockReq.success;
-    if(newBlockReq.newBlockWaiting==='true'){
-      if(newBlockReq.author===token.ID||newBlockReq.lobeOwner===token.ID){
-        alert('A new block is to be generated before a new proposal!');
+    try{
+      let token = sessionStorage.getItem('token');
+      if(token==null){
         this.setState({
-          Redirect:'GenerateBlock'
+          Redirect:'Login'
         })
+        alert('Please login in!');
+        return;
       }
-      else{
-        alert('A new block is to be generated: waiting for lobe owner operation');
+      token = JSON.parse(token);
+      let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
+      // newBlockReq = JSON.parse(newBlockReq);
+      if(newBlockReq.error){
+        alert(newBlockReq.error);
         this.setState({
           Redirect:'Dashboard'
         })
+        return;
       }
-      return;
+      // alert(JSON.stringify(newBlockReq));
+      newBlockReq = newBlockReq.success;
+      if(newBlockReq.newBlockWaiting==='true'){
+        if(newBlockReq.author===token.ID||newBlockReq.lobeOwner===token.ID){
+          alert('A new block is to be generated before a new proposal!');
+          this.setState({
+            Redirect:'GenerateBlock'
+          })
+        }
+        else{
+          alert('A new block is to be generated: waiting for lobe owner operation');
+          this.setState({
+            Redirect:'Dashboard'
+          })
+        }
+        return;
+      }
     }
+    catch{}
   };
 
   handleChangeD = async (event) => {
@@ -156,12 +161,12 @@ export default class CreateNewProp extends Component {
       // console.log(this.state.Domain)
       // console.log(this.state.NewDomain)
       domain = this.state.NewDomain;
-      if(!(this.state.allDomains.find(d => d==domain))){
+      if(!(this.state.allDomains.find(d => d===domain))){
         let newConfig = {
           allDomains: this.state.allDomains
         };
         newConfig["allDomains"].push(domain);
-        await this.saveDomains(newConfig);
+        // await this.saveDomains(newConfig);
         await this.loadDomains();
       }
     }
@@ -196,31 +201,34 @@ export default class CreateNewProp extends Component {
     // alert(JSON.stringify(data));
     // return;
       // console.log("new: "+token)
-      console.log('****New Proposal invokes createProposal api*********');
-    await fetch('http://localhost:3001/createProposal', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }).then(function(response){
+    console.log('****New Proposal invokes createProposal api*********');
+    try{
+      await fetch('http://localhost:3001/createProposal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(function(response){
 
-      // alert('Your proposal is created');
-      return response.json()
-    }).then((body)=>{
-      // alert(body);
-      if(!body.error){
-        alert(body.success)
-        console.log(body);
-        if(body.success!=='please wait')
-          this.setState({
-            Redirect:'Dashboard'
-          });
-      }
-      else{
-        alert(body.error)
-      }
-    });
+        // alert('Your proposal is created');
+        return response.json()
+      }).then((body)=>{
+        // alert(body);
+        if(!body.error){
+          alert(body.success)
+          console.log(body);
+          if(body.success!=='please wait')
+            this.setState({
+              Redirect:'Dashboard'
+            });
+        }
+        else{
+          alert(body.error)
+        }
+      });
+    }
+    catch(error){alert(error)}
   }
   render()
     {

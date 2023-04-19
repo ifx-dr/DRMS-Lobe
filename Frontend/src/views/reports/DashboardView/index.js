@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Container,
@@ -8,10 +8,10 @@ import {
 import Page from 'src/components/Page';
 
 import Tokens from './Tokens';
-import WebVowl from './WebVowl';
+// import WebVowl from './WebVowl';
 import LatestDR from './LatestDR';
 import TotalMembers from './TotalMembers';
-import UploadDR from './UploadDR';
+// import UploadDR from './UploadDR';
 import DRHash from './DRHash';
 import BlockInfo from './BlockInfo';
 // import useToken from 'src/useToken';

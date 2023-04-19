@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Avatar, Box, Button, Card, CardContent, Grid, Typography } from '@material-ui/core';
-import PeopleIcon from '@material-ui/icons/PeopleOutlined';
-import { DropzoneDialog, DropzoneDialogBase } from 'material-ui-dropzone';
-import {DropzoneArea} from 'material-ui-dropzone';
+import { Card, CardContent, Grid, Typography } from '@material-ui/core';
+// import { Avatar, Box, Button, Card, CardContent, Grid, Typography } from '@material-ui/core';
+// import PeopleIcon from '@material-ui/icons/PeopleOutlined';
+// import { DropzoneDialog, DropzoneDialogBase } from 'material-ui-dropzone';
+// import {DropzoneArea} from 'material-ui-dropzone';
 
-import $ from 'jquery';
-import * as axios from 'ajax';
-import { Form } from 'formik';
+// import $ from 'jquery';
+// import * as axios from 'ajax';
+// import { Form } from 'formik';
 class LatestDR extends Component {
   constructor(props) {
     super(props);
@@ -26,47 +27,51 @@ class LatestDR extends Component {
     this.getDRHash();
   }
   getRepo = async () => {
-    const Repo = await fetch('http://localhost:3001/Repo').then((response) => response.json());
-    if(!Repo.error){
-      this.setState({
-        Repo: Repo.success,
-      }, console.log(Repo));
+    try{
+      const Repo = await fetch('http://localhost:3001/Repo').then((response) => response.json());
+      if(!Repo.error){
+        this.setState({
+          Repo: Repo.success,
+        }, console.log(Repo));
+      }
+      else{
+        alert(Repo.error);
+      }
     }
-    else{
-      alert(Repo.error);
+    catch (error){
+      // alert(error);
     }
   }
   getLatestDR = async () => {
-    const DRURI = await fetch('http://localhost:3001/DR').then((response) => response.json());
-    if(!DRURI.error){
-      this.setState({
-        DR: DRURI.success,
-      }, console.log(DRURI));
+    try{
+      const DRURI = await fetch('http://localhost:3001/DR').then((response) => response.json());
+      if(!DRURI.error){
+        this.setState({
+          DR: DRURI.success,
+        }, console.log(DRURI));
+      }
+      else{
+        alert(DRURI.error);
+      }
     }
-    else{
-      alert(DRURI.error);
+    catch (error){
+      // alert(error);
     }
   };
   getDRHash = async () => {
-    const DRHash = await fetch('http://localhost:3001/DRHash').then((response) => response.json());
-    if(!DRHash.error){
-      this.setState({
-        Hash: DRHash.success,
-      }, console.log(DRHash));
+    try{
+      const DRHash = await fetch('http://localhost:3001/DRHash').then((response) => response.json());
+      if(!DRHash.error){
+        this.setState({
+          Hash: DRHash.success,
+        }, console.log(DRHash));
+      }
+      else{
+        alert(DRHash.error)
+      }
     }
-    else{
-      alert(DRHash.error)
-    }
-  };
-  getOngoingDR = async () => {
-    const OngoingDR = await fetch('http://localhost:3001/OngoingDR').then((response) => response.json());
-    if(!OngoingDR.error){
-      this.setState({
-        OngoingDR: OngoingDR.success,
-      }, console.log(OngoingDR));
-    }
-    else{
-      alert(OngoingDR.error);
+    catch (error){
+      // alert(error);
     }
   };
   handleClose = async() => {
@@ -119,7 +124,7 @@ class LatestDR extends Component {
               DR: newDR,
               Hash: newHash
             }
-            let result = fetch('http://localhost:3001/updateDR', {
+            fetch('http://localhost:3001/updateDR', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
