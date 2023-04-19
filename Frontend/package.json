@@ -5,8 +5,8 @@
   "version": "1.0.0",
   "private": false,
   "scripts": {
-    "start": "export PORT=3006 && react-scripts start",
-    "startW": "set PORT=3006 && react-scripts start",
+    "start": "export HTTPS=true && export PORT=3006 && react-scripts start",
+    "startW": "set HTTPS=true && set PORT=3006 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
