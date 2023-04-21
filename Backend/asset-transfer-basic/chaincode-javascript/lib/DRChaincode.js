@@ -969,12 +969,15 @@ class DRChaincode extends Contract {
                 proposal = await this.AddVoter(proposal, voter_id, vote, message);
                 await this.UpdateProposal(ctx, proposal, prop_id);
                 
-                if(vote === 'accept') {
-                    await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
-                }
                 result.Message = 'Lobe Owner Successfully Vote for proposal!';
                 result.Finished = true;
-                result.Result = 'accept by lobe owner';
+                if(vote === 'accept') {
+                    await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+                    result.Result = 'accept by lobe owner'; 
+                }
+                else{
+                    result.Result = 'reject by lobe owner';
+                }  
                 return JSON.stringify(result);
             }
         }

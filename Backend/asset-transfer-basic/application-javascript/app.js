@@ -118,6 +118,7 @@ class signalController{
 }
 var sc = new signalController();
 var signal = sc.controller.signal;
+var proposalID = '';
 
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
@@ -570,7 +571,7 @@ async function main() {
 							console.log(`SUCCESS app createProposal: ${res}`);
 							result = {"success":res.toString()};
 							let s = res.toString();
-							var proposalID = s.substring(s.indexOf('ProposalID:')+'ProposalID:'.length);
+							proposalID = s.substring(s.indexOf('ProposalID:')+'ProposalID:'.length);
 							// start timer
 							setTimeoutPromise(MIN, null, { signal })
 							.then(()=>{
@@ -582,10 +583,12 @@ async function main() {
 									// time out: proposal closed
 									console.log(`INFO app createdProposal: expert voting expired, get proposal:${proposalID}`);
 									return contract.submitTransaction('ProposalVoteResult', proposalID, 'true');
-								}, ()=>{
-									console.log(`INFO app createdProposal: expert voting expired, retry, get proposal:${proposalID}`);
-									return contract.submitTransaction('ProposalVoteResult', proposalID, 'true');
-								})
+								} 
+								// ,()=>{
+								// 	console.log(`INFO app createdProposal: expert voting expired, retry, get proposal:${proposalID}`);
+								// 	return contract.submitTransaction('ProposalVoteResult', proposalID, 'true');
+								// }
+								)
 								.then((res)=>{
 									console.log(`INFO app createdProposal: end proposal, ${res}`)
 									res = JSON.parse(res);
