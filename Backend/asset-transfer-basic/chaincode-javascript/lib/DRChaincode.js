@@ -759,7 +759,8 @@ class DRChaincode extends Contract {
     async CheckTimeOut(ctx, startTimeString, maxHours){
         let endTime = new Date();
         let startTime = new Date(startTimeString);
-        let diff = (startTime.getTime() - endTime.getTime())/(1000*3600);
+        let diff = (endTime.getTime() - startTime.getTime())/(1000*60);
+        console.log(`cc CheckTimeOut diff=${diff}`)
         if(diff > maxHours)
             return true;
         else
@@ -805,6 +806,8 @@ class DRChaincode extends Contract {
         let id = 'proposal'+ valid;
         //get the author
         let members = await this.GetMembers(ctx);
+        let numMembers = members.length;
+        console.log(`cc CreateProposal numMembers: ${numMembers}`);
         let member = members.find(member => member.ID == author_id);
         //get the amount of tokens this author, and charge 20 tokens as deposit of the proposal
         if (member.Tokens < 20) {
@@ -843,6 +846,12 @@ class DRChaincode extends Contract {
             await this.UpdateInfo(ctx, 'membersInDomain', membersInDomain);
             await this.UpdateAllLobeOwners(ctx, allLobeOwners);
         }
+        let lobeOwner = allLobeOwners[domain];
+        // lobe owner does not count as expert, and the proposer cannot vote
+        let numExperts = numMembers - 2;
+        // but if the lobe owner is the proposer
+        if(author_id===lobeOwner)
+            numExperts += 1;
         let proposal = {
             ID: id,
             URI: uri,
@@ -857,10 +866,11 @@ class DRChaincode extends Contract {
             OriginalID: originalID,
             NumAcceptedVotes: 0,
             NumRejectedVotes: 0,
+            NumExperts: numExperts,
             AcceptedVotes: [],
             RejectedVotes: [],
             Hash:download,
-            LobeOwner: allLobeOwners[domain]
+            LobeOwner: lobeOwner,
         };
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(parseInt(total_proposals) + 1)));
         //the author's total proposals should increase by 1
@@ -881,7 +891,7 @@ class DRChaincode extends Contract {
         await ctx.stub.putState("ongoingProposalQueue", Buffer.from(JSON.stringify(ongoingProposalQueue)));
         console.log(JSON.stringify(proposal));
         await ctx.stub.putState(id, Buffer.from(JSON.stringify(proposal)));
-        return ('You successfully create a proposal!');
+        return (`You successfully create a proposal! ProposalID:${proposal.ID}`);
     }
     async AddHash(ctx, hash) {
         // let ongoingprop = await ctx.stub.getState('ongoingProposal');
@@ -941,7 +951,8 @@ class DRChaincode extends Contract {
         // 2. lobe owner, not time out: lobe owner permission
         // 3. expert, time out: expert voting
         // 4. expert, not time out: wait for lobe owner voting
-        let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date_Internal, 24);
+        // let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date_Internal, 24);
+        let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date_Internal, 1);
         if(voter_id===lobeOwner){
             if(isTimeOut){
                 result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
@@ -1012,7 +1023,7 @@ class DRChaincode extends Contract {
             return JSON.stringify(result);
         } 
 
-        let total_members = await ctx.stub.getState('total_members');
+        // let total_members = await ctx.stub.getState('total_members');
         // total_members = JSON.parse(total_members) - 1;
 
         // Add the vote inside the proposal
@@ -1020,21 +1031,30 @@ class DRChaincode extends Contract {
         await this.UpdateProposal(ctx, proposal, prop_id);
         
         const totalVotes = await this.GetTotalVotes(proposal);
+        // all experts have voted, close proposal in advance
+        console.log(`cc ValidateProposal totalVotes=${totalVotes}, numEperts=${proposal.NumExperts}`);
+        // let numExperts = proposal.NumExperts;
+        if(parseInt(proposal.NumExperts)==parseInt(totalVotes)){
+            console.log(`cc ValidateProposal: all experts voted, end proposal in advance`);
+            let finalResult = await this.ProposalVoteResult(ctx, proposal.ID, 'false');
+            return finalResult;
+        }
+
         // Check whether already majority members have voted fo the proposal
         // If yes, the will check the result of the proposal and then close it.
         // Here we take 50% as majority
         // base: the number of experts who can vote
-        let base = total_members;
-        if(lobeOwner===proposal.AuthorID)
-            // lobe owner don't act in the expert voting
-            base -= 1;
-        else
-            // lobe owner and the author don't act in the expert voting
-            base -= 2;
-        if(totalVotes > base/2) {
-            let finalResult = await this.ProposalVoteResult(ctx, proposal);
-            return finalResult;
-        }
+        // let base = total_members;
+        // if(lobeOwner===proposal.AuthorID)
+        //     // lobe owner don't act in the expert voting
+        //     base -= 1;
+        // else
+        //     // lobe owner and the author don't act in the expert voting
+        //     base -= 2;
+        // if(totalVotes > base/2) {
+        //     let finalResult = await this.ProposalVoteResult(ctx, proposal);
+        //     return finalResult;
+        // }
 
         result.Message = 'Successfully Vote for proposal!';
 
@@ -1042,7 +1062,8 @@ class DRChaincode extends Contract {
     }
 
     //check the result of a proposal
-    async ProposalVoteResult(ctx, proposal) {
+    async ProposalVoteResult(ctx, proposalID, timeout) {
+        let proposal = await this.GetProposal(ctx, proposalID);
         let result = {
             ProposalID: proposal.ID,
             Finished: true,
@@ -1051,25 +1072,25 @@ class DRChaincode extends Contract {
         }
         //For a veto proposal, if there are 70% of members vote for rejection, it will be rejected
         if (proposal.Type.toString() === 'vetoProposal') {
-            if(proposal.NumRejectedVotes/(proposal.NumRejectedVotes+proposal.NumAcceptedVotes) >= 0.7) {
-                result.Result = 'accept';
+            if(proposal.NumAcceptedVotes/proposal.NumExperts >= 0.7) {
+                result.Result = timeout=='true'?'accept: time up with enough approval':'accept: enough approval from all experts';
                 result.Message = "Veto proposal voting finished as " + "accepted";
                 await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             }
             else {
-                result.Result = 'reject';
+                result.Result = timeout=='true'?'reject: time up with not enough approval':'reject: not enough approval from all experts';
                 result.Message = "Veto proposal voting finished as " + "rejected";
             }
         }
         //For a new proposal, if there are 50% of members vote for acceptance, it will be accepted
         else if (proposal.Type.toString() === 'newProposal') {
-            if(proposal.NumAcceptedVotes >= proposal.NumRejectedVotes) {
-                result.Result = 'accept';
+            if(proposal.NumAcceptedVotes/proposal.NumExperts >= 0.5) {
+                result.Result = timeout=='true'?'accept: time up with enough approval':'accept: enough approval from all experts';
                 result.Message = "New proposal voting finished as " + "accepted";
                 await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             }
             else {
-                result.Result = 'reject';
+                result.Result = timeout=='true'?'reject: time up with not enough approval':'reject: not enough approval from all experts';
                 result.Message = "New proposal voting finished as " + "rejected";
             }
         }
@@ -1080,6 +1101,7 @@ class DRChaincode extends Contract {
     // Reward the relative participants
     // Add the closed proposal to 'closedProposals'
     async EndProposal(ctx, proposalID, result) {
+        console.log(`cc EndProposal input: ${proposalID} ${result}`);
         let ongoingProposalQueue = JSON.parse(await ctx.stub.getState('ongoingProposalQueue'));
         ongoingProposalQueue.shift();
         if(ongoingProposalQueue.length > 0){
@@ -1096,7 +1118,7 @@ class DRChaincode extends Contract {
         // await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(parseInt(ongoingprop) + 1)));
 
         // Update the start time for ongoing proposal
-        await ctx.stub.putState('time', Buffer.from(Date().toString()));
+        // await ctx.stub.putState('time', Buffer.from(Date().toString()));
 
         let proposal = await this.GetProposal(ctx, proposalID);
 
@@ -1139,11 +1161,6 @@ class DRChaincode extends Contract {
             // let member = members.find(member => member.ID == proposal.AuthorID);
             // member.Total_Accepted_Proposal = parseInt(member.Total_Accepted_Proposal)+1;
             // await this.UpdateMembers(ctx, members);
-
-            let members = await this.GetMembers(ctx);
-            let member = members.find(member => member.ID == proposal.AuthorID);
-            member.Total_Accepted_Proposal = parseInt(member.Total_Accepted_Proposal)+1;
-            await this.UpdateMembers(ctx, members);
         }
         ////////////////////
         
@@ -1195,21 +1212,25 @@ class DRChaincode extends Contract {
         let votes;
         let member;
         let pos;
-        
+        let flag = false;
         if (result.includes('accept')) {
             votes = proposal.AcceptedVotes;
-        } else {
+        } else if(result.includes('reject: time up')){
+            flag = true;
+            votes = proposal.AcceptedVotes.concat(proposal.RejectedVotes);
+        }
+        else{
             votes = proposal.RejectedVotes;
         }
         console.log(`cc RewardVoters proposal: ${JSON.stringify(proposal)}`)
-        console.log(`cc RewardVoters votes: ${votes}`)
+        console.log(`cc RewardVoters votes: ${JSON.stringify(votes)}`)
 
         // Reward voters
         for (let vote of votes) {
             member = members.find(expert => expert.ID == vote.ID);
             if (member != undefined) {
                 pos = members.indexOf(member);
-                members[pos].Tokens += (voteDeposit + reward);
+                members[pos].Tokens += (voteDeposit + (flag?0:reward));
             }
         }
 
@@ -1219,6 +1240,7 @@ class DRChaincode extends Contract {
             if (member != undefined) {
                 pos = members.indexOf(member);
                 members[pos].Tokens += (proposalDeposit + reward);
+                members[pos].Total_Accepted_Proposal += 1;
             }
         }
         console.log(`cc RewardVoters members to update: ${JSON.stringify(members)}`)

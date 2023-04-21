@@ -82,6 +82,43 @@ var latestDR = '';
 var fileHash = '';
 var blockDataPreview = null;
 
+const DAY = 24*60*60*1000;
+const MIN = 60*1000;
+const { setTimeout: setTimeoutPromise } = require('node:timers/promises');
+// const AC_LobeOwnerVoting = new AbortController();
+// const SIG_LobeOwnerVoting = AC_LobeOwnerVoting.signal;
+// var lobeOwnerResult = '';
+
+// var AC_Finish = new AbortController();
+// var signal = AC_Finish.signal;
+// var lobeOwnerResult = '';
+// function resetAbortController(){
+// 	delete AC_Finish;
+// 	AC_Finish = new AbortController();
+// }
+class signalController{
+	controller = null;
+	constructor(){
+        this.resetController();
+    }
+	resetController(){
+		if(this.controller)
+			delete this.controller
+		console.log('signalController: reset');
+		this.controller = new AbortController();
+		signal = this.controller.signal;
+	}
+	triggerSignal(){
+		if(this.controller){
+			console.log('signalController: triggered');
+			this.controller.abort();
+			this.resetController();
+		}
+	}
+}
+var sc = new signalController();
+var signal = sc.controller.signal;
+
 app.use(express.json());
 // for parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
@@ -312,18 +349,18 @@ async function main() {
 				// await contract.submitTransaction('GenerateSymmetricKey');
 				res.json(JSON.parse('{"success":"ledger initialized"}'));
 			});
-			//Check whether a proposal is expired every 1 min
-			let NewLobeOwner = setInterval(async function(str1, str2) {
-				let newLobeOwner = await contract.submitTransaction('CheckNewLobeOwner');
-				console.log("********" + newLobeOwner);
-			}, 60000000);
-			//Check whether a proposal is expired every 10 min
-			let interval = setInterval(async function(str1, str2) {
-				await network.connectNetwork();
-				let contract = await network.getContract();
-				let time = await contract.submitTransaction('CheckTime');
-				console.log("*****Here" + time);
-			}, 60000000);
+			// //Check whether a proposal is expired every 1 min
+			// let NewLobeOwner = setInterval(async function(str1, str2) {
+			// 	let newLobeOwner = await contract.submitTransaction('CheckNewLobeOwner');
+			// 	console.log("********" + newLobeOwner);
+			// }, 60000000);
+			// //Check whether a proposal is expired every 10 min
+			// let interval = setInterval(async function(str1, str2) {
+			// 	await network.connectNetwork();
+			// 	let contract = await network.getContract();
+			// 	let time = await contract.submitTransaction('CheckTime');
+			// 	console.log("*****Here" + time);
+			// }, 60000000);
 			app.get("/allData", async (req,res) => {
 				//To get all the data , this will be sent to just one peer and the results will be shown
 				let result = await contract.evaluateTransaction('GetAllData');
@@ -452,6 +489,7 @@ async function main() {
 				}
 				else{
 					NewBlockLock = !NewBlockLock;
+					console.log('\n--> Submit Transaction: generateBlock');
 					let result;
 					for(let i=0;i<1;i++){
 						try {
@@ -531,6 +569,42 @@ async function main() {
 							if (message != '') res += message + '\n';
 							console.log(`SUCCESS app createProposal: ${res}`);
 							result = {"success":res.toString()};
+							let s = res.toString();
+							var proposalID = s.substring(s.indexOf('ProposalID:')+'ProposalID:'.length);
+							// start timer
+							setTimeoutPromise(MIN, null, { signal })
+							.then(()=>{
+								console.log(`INFO app createdProposal: no lobe owner voting in 1 min, expert voting available within 1 min`);
+								// chaincode checks the time interval
+								// start expert voting timer: 48 h
+								setTimeoutPromise(MIN, null, {signal})
+								.then(()=>{
+									// time out: proposal closed
+									console.log(`INFO app createdProposal: expert voting expired, get proposal:${proposalID}`);
+									return contract.submitTransaction('ProposalVoteResult', proposalID, 'true');
+								})
+								.then((res)=>{
+									console.log(`INFO app createdProposal: end proposal, ${res}`)
+									res = JSON.parse(res);
+									return contract.submitTransaction('EndProposal', res.ProposalID, res.Result);
+								})
+								.then((res)=>{
+									console.log(res.toString())
+									contract.submitTransaction('CheckNewLobOwner');
+								})
+								.catch((err)=>{
+									if (err.name === 'AbortError')
+										console.log(`INFO app createdProposal: proposal finished before time up`);
+									else
+										console.log(`ERROR unexpected error: ${err}`);
+								});
+							})	
+							.catch((err)=>{
+								if (err.name === 'AbortError')
+									console.log(`INFO app createdProposal: proposal finished before time up`);
+								else
+									console.log(`ERROR unexpected error: ${err}`);
+							});
 							break;
 						} catch (error) {
 							console.log(`FAILED ${i} app createProposal: ${error}`);
@@ -547,6 +621,7 @@ async function main() {
 				}
 				else{
 					VaidateProposalLock = !VaidateProposalLock;
+					console.log('\n--> Submit Transaction: ValidateProposal');
 					let result;
 					let message = '';
 					for(let i=0;i<retry_cnt;i++){
@@ -567,6 +642,10 @@ async function main() {
 
 								let checkLobeOwnerResult = await contract.submitTransaction('CheckNewLobOwner');
 								console.log(checkLobeOwnerResult.toString());
+								// lobeOwnerResult = res.Result;
+								// AC_Finish.abort();
+								sc.triggerSignal();
+								console.log(`app validateProposal: finish signal triggered`);
 							}
 
 							res.Message = message + res.Message;
