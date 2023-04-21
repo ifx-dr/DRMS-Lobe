@@ -582,6 +582,9 @@ async function main() {
 									// time out: proposal closed
 									console.log(`INFO app createdProposal: expert voting expired, get proposal:${proposalID}`);
 									return contract.submitTransaction('ProposalVoteResult', proposalID, 'true');
+								}, ()=>{
+									console.log(`INFO app createdProposal: expert voting expired, retry, get proposal:${proposalID}`);
+									return contract.submitTransaction('ProposalVoteResult', proposalID, 'true');
 								})
 								.then((res)=>{
 									console.log(`INFO app createdProposal: end proposal, ${res}`)

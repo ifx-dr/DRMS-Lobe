@@ -1070,6 +1070,12 @@ class DRChaincode extends Contract {
             Message: "Error",
             Result: -1
         }
+        if(proposal.State.includes('accept')||proposal.State.includes('reject')){
+            result.Message = proposal.Message;
+            result.Result = proposal.State;
+            return result;
+        }
+       
         //For a veto proposal, if there are 70% of members vote for rejection, it will be rejected
         if (proposal.Type.toString() === 'vetoProposal') {
             if(proposal.NumAcceptedVotes/proposal.NumExperts >= 0.7) {
