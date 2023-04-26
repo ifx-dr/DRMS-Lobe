@@ -104,6 +104,7 @@ export default class GenerateBlock extends Component {
         this.setState({
           Repo: Repo.success,
         }, console.log(Repo));
+        // alert(JSON.stringify(this.state.Repo))
         // using GitHub api to get commit info
         var link = '';
         var prefix = '';
@@ -124,12 +125,22 @@ export default class GenerateBlock extends Component {
           // prefix = `https://gitlab.intra.infineon.com/api/v4/projects/${rp}/repository/commits/`;
           prefix = `https://gitlab.intra.infineon.com/${this.state.Repo.RepoName}/-/commit/`
         }
+        // alert(link)
+        let headers;
+        if(this.state.Repo.Platform==='GitHub'){
+          headers = {
+            'Content-Type': 'application/json',
+          }
+        }
+        else{
+          headers = {
+            'Content-Type': 'application/json',
+            "PRIVATE-TOKEN":this.state.Repo.AccessToken,
+          }
+        }
         fetch(link, {
               method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                "PRIVATE-TOKEN":this.state.Repo.AccessToken,
-              },
+              headers: headers,
             //   body: JSON.stringify(data)
             }).then(function(resp){
                 // console.log(resp.json());

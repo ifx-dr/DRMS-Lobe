@@ -73,7 +73,8 @@ var NewBlockLock = true;
 // var outFileName = '';
 // specify the config file to change project
 // var ledgerFile = 'ledger_sub_OrderManagement.yaml';
-var ledgerFile = 'ledger_sub_PMV.yaml';
+// var ledgerFile = 'ledger_sub_PMV.yaml';
+var ledgerFile = 'ledger_DR.yaml';
 // var platform = '';
 var ontologyInfo = null;
 var blockchainInfo = null;

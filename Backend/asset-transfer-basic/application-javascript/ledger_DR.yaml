@@ -17,6 +17,8 @@ OntologyInfo:
     - Battery Management System
   Repo: tibonto/dr
   Default: master
+  Platform: GitHub
+  AccessToken: n/a
 BlockchainInfo:
   FileName: ./blockchain/blockchain_hist_DR.xlsx
   OutFileName: ./blockchain/blockchain_hist_DR.xlsx
@@ -28,7 +30,8 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 24.2.2023, 16:05:22 (CET)
+    LastParticipation_Internal: Fri Feb 24 2023 15:05:22 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Planning
       - Time
@@ -43,7 +46,8 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 23.1.2023, 01:00:00 (CET)
+    LastParticipation_Internal: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - Product
       - Power
@@ -57,7 +61,8 @@ UserInfo:
     Tokens: 1020
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 9.3.2023, 11:02:02 (CET)
+    LastParticipation_Internal: Thu Mar 09 2023 10:02:02 GMT+0000 (Coordinated Universal Time)
     LobeOwner:
       - System
       - Process
@@ -72,7 +77,8 @@ UserInfo:
     Tokens: 1000
     Total_Proposal: 0
     Total_Accepted_Proposal: 0
-    LastParticipation: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
+    LastParticipation: 23.1.2023, 01:00:00 (CET)
+    LastParticipation_Internal: Mon Jan 23 2023 00:00:00 GMT+0000 (Coordinated Universal Time)
     LobeOwner: []
     Expert: []
 OngoingProposalInfo: []
@@ -82,12 +88,37 @@ ClosedProposalInfo:
     EndDate: Fri Feb 24 2023 15:05:24 GMT+0000 (Coordinated Universal Time)
     Veto: false
   - ID: proposal1
-    State: accept
-    EndDate: Thu Mar 09 2023 10:02:04 GMT+0000 (Coordinated Universal Time)
+    State: accept by lobe owner
+    StartDate: 7.3.2023, 11:02:04 (CET)
+    StartDate_Internal: Tue Mar 07 2023 10:02:04 GMT+0000 (Coordinated Universal Time)
+    EndDate: 9.3.2023, 11:02:04 (CET)
+    EndDate_Internal: Thu Mar 09 2023 10:02:04 GMT+0000 (Coordinated Universal Time)
     Veto: false
+    URI: >-
+      https://github.com/tibonto/dr/commit/427f690a506c4404aebf3dbb532def01b5d895cd
+    Message: Battery Managemnt System ontology added
+    Author: member4
+    Domain: Battery Management System
+    LobeOwner: member3
+  - ID: proposal1
+    State: accept by lobe owner
+    StartDate: 7.3.2023, 11:02:04 (CET)
+    StartDate_Internal: Tue Mar 07 2023 10:02:04 GMT+0000 (Coordinated Universal Time)
+    EndDate: 9.3.2023, 11:02:04 (CET)
+    EndDate_Internal: Thu Mar 09 2023 10:02:04 GMT+0000 (Coordinated Universal Time)
+    Veto: false
+    URI: >-
+      https://github.com/tibonto/dr/commit/427f690a506c4404aebf3dbb532def01b5d895cd
+    Message: Battery Managemnt System ontology added
+    Author: member4
+    Domain: Battery Management System
+    LobeOwner: member3
 NewBlockRequest:
   newBlockWaiting: 'false'
   proposalID: n/a
   author: n/a
   lobeOwner: n/a
   supervisor: n/a
+LatestDR: https://github.com/tibonto/dr/commit/427f690a506c4404aebf3dbb532def01b5d895cd
+FileHash: >-
+  https://github.com/tibonto/dr/archive/427f690a506c4404aebf3dbb532def01b5d895cd.zip
