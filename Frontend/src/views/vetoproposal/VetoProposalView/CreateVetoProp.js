@@ -10,7 +10,6 @@ import {
   Input,
   Button
 } from '@material-ui/core';
-import useToken from 'src/useToken';
 import { Navigate } from 'react-router';
 
 export default class CreateVetoProp extends Component {
@@ -27,10 +26,73 @@ export default class CreateVetoProp extends Component {
       Creation_Date: '',
       Messages: '',
       Download:'',
-      Redirect: ''
+      Redirect: '',
+      newBlockReq:'',
+      allDomains: [],
     }
   }
-
+  componentDidMount(){
+    this.getNewBlockRequest();
+    this.loadDomains();
+  }
+  getNewBlockRequest = async () => {
+    try{
+      let token = sessionStorage.getItem('token');
+      if(token==null){
+        this.setState({
+          Redirect:'Login'
+        })
+        alert('Please login in!');
+        return;
+      }
+      token = JSON.parse(token);
+      let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
+      // newBlockReq = JSON.parse(newBlockReq);
+      if(newBlockReq.error){
+        alert(newBlockReq.error);
+        this.setState({
+          Redirect:'Dashboard'
+        })
+        return;
+      }
+      newBlockReq = newBlockReq.success;
+      if(newBlockReq.newBlockWaiting==='true'){
+        if(newBlockReq.author===token.ID||newBlockReq.lobeOwner===token.ID){
+          alert('A new block is to be generated before a new proposal!');
+          this.setState({
+            Redirect:'GenerateBlock'
+          })
+        }
+        else{
+          alert('A new block is to be generated: waiting for lobe owner operation');
+          this.setState({
+            Redirect:'Dashboard'
+          })
+        }
+        return;
+      }
+    }
+    catch{}
+  };
+  loadDomains = async () => {
+    try{
+      await fetch('http://localhost:3001/loadDomainsInFrontend', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }).then(function(response){
+        return response.json()
+      }).then((body)=>{
+        // alert(body);
+        console.log(body);
+        this.setState({
+          allDomains: JSON.parse(body)
+        })
+      });
+    }
+    catch{}
+  };
   handleChangeD = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
     this.setState({
@@ -103,7 +165,8 @@ export default class CreateVetoProp extends Component {
     }
     // console.log('veto: '+token);
       console.log('****New Proposal invokes createProposal api*********');
-    await fetch('http://localhost:3001/createProposal', {
+    try{
+      await fetch('http://localhost:3001/createProposal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -122,15 +185,19 @@ export default class CreateVetoProp extends Component {
           Redirect:'Dashboard'
         });
       });
-
+    }
+    catch(error){alert(error)}
   }
   render()
     {
-      if(this.state.Redirect=='Login'){
+      if(this.state.Redirect==='Login'){
         return <Navigate to='/app/login' state={this.state}></Navigate>
       }
-      else if(this.state.Redirect=='Dashboard'){
+      else if(this.state.Redirect==='Dashboard'){
         return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+      }
+      else if(this.state.Redirect==='GenerateBlock'){
+        return <Navigate to='/app/generateBlock' state={this.state}></Navigate>
       }
       return (
         <form onSubmit={this.handleSubmit} >
@@ -161,19 +228,11 @@ export default class CreateVetoProp extends Component {
                   </Typography>
                   <select value={this.state.Domain} onChange={this.handleChangeD}>
                     <option></option>
-                    <option value='Planning'>Planning</option>
-                    <option value='Time'>Time</option>
-                    <option value='Supply Chain'>Supply Chain</option>
-                    <option value='Organisation'>Organisation</option>
-                    <option value='Semiconductor Production'>Semiconductor Production</option>
-                    <option value='Product'>Product</option>
-                    <option value='Power'>Power</option>
-                    <option value='Sensor'>Sensor</option>
-                    <option value='Semi-conductor Development'>Semi-conductor Development</option>
-                    <option value='System'>System</option>
-                    <option value='Process'>Process</option>
-                    <option value='Wired Communication'>Wired Communication</option>
-                    <option value='Cloud'>Cloud</option>
+                    {
+                      this.state.allDomains.map((value, index) => {
+                          return <option key={index} value={value}>{value}</option>
+                      })
+                    }
                   </select>
                 </Grid>
               </Grid>

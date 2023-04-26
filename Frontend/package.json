@@ -5,8 +5,8 @@
   "version": "1.0.0",
   "private": false,
   "scripts": {
-    "start": "export PORT=3006 && react-scripts start",
-    "startW": "set PORT=3006 && react-scripts start",
+    "start": "export HTTPS=true && export PORT=3006 && react-scripts start",
+    "startW": "set HTTPS=true && set PORT=3006 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -38,7 +38,9 @@
     "clsx": "^1.1.1",
     "formik": "^2.1.5",
     "history": "^5.0.0",
+    "iojson": "^1.0.4",
     "jquery": "^3.5.1",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.19",
     "material-ui-dropzone": "^3.5.0",
     "moment": "^2.27.0",

@@ -10,7 +10,6 @@ import {
   Input,
   Button
 } from '@material-ui/core';
-import useToken from 'src/useToken';
 import { Navigate } from 'react-router';
 
 export default class CreateNewProp extends Component {
@@ -19,6 +18,7 @@ export default class CreateNewProp extends Component {
     this.state = {
       Type: 'newProposal',
       Domain: '',
+      NewDomain: '',
       URI: '',
       Valid: '',
       // Author: window.userID,
@@ -26,9 +26,83 @@ export default class CreateNewProp extends Component {
       Creation_Date: '',
       Messages: '',
       Download: '',
-      Redirect:''
+      Redirect:'',
+      allDomains: [],
+      newBlockReq:''
     }
   }
+  componentDidMount(){
+    this.getNewBlockRequest();
+    this.loadDomains();
+  }
+  loadDomains = async () => {
+    try{
+      await fetch('http://localhost:3001/loadDomainsInFrontend', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }).then(function(response){
+        return response.json()
+      }).then((body)=>{
+        // alert(body);
+        console.log(body);
+        this.setState({
+          allDomains: JSON.parse(body)
+        })
+      });
+    }
+    catch{}
+  };
+  saveDomains = async (newConfig) => {
+    await fetch('http://localhost:3001/saveDomainsInFrontend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newConfig)
+    })
+  }
+  getNewBlockRequest = async () => {
+    try{
+      let token = sessionStorage.getItem('token');
+      if(token==null){
+        this.setState({
+          Redirect:'Login'
+        })
+        alert('Please login in!');
+        return;
+      }
+      token = JSON.parse(token);
+      let newBlockReq = await fetch('http://localhost:3001/checkNewBlockRequest').then((response) => response.json());
+      // newBlockReq = JSON.parse(newBlockReq);
+      if(newBlockReq.error){
+        alert(newBlockReq.error);
+        this.setState({
+          Redirect:'Dashboard'
+        })
+        return;
+      }
+      // alert(JSON.stringify(newBlockReq));
+      newBlockReq = newBlockReq.success;
+      if(newBlockReq.newBlockWaiting==='true'){
+        if(newBlockReq.author===token.ID||newBlockReq.lobeOwner===token.ID){
+          alert('A new block is to be generated before a new proposal!');
+          this.setState({
+            Redirect:'GenerateBlock'
+          })
+        }
+        else{
+          alert('A new block is to be generated: waiting for lobe owner operation');
+          this.setState({
+            Redirect:'Dashboard'
+          })
+        }
+        return;
+      }
+    }
+    catch{}
+  };
 
   handleChangeD = async (event) => {
     let value = Array.from(event.target.selectedOptions, option => option.value)
@@ -56,6 +130,12 @@ export default class CreateNewProp extends Component {
     });
     console.log(this.state.Author);
   }
+  handleNewDomain = async (event) => {
+    let value = event.target.value;
+    this.setState({
+      NewDomain: value
+    })
+  }
 
   async handleSubmit(event){
     // const {token, setToken} = useToken();
@@ -72,9 +152,31 @@ export default class CreateNewProp extends Component {
     // console.log(token);
     // console.log("author: "+token.ID);
     event.preventDefault();
+
+    let domain;
+    if(this.state.NewDomain!==''){
+      // this.setState({
+      //   Domain: this.state.NewDomain
+      // })
+      // console.log(this.state.Domain)
+      // console.log(this.state.NewDomain)
+      domain = this.state.NewDomain;
+      if(!(this.state.allDomains.find(d => d===domain))){
+        let newConfig = {
+          allDomains: this.state.allDomains
+        };
+        newConfig["allDomains"].push(domain);
+        // await this.saveDomains(newConfig);
+        await this.loadDomains();
+      }
+    }
+    else
+      domain = this.state.Domain;
+
     const data = {
       type: this.state.Type,
-      domain: this.state.Domain,
+      // domain: this.state.Domain,
+      domain:domain,
       // author: this.state.Author,
       author: token.ID,
       // author: 'member1',
@@ -96,8 +198,11 @@ export default class CreateNewProp extends Component {
       alert('Please input the download link!');
       return;
     }
+    // alert(JSON.stringify(data));
+    // return;
       // console.log("new: "+token)
-      console.log('****New Proposal invokes createProposal api*********');
+    console.log('****New Proposal invokes createProposal api*********');
+    try{
       await fetch('http://localhost:3001/createProposal', {
         method: 'POST',
         headers: {
@@ -109,21 +214,32 @@ export default class CreateNewProp extends Component {
         // alert('Your proposal is created');
         return response.json()
       }).then((body)=>{
-        alert(body);
-        console.log(body);
-        
-        this.setState({
-          Redirect:'Dashboard'
-        });
+        // alert(body);
+        if(!body.error){
+          alert(body.success)
+          console.log(body);
+          if(body.success!=='please wait')
+            this.setState({
+              Redirect:'Dashboard'
+            });
+        }
+        else{
+          alert(body.error)
+        }
       });
+    }
+    catch(error){alert(error)}
   }
   render()
     {
-      if(this.state.Redirect=='Login'){
+      if(this.state.Redirect==='Login'){
         return <Navigate to='/app/login' state={this.state}></Navigate>
       }
-      else if(this.state.Redirect=='Dashboard'){
+      else if(this.state.Redirect==='Dashboard'){
         return <Navigate to='/app/dashboard' state={this.state}></Navigate>
+      }
+      else if(this.state.Redirect==='GenerateBlock'){
+        return <Navigate to='/app/generateBlock' state={this.state}></Navigate>
       }
       return (
         <form onSubmit={this.handleSubmit.bind(this)} >
@@ -154,23 +270,24 @@ export default class CreateNewProp extends Component {
                   </Typography>
                   <select value={this.state.Domain} onChange={this.handleChangeD}>
                     <option></option>
-                    <option value='Planning'>Planning</option>
-                    <option value='Time'>Time</option>
-                    <option value='Supply Chain'>Supply Chain</option>
-                    <option value='Organisation'>Organisation</option>
-                    <option value='Semiconductor Production'>Semiconductor Production</option>
-                    <option value='Product'>Product</option>
-                    <option value='Power'>Power</option>
-                    <option value='Sensor'>Sensor</option>
-                    <option value='Semi-conductor Development'>Semi-conductor Development</option>
-                    <option value='System'>System</option>
-                    <option value='Process'>Process</option>
-                    <option value='Wired Communication'>Wired Communication</option>
-                    <option value='Cloud'>Cloud</option>
+                    {
+                      this.state.allDomains.map((value, index) => {
+                          return <option key={index} value={value}>{value}</option>
+                      })
+                    }
                   </select>
                 </Grid>
               </Grid>
-
+                {/* <TextField
+                  fullWidth
+                  onChange={this.handleNewDomain}
+                  label="New domain? Input the domain name"
+                  margin="normal"
+                  name="NewDomain"
+                  type="NewDomain"
+                  value={this.state.NewDomain}
+                  variant="outlined"
+                /> */}
                 <TextField
                   fullWidth
                   onChange={this.handleChangeU}

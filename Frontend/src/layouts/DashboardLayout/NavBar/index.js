@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {
   Avatar,
   Box,
-  Button,
+  // Button,
   Divider,
   Drawer,
   Hidden,
@@ -13,16 +13,15 @@ import {
   makeStyles
 } from '@material-ui/core';
 import {
-  AlertCircle as AlertCircleIcon,
+  // AlertCircle as AlertCircleIcon,
   BarChart as BarChartIcon,
   Lock as LockIcon,
-  UserCheck as UserCheck,
-  User as UserIcon,
-  UserPlus as UserPlusIcon,
-  Users as UsersIcon
+  UserCheck,
+  // User as UserIcon,
+  // UserPlus as UserPlusIcon,
+  // Users as UsersIcon
 } from 'react-feather';
 import NavItem from './NavItem';
-import useToken from 'src/useToken';
 
 // let user = {
 //   //avatar: '/static/images/avatars/avatar_6.png',
@@ -78,7 +77,22 @@ const items = [
     href: '/app/validateProposal',
     icon: UserCheck,
     title: 'Vote for a Proposal'
-  }
+  },
+  {
+    href: '/app/generateBlock',
+    icon: UserCheck,
+    title: 'Generate New Block'
+  },
+  {
+    href: '/app/blockchain',
+    icon: BarChartIcon,
+    title: 'View Blockchain'
+  },
+  // {
+  //   href: '/app/testPage',
+  //   icon: UserCheck,
+  //   title: 'test page'
+  // }
 ];
 
 const useStyles = makeStyles(() => ({

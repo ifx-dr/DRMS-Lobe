@@ -192,10 +192,12 @@ function resetChain(file_xlsx){
 
 module.exports = {
     Block,
+    Blockchain,
     loadChainFromExcel,
     exportChainToExcel, 
     printBlockToConsole,
     printChainToConsole,
     exportChainOnlyToExcel,
+    exportChainToWord,
     resetChain,
 }

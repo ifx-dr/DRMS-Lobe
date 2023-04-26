@@ -1,7 +1,8 @@
 import React from 'react';
-import { Container, makeStyles } from '@material-ui/core';
+import { Container, makeStyles} from '@material-ui/core';
 import Page from 'src/components/Page';
-import ValidateProposal from './Vote'
+import Blockchain from './BlockchainView';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: theme.palette.background.dark,
@@ -11,18 +12,18 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const ValidateProposalView = () => {
+const BlockchainView = () => {
   const classes = useStyles();
   return (
     <Page
       className={classes.root}
-      title="Validate the ongoing Proposal"
+      title="View Blockchain"
     >
       <Container maxWidth="lg">
-        <ValidateProposal />
+        <Blockchain />
       </Container>
     </Page>
   );
 };
 
-export default ValidateProposalView;
+export default BlockchainView;

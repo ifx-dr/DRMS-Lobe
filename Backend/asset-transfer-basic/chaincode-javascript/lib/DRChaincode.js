@@ -63,42 +63,49 @@ class DRChaincode extends Contract {
         let ongoingProposals = ledgerTXT['OngoingProposalInfo'];
         console.log(ongoingProposals)
         let closedProposals = ledgerTXT['ClosedProposalInfo'];
+        let domains = ledgerTXT['OntologyInfo']['Domains'];
 
-        let membersInDomain = {
-            "Planning": [],
-            "Time":[],
-            "Supply Chain":[],
-            "Organisation":[],
-            "Semiconductor Production":[],
-            "Product":[],
-            "Power":[],
-            "Sensor":[],
-            "Semi-conductor Development":[],
-            "System":[],
-            "Process":[],
-            "Wired Communication":[],
-            "Cloud":[],
+        let membersInDomain = {};
+        let allLobeOwners = {};
+        for(let domain of domains){
+            membersInDomain[domain] = [];
+            allLobeOwners[domain] = null;
         }
-        let allLobeOwners = {
-            "Planning": null,
-            "Time":null,
-            "Supply Chain":null,
-            "Organisation":null,
-            "Semiconductor Production":null,
-            "Product":null,
-            "Power":null,
-            "Sensor":null,
-            "Semi-conductor Development":null,
-            "System":null,
-            "Process":null,
-            "Wired Communication":null,
-            "Cloud":null,
-        }
+        // membersInDomain = {
+        //     "Planning": [],
+        //     "Time":[],
+        //     "Supply Chain":[],
+        //     "Organisation":[],
+        //     "Semiconductor Production":[],
+        //     "Product":[],
+        //     "Power":[],
+        //     "Sensor":[],
+        //     "Semi-conductor Development":[],
+        //     "System":[],
+        //     "Process":[],
+        //     "Wired Communication":[],
+        //     "Cloud":[],
+        // }
+        // allLobeOwners = {
+        //     "Planning": null,
+        //     "Time":null,
+        //     "Supply Chain":null,
+        //     "Organisation":null,
+        //     "Semiconductor Production":null,
+        //     "Product":null,
+        //     "Power":null,
+        //     "Sensor":null,
+        //     "Semi-conductor Development":null,
+        //     "System":null,
+        //     "Process":null,
+        //     "Wired Communication":null,
+        //     "Cloud":null,
+        // }
         
         for(let member of members){
-            let date_part = member.LastParticipation.split('.');
+            let date_part = member.LastParticipation_Internal.split('.');
             if(date_part.length==3){
-                member.LastParticipation = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString();
+                member.LastParticipation_Internal = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
             }
             for(let domain of member["LobeOwner"]){
                 console.log("Finding lobe owner: "+domain)
@@ -127,9 +134,9 @@ class DRChaincode extends Contract {
         let closedProposalQueue = [];
         if(ongoingProposals!=null){
             for(let ongoingProposal of ongoingProposals){
-                let date_part = ongoingProposal.Creation_Date.split('.');
+                let date_part = ongoingProposal.Creation_Date_Internal.split('.');
                 if(date_part.length==3){
-                    ongoingProposal.Creation_Date = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString();
+                    ongoingProposal.Creation_Date_Internal = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
                 }
                 // ongoingProposal.docType = 'proposal';
                 ongoingProposalQueue.push(ongoingProposal.ID);
@@ -146,14 +153,14 @@ class DRChaincode extends Contract {
 
         if(closedProposals!=null){
             for(let closedProposal of closedProposals){
-                let date_part = closedProposal.EndDate.split('.');
-                if(date_part.length==3){
-                    closedProposal.EndDate = (new Date(date_part[2], date_part[1]-1, date_part[0])).toString();
-                }
+                // let date_part = closedProposal.EndDate.split('.');
+                // if(date_part.length==3){
+                //     closedProposal.EndDate = (new Date(date_part[2], date_part[1]-1, date_part[0])).toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+                // }
                 // closedProposal.docType = 'closedProposal';
                 await ctx.stub.putState(closedProposal.ID, Buffer.from(JSON.stringify(closedProposal)));
                 console.info(`ClosedProposal ${closedProposal.ID} initialized`);
-                closedProposalQueue.push(closedProposal);
+                closedProposalQueue.push(closedProposal.ID);
             }
         }
         await ctx.stub.putState("closedProposalQueue", Buffer.from(JSON.stringify(closedProposalQueue)));
@@ -174,32 +181,85 @@ class DRChaincode extends Contract {
             await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify('none')));
         
 
-        // const latestDR = 'http://localhost:3006/v0';
-        const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
+        const latestDR = ledgerTXT['LatestDR'];
+        console.log(`cc latestDR: ${latestDR}`);
+        // const latestDR = 'https://github.com/tibonto/dr/commit/50d0834deba2ce791772be7932055cf1a7bb9545'
         await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
         // download link of the ongoing proposal
         // const fileHash = 'https://ipfs.io/ipfs/QmSWDa85q8FQzB8qAnuoxZ4LDoXoWKmD6t4sPszdq5FiW2?filename=test.owl';
-        const fileHash = 'https://github.com/tibonto/dr/archive/50d0834deba2ce791772be7932055cf1a7bb9545.zip'
+        // const fileHash = 'https://github.com/tibonto/dr/archive/50d0834deba2ce791772be7932055cf1a7bb9545.zip'
+        const fileHash = ledgerTXT['FileHash'];
         await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
 
         ////////////////////
         // voted voters
         var voted = [];
         await ctx.stub.putState('voted', Buffer.from(JSON.stringify(voted)));
-        
+
+        // const finishedMerge = [];
+        // await ctx.stub.putState('finishedMerge', Buffer.from(JSON.stringify(finishedMerge)));
+        let newBlockRequest = {
+            newBlockWaiting: 'false',
+            proposalID: 'n/a',
+            author: 'n/a',
+            lobeOwner: 'n/a',
+            supervisor: 'n/a'
+        }
+        if(ledgerTXT['NewBlockRequest']!==null){
+            newBlockRequest = ledgerTXT['NewBlockRequest'];
+        }
+        await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
+
         console.log('*******************DRChaincode: File recovered*******************');
     }
-    async InitBlockchainFromFile(ctx, blockchain){
-        console.log('cc: retrieve blockchain from file');
+    async WriteBlockchain(ctx, blockchain){
+        console.log('cc: write blockchain');
         blockchain = JSON.parse(blockchain);
         await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain.chain)));
     }
-    async InitLatestBlock(ctx, latestBlock){
-        console.log('cc: latest block')
+    async WriteLatestBlock(ctx, latestBlock, platform, ontologyName, flag){
+        console.log(`cc flag: ${flag}, type: ${typeof flag}`)
+        console.log('cc: write latest block')
         console.log(latestBlock);
+        
         // latestBlock = JSON.parse(latestBlock);
         // ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
-        ctx.stub.putState('latestBlock', Buffer.from(latestBlock));
+        await ctx.stub.putState('latestBlock', Buffer.from(latestBlock));
+        if(flag==='true'){
+            // when flag is true, update latestDR and fileHash with latestBlock
+            latestBlock = JSON.parse(latestBlock);
+            let latestDR = 'New project: please upload ontology file';
+            let fileHash = 'New project: please upload ontology file';
+            if(latestBlock.data!=='Genesis Block'){
+                // latestDR = latestBlock.data;
+                if(latestBlock.data.includes('UpdatedVersion')){
+                    console.log(`cc improved`)
+                    let data = JSON.parse(latestBlock.data)
+                    latestDR = data.UpdatedVersion;
+                }    
+                else{
+                    console.log(`cc origin`)
+                    latestDR = latestBlock.data;
+                }
+                if(platform==='GitHub'){
+                    // https://github.com/ifx-dr/Update-Test-DR-Sub-Onto/commit/ac9aef219f062221dc147d65b4fdfc5e5930804d
+                    let latestDRSplit = latestDR.split('/');
+                    let hash = latestDRSplit.pop();
+                    latestDRSplit.pop();
+                    let repoName = latestDRSplit.pop();
+                    let repoAuthor = latestDRSplit.pop();
+                    let repo = repoAuthor + '/' + repoName;
+                    fileHash = `https://github.com/${repo}/archive/${hash}.zip`;
+                }
+                else{
+                    // https://gitlab.intra.infineon.com/digital-reference/order_management/-/commit/802222735fe9a7fa2b0feb3ad198dbbb30342ac9
+                    // https://gitlab.intra.infineon.com/digital-reference/Order_Management/-/raw/802222735fe9a7fa2b0feb3ad198dbbb30342ac9/OrderManagement.owl?inline=false
+                    fileHash = `${latestDR.split('/commit/')[0]}/raw/${latestDR.split('/commit/')[1]}/${ontologyName}?inline=false`;
+                }
+            }
+            await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(latestDR)));
+            await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(fileHash)));
+        }
     }
 
     // async Init_Ledger(ctx) {
@@ -454,7 +514,21 @@ class DRChaincode extends Contract {
         }
         return JSON.stringify(allResults);
     }
-
+    async GetNewBlockRequest(ctx){
+        const result = await ctx.stub.getState('newBlockRequest');
+        console.log('cc newBlockRequest: '+result);
+        return JSON.parse(result.toString());
+    }
+    async CloseNewBlockRequest(ctx){
+        let newBlockRequest = {
+            newBlockWaiting: 'false',
+            proposalID: 'n/a',
+            author: 'n/a',
+            lobeOwner: 'n/a',
+            supervisor: 'n/a'
+        }
+        await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
+    }
     // async CheckTotalProposals(ctx){
     //     const total_roposal = await ctx.stub.getState('total_proposals');
     //     console.log(total_roposal + 'is read');
@@ -475,9 +549,16 @@ class DRChaincode extends Contract {
     async CheckTotalMembers(ctx){
         //Get the amount of all members. It is shown on dashboard.
         const totalMembers = await ctx.stub.getState('total_members');
-        return totalMembers.toString();
+        return JSON.parse(totalMembers.toString());
     }
 
+    async UpdateDRfromGithub(ctx, newDR, newHash){
+        console.log(`cc UpdateDRfromGithub: ${newDR}`);
+        console.log(`cc UpdateDRfromGithub: ${newHash}`);
+        await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(newDR)));
+        await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(newHash)));
+        // return JSON.parse(result.toString());
+    }
     //return the latest DR
     async CheckLatestDR(ctx) {
         const result = await ctx.stub.getState('latestDR');
@@ -611,7 +692,7 @@ class DRChaincode extends Contract {
             proposal.RejectedVotes.push(vote);
             proposal.NumRejectedVotes = proposal.RejectedVotes.length;
         }
-
+        console.log(`cc AddVoter updated proposal: ${JSON.stringify(proposal)}`)
         return proposal;
     }
 
@@ -622,16 +703,24 @@ class DRChaincode extends Contract {
         let members = await this.GetMembers(ctx);
 
         let member = members.find(member => member.ID == member_id);
-        console.log('member is: '+member);
-        if (member != undefined){
-            let pos = members.indexOf(member);
-            member.Tokens -= numTokens;
-            if (member.Tokens < voteDeposit) member.Tokens = voteDeposit;
-            member.LastParticipation = Date();
-            members[pos] = member;
-            await this.UpdateMembers(ctx, members);
-            result = 1;
-        }
+        console.log('member is: '+JSON.stringify(member));
+        let pos = members.indexOf(member);
+        
+        member.Tokens = parseInt(member.Tokens) - numTokens;
+
+        if (member.Tokens < voteDeposit) 
+            member.Tokens = voteDeposit;
+        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+        member.LastParticipation_Internal = Date();
+        console.log(`member info to update: ${JSON.stringify(member)}`)
+        members[pos] = member;
+
+        console.log(`pos: ${pos}`)
+        console.log(`members: ${JSON.stringify(members)}`)
+
+        this.UpdateMembers(ctx, members);
+
+        result = 1;
 
         return result;
     }
@@ -667,6 +756,17 @@ class DRChaincode extends Contract {
         return ('LO');
     }
 
+    async CheckTimeOut(ctx, startTimeString, maxHours){
+        let endTime = new Date();
+        let startTime = new Date(startTimeString);
+        let diff = (endTime.getTime() - startTime.getTime())/(1000*60);
+        console.log(`cc CheckTimeOut diff=${diff}`)
+        if(diff > maxHours)
+            return true;
+        else
+            return false;
+    }
+
     async CheckVetoProposal(ctx, domain, author_id, originalID){
         // To create a veto proposal, the author should be a lobe owner
         // and the original proposal has been accepted within 30 days
@@ -687,7 +787,7 @@ class DRChaincode extends Contract {
             const proposalID = 'closedproposal' + originalID.substring(8);
             let proposal = await ctx.stub.getState(proposalID);
             proposal = JSON.parse(proposal);
-            let EndDate = proposal.EndDate;
+            let EndDate = proposal.EndDate_Internal;
             EndDate = new Date(EndDate);
             const currentT = new Date().getTime();
             return (currentT - EndDate.getTime()) >= 2592000000;
@@ -700,20 +800,24 @@ class DRChaincode extends Contract {
     async CreateProposal(ctx, domain, uri, author_id, message, type, originalID, download){
         //get amount of total proposals, for later update
         let total_proposals = await ctx.stub.getState('total_proposals');
-        let valid = parseInt(total_proposals) + 1;
+        // let valid = parseInt(total_proposals) + 1;
+        let valid = parseInt(total_proposals);
         //generate a new id
         let id = 'proposal'+ valid;
         //get the author
         let members = await this.GetMembers(ctx);
+        let numMembers = members.length;
+        console.log(`cc CreateProposal numMembers: ${numMembers}`);
         let member = members.find(member => member.ID == author_id);
         //get the amount of tokens this author, and charge 20 tokens as deposit of the proposal
-        let tokens = member.Tokens;
-        tokens = parseInt(tokens) -20;
-        if (tokens < 0) {
+        if (member.Tokens < 20) {
             return ('Sorry you do not have enough tokens!');
-        } else {
-            await this.RemoveTokens(ctx, author_id, 20);
-        }
+        } 
+        const CreateProposalDeposit = 20;
+        // console.log(`cc RemoveTokens: ${res}`);
+
+        // let members2 = await this.GetMembers(ctx);
+        // console.log(`cc members after removetokens: ${JSON.stringify(members2)}`)
         //Check whether this proposal is a veto proposal
         if(type !== 'newProposal'){
             //Check whether the author is able to create a veto proposal
@@ -723,6 +827,31 @@ class DRChaincode extends Contract {
                 return ('Sorry You are not able to create this veto proposal');
             }
         }
+        // check if the domain is new
+        // if so, the author will be assigned to be the lobe owner
+        let allLobeOwners = await this.GetAllLobeOwners(ctx);
+        if(!(domain in allLobeOwners)){
+            console.log('cc createProposal: new domain '+domain);
+            allLobeOwners[domain] = author_id;
+            let membersInDomain = await this.GetMembersInDomain(ctx);
+            membersInDomain[domain] = [author_id];
+            members = await this.GetMembers(ctx);
+            for(let i=0;i<members.length;i++){
+                if(members[i].ID===author_id){
+                    members[i].LobeOwner.push(domain);
+                    break;
+                }
+            }
+            await this.UpdateMembers(ctx, members);
+            await this.UpdateInfo(ctx, 'membersInDomain', membersInDomain);
+            await this.UpdateAllLobeOwners(ctx, allLobeOwners);
+        }
+        let lobeOwner = allLobeOwners[domain];
+        // lobe owner does not count as expert, and the proposer cannot vote
+        let numExperts = numMembers - 2;
+        // but if the lobe owner is the proposer
+        if(author_id===lobeOwner)
+            numExperts += 1;
         let proposal = {
             ID: id,
             URI: uri,
@@ -730,19 +859,28 @@ class DRChaincode extends Contract {
             Valid: valid.toString(),
             AuthorID: author_id,
             Proposal_Message: message,
-            Creation_Date: Date(),
+            Creation_Date: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+            Creation_Date_Internal: Date(),
             State: 'ongoing',
             Type: type,
             OriginalID: originalID,
             NumAcceptedVotes: 0,
             NumRejectedVotes: 0,
+            NumExperts: numExperts,
             AcceptedVotes: [],
             RejectedVotes: [],
             Hash:download,
+            LobeOwner: lobeOwner,
         };
         await ctx.stub.putState('total_proposals', Buffer.from(JSON.stringify(parseInt(total_proposals) + 1)));
         //the author's total proposals should increase by 1
+        members = await this.GetMembers(ctx);
+        member = members.find(member => member.ID == author_id);
         member.Total_Proposal = parseInt(member.Total_Proposal)+1;
+        member.Tokens = member.Tokens - CreateProposalDeposit;
+        member.LastParticipation = new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)';
+        member.LastParticipation_Internal = Date();
+        await this.UpdateMembers(ctx, members);
         //add new proposal to the world state
 
         let ongoingProposalQueue = JSON.parse(await ctx.stub.getState('ongoingProposalQueue'));
@@ -753,7 +891,7 @@ class DRChaincode extends Contract {
         await ctx.stub.putState("ongoingProposalQueue", Buffer.from(JSON.stringify(ongoingProposalQueue)));
         console.log(JSON.stringify(proposal));
         await ctx.stub.putState(id, Buffer.from(JSON.stringify(proposal)));
-        return ('You successfully create a proposal!');
+        return (`You successfully create a proposal! ProposalID:${proposal.ID}`);
     }
     async AddHash(ctx, hash) {
         // let ongoingprop = await ctx.stub.getState('ongoingProposal');
@@ -792,12 +930,13 @@ class DRChaincode extends Contract {
         ////////////////////
         // check if the voter is in the same domain as the proposal
         // const ownProposal = await this.CheckOwnProposal(ctx, proposal.AuthorID, voter_id);
-        let membersInDomain = JSON.parse(await ctx.stub.getState('membersInDomain'));
-        let rightToVote = membersInDomain[proposal.Domain].includes(voter_id);
-        if(rightToVote !== true) {
-            result.Message = 'Sorry you can not vote for a proposal in another domain!';
-            return JSON.stringify(result);
-        }
+
+        // let membersInDomain = JSON.parse(await ctx.stub.getState('membersInDomain'));
+        // let rightToVote = membersInDomain[proposal.Domain].includes(voter_id);
+        // if(rightToVote !== true) {
+        //     result.Message = 'Sorry you can not vote for a proposal in another domain!';
+        //     return JSON.stringify(result);
+        // }
         ////////////////////
 
         const voteTwice = await this.CheckVoteTwice(proposal, voter_id);
@@ -806,17 +945,20 @@ class DRChaincode extends Contract {
             return JSON.stringify(result);
         }
         
-        //check whether the vote comes from a lobe owner && within 24 hours since proposal has been ongoing
-        let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
-        console.log('The result*****' + lobeownerVote);
-        try {
-            if (lobeownerVote === 'TimeOut') {
+
+        // check role & time: 
+        // 1. lobe owner, time out: cannot vote any more
+        // 2. lobe owner, not time out: lobe owner permission
+        // 3. expert, time out: expert voting
+        // 4. expert, not time out: wait for lobe owner voting
+        // let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date_Internal, 24);
+        let isTimeOut = await this.CheckTimeOut(ctx, proposal.Creation_Date_Internal, 1);
+        if(voter_id===lobeOwner){
+            if(isTimeOut){
                 result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
                 return JSON.stringify(result);
             }
-            if(lobeownerVote === 'LO') {
-                // A lobe owner votes within 24 hour, so his vote decide the result of the proposal
-                // thus, EndProposal() is triggered. Remove the deposit of tokens for voting.
+            else{
                 console.log('*******' + proposal.URI);
                 let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
                 if(removeResult === -1) {
@@ -827,16 +969,55 @@ class DRChaincode extends Contract {
                 proposal = await this.AddVoter(proposal, voter_id, vote, message);
                 await this.UpdateProposal(ctx, proposal, prop_id);
                 
-                if(vote === 'accept') {
-                    await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
-                }
                 result.Message = 'Lobe Owner Successfully Vote for proposal!';
                 result.Finished = true;
+                if(vote === 'accept') {
+                    await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+                    result.Result = 'accept by lobe owner'; 
+                }
+                else{
+                    result.Result = 'reject by lobe owner';
+                }  
                 return JSON.stringify(result);
             }
-        } catch(e){
-            console.log('********Problems when checking Lobe Owners Voting power'+e);
         }
+        else{
+            if(!isTimeOut){
+                result.Message = 'Please wait: Lobe Owner has not voted yet!';
+                return JSON.stringify(result);
+            }
+        }
+        // //check whether the vote comes from a lobe owner && within 24 hours since proposal has been ongoing
+        // let lobeownerVote = await this.CheckLobeOwnerPower(ctx, proposal.Domain, voter_id);
+        // console.log('The result*****' + lobeownerVote);
+        // try {
+        //     if (lobeownerVote === 'TimeOut') {
+        //         result.Message = 'Lobe Owner cannot vote after 24 hours since the proposal is ongoing';
+        //         return JSON.stringify(result);
+        //     }
+        //     if(lobeownerVote === 'LO') {
+        //         // A lobe owner votes within 24 hour, so his vote decide the result of the proposal
+        //         // thus, EndProposal() is triggered. Remove the deposit of tokens for voting.
+        //         console.log('*******' + proposal.URI);
+        //         let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
+        //         if(removeResult === -1) {
+        //             result.Message = 'Problems removing tokens';
+        //             return JSON.stringify(result);
+        //         }
+
+        //         proposal = await this.AddVoter(proposal, voter_id, vote, message);
+        //         await this.UpdateProposal(ctx, proposal, prop_id);
+                
+        //         if(vote === 'accept') {
+        //             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
+        //         }
+        //         result.Message = 'Lobe Owner Successfully Vote for proposal!';
+        //         result.Finished = true;
+        //         return JSON.stringify(result);
+        //     }
+        // } catch(e){
+        //     console.log('********Problems when checking Lobe Owners Voting power'+e);
+        // }
 
         // Remove the deposit to the member 
         let removeResult = await this.RemoveTokens(ctx, voter_id, tokenDeposit);
@@ -845,21 +1026,38 @@ class DRChaincode extends Contract {
             return JSON.stringify(result);
         } 
 
-        let total_members = await ctx.stub.getState('total_members');
-        total_members = JSON.parse(total_members);
+        // let total_members = await ctx.stub.getState('total_members');
+        // total_members = JSON.parse(total_members) - 1;
 
         // Add the vote inside the proposal
         proposal = await this.AddVoter(proposal, voter_id, vote, message);
         await this.UpdateProposal(ctx, proposal, prop_id);
         
         const totalVotes = await this.GetTotalVotes(proposal);
+        // all experts have voted, close proposal in advance
+        console.log(`cc ValidateProposal totalVotes=${totalVotes}, numEperts=${proposal.NumExperts}`);
+        // let numExperts = proposal.NumExperts;
+        if(parseInt(proposal.NumExperts)==parseInt(totalVotes)){
+            console.log(`cc ValidateProposal: all experts voted, end proposal in advance`);
+            let finalResult = await this.ProposalVoteResult(ctx, proposal.ID, 'false');
+            return finalResult;
+        }
+
         // Check whether already majority members have voted fo the proposal
         // If yes, the will check the result of the proposal and then close it.
         // Here we take 50% as majority
-        if(totalVotes > total_members/2) {
-            let finalResult = await this.ProposalVoteResult(ctx, proposal);
-            return finalResult;
-        }
+        // base: the number of experts who can vote
+        // let base = total_members;
+        // if(lobeOwner===proposal.AuthorID)
+        //     // lobe owner don't act in the expert voting
+        //     base -= 1;
+        // else
+        //     // lobe owner and the author don't act in the expert voting
+        //     base -= 2;
+        // if(totalVotes > base/2) {
+        //     let finalResult = await this.ProposalVoteResult(ctx, proposal);
+        //     return finalResult;
+        // }
 
         result.Message = 'Successfully Vote for proposal!';
 
@@ -867,34 +1065,41 @@ class DRChaincode extends Contract {
     }
 
     //check the result of a proposal
-    async ProposalVoteResult(ctx, proposal) {
+    async ProposalVoteResult(ctx, proposalID, timeout) {
+        let proposal = await this.GetProposal(ctx, proposalID);
         let result = {
             ProposalID: proposal.ID,
             Finished: true,
             Message: "Error",
             Result: -1
         }
+        if(proposal.State.includes('accept')||proposal.State.includes('reject')){
+            result.Message = proposal.Message;
+            result.Result = proposal.State;
+            return result;
+        }
+       
         //For a veto proposal, if there are 70% of members vote for rejection, it will be rejected
         if (proposal.Type.toString() === 'vetoProposal') {
-            if(proposal.NumRejectedVotes/(proposal.NumRejectedVotes+proposal.NumAcceptedVotes) >= 0.7) {
-                result.Result = 'accept';
+            if(proposal.NumAcceptedVotes/proposal.NumExperts >= 0.7) {
+                result.Result = timeout=='true'?'accept: time up with enough approval':'accept: enough approval from all experts';
                 result.Message = "Veto proposal voting finished as " + "accepted";
                 await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             }
             else {
-                result.Result = 'reject';
+                result.Result = timeout=='true'?'reject: time up with not enough approval':'reject: not enough approval from all experts';
                 result.Message = "Veto proposal voting finished as " + "rejected";
             }
         }
         //For a new proposal, if there are 50% of members vote for acceptance, it will be accepted
         else if (proposal.Type.toString() === 'newProposal') {
-            if(proposal.NumAcceptedVotes >= proposal.NumRejectedVotes) {
-                result.Result = 'accept';
+            if(proposal.NumAcceptedVotes/proposal.NumExperts >= 0.5) {
+                result.Result = timeout=='true'?'accept: time up with enough approval':'accept: enough approval from all experts';
                 result.Message = "New proposal voting finished as " + "accepted";
                 await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             }
             else {
-                result.Result = 'reject';
+                result.Result = timeout=='true'?'reject: time up with not enough approval':'reject: not enough approval from all experts';
                 result.Message = "New proposal voting finished as " + "rejected";
             }
         }
@@ -905,6 +1110,7 @@ class DRChaincode extends Contract {
     // Reward the relative participants
     // Add the closed proposal to 'closedProposals'
     async EndProposal(ctx, proposalID, result) {
+        console.log(`cc EndProposal input: ${proposalID} ${result}`);
         let ongoingProposalQueue = JSON.parse(await ctx.stub.getState('ongoingProposalQueue'));
         ongoingProposalQueue.shift();
         if(ongoingProposalQueue.length > 0){
@@ -921,34 +1127,49 @@ class DRChaincode extends Contract {
         // await ctx.stub.putState('ongoingProposal', Buffer.from(JSON.stringify(parseInt(ongoingprop) + 1)));
 
         // Update the start time for ongoing proposal
-        await ctx.stub.putState('time', Buffer.from(Date()));
+        // await ctx.stub.putState('time', Buffer.from(Date().toString()));
 
         let proposal = await this.GetProposal(ctx, proposalID);
 
         ////////////////////
         // if approved, update the blockchain and latest block
-        if(result=='accept'){
-            let blockchain = await this.GetBlockchain(ctx);
-            // console.log(blockchain);
-            let latestBlock = await this.GetLatestBlock(ctx);
-            let index = latestBlock.index+1;
-            let timestamp = Date();
-            let data = null;
-            if(proposal.Type=='vetoProposal'){
-                data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
+        // if(result==='accept'||result==='accept by lobe owner'){
+        if(result.includes('accept')){
+            // // let blockchain = await this.GetBlockchain(ctx);
+            // // console.log(blockchain);
+            // let latestBlock = await this.GetLatestBlock(ctx);
+            // let index = latestBlock.index+1;
+            // let timestamp = Date();
+            // let data = null;
+            // if(proposal.Type==='vetoProposal'){
+            //     data = `vetoProposal.OriginalID:${proposal.OriginalID}`;
+            // }
+            // else
+            //     data = `commemt: ${proposal.Proposal_Message}, file hash: ${proposal.Hash}`; // Hash or URI? Hash is unique give a specific file
+            // // let previousHash = latestBlock.hash;
+            // // latestBlock = new BC.Block(index, timestamp, data, previousHash);
+            // // console.log(blockchain);
+            // // console.log(latestBlock);
+            // // blockchain.push(latestBlock);
+            // // await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
+            // // await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
+            let lobeOwner = await this.GetLobeOwner(ctx, proposal.Domain);
+            let newBlockRequest = {
+                newBlockWaiting: 'true',
+                proposalID: proposalID,
+                author: proposal.AuthorID,
+                lobeOwner: lobeOwner,
+                supervisor: 'n/a'
             }
-            else
-                data = `commemt: ${proposal.Proposal_Message}, file hash: ${proposal.Hash}`; // Hash or URI? Hash is unique give a specific file
-            let previousHash = latestBlock.hash;
-            latestBlock = new BC.Block(index, timestamp, data, previousHash);
-            // console.log(blockchain);
-            // console.log(latestBlock);
-            blockchain.push(latestBlock);
-            await ctx.stub.putState('blockchain', Buffer.from(JSON.stringify(blockchain)));
-            await ctx.stub.putState('latestBlock', Buffer.from(JSON.stringify(latestBlock)));
+            await ctx.stub.putState('newBlockRequest', Buffer.from(JSON.stringify(newBlockRequest)));
 
             await ctx.stub.putState('latestDR', Buffer.from(JSON.stringify(proposal.URI)));
             await ctx.stub.putState('fileHash', Buffer.from(JSON.stringify(proposal.Hash)));
+
+            // let members = await this.GetMembers(ctx);
+            // let member = members.find(member => member.ID == proposal.AuthorID);
+            // member.Total_Accepted_Proposal = parseInt(member.Total_Accepted_Proposal)+1;
+            // await this.UpdateMembers(ctx, members);
         }
         ////////////////////
         
@@ -963,8 +1184,16 @@ class DRChaincode extends Contract {
         const closedProposal = {
             ID: closedProposalID,
             State: result,
-            EndDate: Date(),
-            Veto: false
+            StartDate: proposal.Creation_Date,
+            StartDate_Internal: proposal.Creation_Date_Internal,
+            EndDate: new Date().toLocaleString('de-DE', { timeZone: 'CET' }) + ' (CET)',
+            EndDate_Internal: Date(),
+            Veto: false,
+            URI: proposal.URI,
+            Message: proposal.Proposal_Message,
+            Author: proposal.AuthorID,
+            Domain: proposal.Domain,
+            LobeOwner: proposal.LobeOwner,
         };
         // let closedProposalQueue = JSON.parse(await ctx.stub.getState("closedProposalQueue"));
         let closedProposalQueue = await ctx.stub.getState("closedProposalQueue");
@@ -992,31 +1221,38 @@ class DRChaincode extends Contract {
         let votes;
         let member;
         let pos;
-        
-        if (result === 'accept') {
+        let flag = false;
+        if (result.includes('accept')) {
             votes = proposal.AcceptedVotes;
-        } else {
+        } else if(result.includes('reject: time up')){
+            flag = true;
+            votes = proposal.AcceptedVotes.concat(proposal.RejectedVotes);
+        }
+        else{
             votes = proposal.RejectedVotes;
         }
+        console.log(`cc RewardVoters proposal: ${JSON.stringify(proposal)}`)
+        console.log(`cc RewardVoters votes: ${JSON.stringify(votes)}`)
 
         // Reward voters
         for (let vote of votes) {
             member = members.find(expert => expert.ID == vote.ID);
             if (member != undefined) {
                 pos = members.indexOf(member);
-                members[pos].Tokens += (voteDeposit + reward);
+                members[pos].Tokens += (voteDeposit + (flag?0:reward));
             }
         }
 
         // Reward proposal author
-        if (result === 'accept') {
+        if (result.includes('accept')) {
             member = members.find(expert => expert.ID == proposal.AuthorID);
             if (member != undefined) {
                 pos = members.indexOf(member);
                 members[pos].Tokens += (proposalDeposit + reward);
+                members[pos].Total_Accepted_Proposal += 1;
             }
         }
-
+        console.log(`cc RewardVoters members to update: ${JSON.stringify(members)}`)
         await this.UpdateMembers(ctx, members);
     }
 
@@ -1058,11 +1294,15 @@ class DRChaincode extends Contract {
 
     async CalculateMonthDifference (member) {
         let currentDate = new Date();
-        let lastParticipation = new Date(member.LastParticipation);
+        let lastParticipation = new Date(member.LastParticipation_Internal);
         
-        let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
-
-        return difference;
+        // let difference = currentDate.getMonth() - lastParticipation.getMonth() + 12 * (currentDate.getFullYear() - lastParticipation.getFullYear());
+        // 1 month = 4 weeks
+        let difference = (currentDate.getTime()-lastParticipation.getTime())/(1000*86400*28);
+        console.log(`currentDate: ${currentDate.toString()}`);
+        console.log(`lastParticipation: ${lastParticipation.toString()}`);
+        console.log(`difference: ${difference}`);
+        return Math.floor(difference);
     }
 
     //Check if a member who is not the lobe owner but has the highest tokens under a domain
@@ -1243,6 +1483,20 @@ class DRChaincode extends Contract {
             }
         console.log(allClosedProposal);
         return allClosedProposal;
+    }
+    async ParseTimestamp(timestamp){
+        let timestamp_split = timestamp.split(' ');
+        let year, month, date, hh, mm;
+        if(timestamp_split.length===1){
+            // dd.mm.yyyy
+        }
+        else if(timestamp_split.length===2){
+            // dd.mm.yyyy, hh:mm:ss
+        }
+        else if(timestamp_split.length===3){
+            // dd.mm.yyyy, hh:mm:ss (CET)
+        }
+        return 1;
     }
 }
 

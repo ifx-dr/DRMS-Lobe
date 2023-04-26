@@ -8,7 +8,6 @@ import {
   Typography,
   TextField, Input, Button
 } from '@material-ui/core';
-import useToken from 'src/useToken';
 import { Navigate } from 'react-router';
 
 export default class Vote extends Component {
@@ -33,21 +32,32 @@ export default class Vote extends Component {
     //alert("Every 30 seconds!");
   }
   getOnGoingProp = async () => {
-    const data = await fetch('http://localhost:3001/ongoingProp').then((response) => response.json());
-    if(!data.error){
-      this.setState({
-        prop: data,
-        prop_ID: data.ID,
-        // eslint-disable-next-line react/destructuring-assignment
-      });
-      console.log(this.state.prop + this.state.prop_ID);
+    try{
+      const data = await fetch('http://localhost:3001/ongoingProp').then((response) => response.json());
+      if(data.error){
+        alert(data.error);
+        this.setState({
+          Redirect:'Dashboard'
+        })
+      }
+      else{
+        if(!data.success.error){
+          this.setState({
+            prop: data.success,
+            prop_ID: data.success.ID,
+            // eslint-disable-next-line react/destructuring-assignment
+          });
+          console.log(this.state.prop + this.state.prop_ID);
+        }
+        else{
+          alert('No ongoing proposal now!');
+          this.setState({
+            Redirect:'Dashboard'
+          })
+        }
+      }
     }
-    else{
-      alert('No ongoing proposal now!');
-      this.setState({
-        Redirect:'Dashboard'
-      })
-    }
+    catch{}
   };
 
   handleChangeV = async (event) => {
@@ -87,28 +97,43 @@ export default class Vote extends Component {
       return;
     }
     console.log('Submit*******'+ JSON.stringify(data));
-    fetch('http://localhost:3001/validateProposal', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }).then(function(response){
-      return response.json();
-    }).then((body)=>{
-      alert(body.Message);
-      console.log(body);
-      this.setState({
-        Redirect:'Dashboard'
-      })
-    });
+    try{
+      await fetch('http://localhost:3001/validateProposal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(function(response){
+        return response.json();
+      }).then((body)=>{
+        // body = JSON.parse(body.success)
+        // alert(JSON.stringify(body));
+        if(body.error){
+          alert(body.error);
+          return;
+        }
+        else{
+          if(body.success==='please wait')
+            alert(body.success)
+          else{
+            alert(body.success.Message);
+            console.log(body);
+            this.setState({
+              Redirect:'Dashboard'
+            })
+          }
+        }
+      });
+    }
+    catch(error){alert(error)}
   }
   render()
   {
-    if(this.state.Redirect=='Login'){
+    if(this.state.Redirect==='Login'){
       return <Navigate to='/app/login' state={this.state}></Navigate>
     }
-    else if(this.state.Redirect=='Dashboard'){
+    else if(this.state.Redirect==='Dashboard'){
       return <Navigate to='/app/dashboard' state={this.state}></Navigate>
     }
     return (
@@ -126,44 +151,47 @@ export default class Vote extends Component {
             >
               <Grid
                 item
-                md={4}
-                sm={8}
+                md={9}
+                sm={9}
                 xs={12}
               >
                 <p>
-                  Domain: {this.state.prop.Domain},
+                  Domain: {this.state.prop.Domain}
                 </p>
                 <p>
-                  AuthorID: {this.state.prop.AuthorID},
+                  AuthorID: {this.state.prop.AuthorID}
                 </p>
                 <p>
-                  ProposalType: {this.state.prop.Type},
+                  ProposalType: {this.state.prop.Type}
                 </p>
                 <p>
-                  AcceptedVotes: {this.state.prop.NumAcceptedVotes},
+                  AcceptedVotes: {this.state.prop.NumAcceptedVotes}
                 </p>
                 <p>
-                  RejectedVotes: {this.state.prop.NumRejectedVotes},
+                  RejectedVotes: {this.state.prop.NumRejectedVotes}
                 </p>
-              </Grid>
+              {/* </Grid>
 
               <Grid
                 item
                 md={4}
                 sm={8}
-                xs={12}>
+                xs={12}> */}
                 <p>
                 Proposal ID: {this.state.prop.ID}
                 </p>
                 <p>
-                Proposal_Message: {this.state.prop.Proposal_Message},
+                Proposal_Message: {this.state.prop.Proposal_Message}
                 </p>
 
                 <p>
-                Creation_Date: {this.state.prop.Creation_Date},
+                Creation_Date: {this.state.prop.Creation_Date}
                 </p>
                 <p>
-                  URI: {this.state.prop.URI},
+                  URI: {this.state.prop.URI} <button><a href={this.state.prop.URI} style={{"text-decoration":"none"}} target="_blank" rel={"noopener noreferrer"}>check</a></button>
+                </p>
+                <p>
+                LobeOwner: {this.state.prop.LobeOwner}
                 </p>
               </Grid>
             </Grid>

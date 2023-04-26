@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import clsx from 'clsx';
-import { Avatar, Box, Card, CardContent, Grid, Typography } from '@material-ui/core';
+// import clsx from 'clsx';
+import { Avatar, Card, CardContent, Grid, Typography } from '@material-ui/core';
 import PeopleIcon from '@material-ui/icons/PeopleOutlined';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+// import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 
 export default class TotalMembers extends Component{
   constructor() {
@@ -13,10 +13,20 @@ export default class TotalMembers extends Component{
     this.getMembers();
   };
   getMembers = async () => {
-    const data = await fetch('http://localhost:3001/allMembers').then((response) =>response.json());
-    this.setState({
-      members: data
-    })
+    try{
+      let data = await fetch('http://localhost:3001/allMembers').then((response) =>response.json());
+      if(!data.error){
+        this.setState({
+          members: data.success
+        })
+      }
+      else{
+        alert(data.error);
+      }
+    }
+    catch (error){
+      // alert(error);
+    }
   };
   render() {
     return (
@@ -33,7 +43,7 @@ export default class TotalMembers extends Component{
                 gutterBottom
                 variant="h6"
               >
-                TOTAL Members
+                Total Members
               </Typography>
               <Typography
                 color="textPrimary"

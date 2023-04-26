@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Avatar, Box, Card, CardContent, Grid, Typography } from '@material-ui/core';
+import { Avatar, Card, CardContent, Grid, Typography } from '@material-ui/core';
 import AccountBalance from '@material-ui/icons/AccountBalance';
 
 class Tokens extends Component {
@@ -25,24 +25,34 @@ class Tokens extends Component {
     //   data.id = window.userID;
     // }
     // const data = await fetch('http://localhost:3001/tokens').then((response) => response.json());
-    let result = await fetch('http://localhost:3001/tokens', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        }).then(function(response){
-          return response.json();
-        }).then(function(body){
-          token=body;
+    try{
+      await fetch('http://localhost:3001/tokens', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(function(response){
+        return response.json();
+      }).then(function(body){
+        if(!body.error){
+          token=body.success;
           console.log(body);
-        })
-    console.log('RESULT= ' + token);
-    this.setState({
-      tokens: token
-    })
-    console.log('***********Succesfully invoke func '+this.state.tokens);
-    };
+        }
+        else{
+          alert(body.error)
+        }
+      })
+      console.log('RESULT= ' + token);
+      this.setState({
+        tokens: token
+      })
+      console.log('***********Succesfully invoke func '+this.state.tokens);
+    }
+    catch (error) {
+      alert(error);
+    }
+  };
 
   render() {
 
