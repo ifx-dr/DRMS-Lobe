@@ -759,7 +759,7 @@ class DRChaincode extends Contract {
     async CheckTimeOut(ctx, startTimeString, maxHours){
         let endTime = new Date();
         let startTime = new Date(startTimeString);
-        let diff = (endTime.getTime() - startTime.getTime())/(1000*60);
+        let diff = (endTime.getTime() - startTime.getTime())/(1000*60*60*24);
         console.log(`cc CheckTimeOut diff=${diff}`)
         if(diff > maxHours)
             return true;

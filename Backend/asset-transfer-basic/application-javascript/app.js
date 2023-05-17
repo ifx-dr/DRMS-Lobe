@@ -574,12 +574,12 @@ async function main() {
 							let s = res.toString();
 							proposalID = s.substring(s.indexOf('ProposalID:')+'ProposalID:'.length);
 							// start timer
-							setTimeoutPromise(MIN, null, { signal })
+							setTimeoutPromise(DAY, null, { signal })
 							.then(()=>{
 								console.log(`INFO app createdProposal: no lobe owner voting in 1 min, expert voting available within 1 min`);
 								// chaincode checks the time interval
 								// start expert voting timer: 48 h
-								setTimeoutPromise(MIN, null, {signal})
+								setTimeoutPromise(DAY*2, null, {signal})
 								.then(()=>{
 									// time out: proposal closed
 									console.log(`INFO app createdProposal: expert voting expired, get proposal:${proposalID}`);
