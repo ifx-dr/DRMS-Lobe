@@ -80,6 +80,8 @@ Copy the folders /bin and /config from "fabric-sample" to "DRMS-Lobe\Backend".
 - If this is the first time to deploy the system, we need to install needed packages and so on
 
 		npm install
+		cd blockchain
+		npm install
 
 - Start the API
 
@@ -87,7 +89,7 @@ Copy the folders /bin and /config from "fabric-sample" to "DRMS-Lobe\Backend".
 
 ### To start the front end
 
-- Go into the folder Front end/
+- Go into the folder Frontend/
 
 		cd DRMS-Lobe/Frontend
 
